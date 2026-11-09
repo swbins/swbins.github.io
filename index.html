@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>swbins</title>
+<meta name="description" content="개인이 만든 무료 Windows 앱 — Taskhand(업무 자동화), 둥이로그(쌍둥이 육아 기록). 내 PC 안에서만 돌고, 무료 AI 가 들어 있습니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f4efe6; --ink: #2b2723; --muted: #6d655c; --line: #d9d0c2; --accent: #9a3f1d; --card: #fbf8f2;
+  --head: "Gowun Batang", Batang, serif; --body: "Noto Sans KR", "Malgun Gothic", sans-serif; --mono: "JetBrains Mono", Consolas, monospace;
+  --gutter: clamp(16px, 5vw, 64px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #1f1c19; --ink: #ece4d6; --muted: #a59b8d; --line: #3a342e; --accent: #d7774f; --card: #262220; }
+}
+:root[data-theme="dark"] { --bg: #1f1c19; --ink: #ece4d6; --muted: #a59b8d; --line: #3a342e; --accent: #d7774f; --card: #262220; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); line-height: 1.65; min-height: 100vh; }
+a { color: inherit; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 var(--gutter); }
+header { padding: 28px 0 0; font-family: var(--head); font-weight: 700; font-size: 20px; }
+.hero { padding: clamp(40px, 8vw, 88px) 0 clamp(28px, 5vw, 48px); border-bottom: 2px solid var(--ink); }
+.kicker { font-family: var(--mono); font-size: 13px; color: var(--accent); margin-bottom: 16px; }
+h1 { font-family: var(--head); font-size: clamp(30px, 4.6vw, 52px); line-height: 1.2; letter-spacing: -0.02em; word-break: keep-all; }
+.hero p.sub { margin-top: 18px; color: var(--muted); font-size: 16.5px; max-width: 38em; word-break: keep-all; }
+.apps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 56px; margin: 0 0 56px; }
+.app { display: block; text-decoration: none; padding: 28px 0 30px; border-bottom: 1px solid var(--line); }
+.app img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: top left; border: 1px solid var(--ink); border-radius: 3px; background: var(--card); }
+.app h2 { font-family: var(--head); font-size: 26px; margin: 18px 0 4px; }
+.app .tag { font-family: var(--mono); font-size: 12.5px; color: var(--accent); }
+.app p { color: var(--muted); font-size: 15px; margin-top: 8px; word-break: keep-all; }
+.app .go { display: inline-block; margin-top: 14px; font-weight: 700; font-size: 15px; border-bottom: 2px solid var(--accent); }
+.app:hover h2 { color: var(--accent); }
+.app:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+footer { padding: 0 0 40px; font-size: 13px; color: var(--muted); word-break: keep-all; }
+@media (max-width: 760px) {
+  .apps { grid-template-columns: minmax(0, 1fr); }
+  .app { padding: 24px 0; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>swbins</header>
+  <section class="hero">
+    <p class="kicker">Windows 10/11 · 무료 · 내 PC 안에서만</p>
+    <h1>필요해서 만든 작은 앱들</h1>
+    <p class="sub">계정 가입·광고·사용 통계 없이 내 PC 안에서만 돕니다. 무료 AI 가 앱에 들어 있어 AI 요금이 없고, AI 없이도 쓸 수 있어요.</p>
+  </section>
+  <section class="apps" aria-label="앱">
+    <a class="app" href="taskhand/">
+      <img src="taskhand/assets/poster.png" alt="Taskhand 화면" loading="lazy">
+      <h2>Taskhand</h2>
+      <span class="tag">업무 자동화</span>
+      <p>반복 업무는 한 번 보여 주면 끝 — 따라 하기·예약·일 순서·사이트 감시·백업. 말로 부탁하면 무료 AI 가 자동화를 만들어요.</p>
+      <span class="go">자세히 · 받기 →</span>
+    </a>
+    <a class="app" href="dungilog/">
+      <img src="dungilog/assets/poster.png" alt="둥이로그 화면" loading="lazy">
+      <h2>둥이로그</h2>
+      <span class="tag">쌍둥이 육아 기록</span>
+      <p>사진 몇 장과 메모로 블로그·인스타 글 초안을 내 말투로. 둥이 비교 카드, 체험단·협찬 정리, 장부와 성장 기록까지.</p>
+      <span class="go">자세히 · 받기 →</span>
+    </a>
+  </section>
+  <footer>
+    문의·버그는 각 앱 저장소의 Issues 로 — <a href="https://github.com/swbins/taskhand/issues">Taskhand</a> · <a href="https://github.com/swbins/dungilog/issues">둥이로그</a>.
+    개인이 만든 독립 앱으로, 이름이 나오는 AI·플랫폼 회사들과 제휴·보증 관계가 없습니다.
+  </footer>
+</div>
+</body>
+</html>
