@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-/* 받기 주소는 아래 <script> 의 RELEASE_URL 한 곳 — 무료판 저장소를 만들면 바꾼다 */
+/* 받기 주소는 아래 <script> 의 RELEASE_URL 한 곳 */
 /* ── 종이 노트 (허브·메신저와 같은 집) ── */
 :root {
   --bg: #f4efe6; --ink: #2b2723; --muted: #6d655c; --line: #d9d0c2; --accent: #9a3f1d;
@@ -68,12 +68,6 @@ h1 .keep { white-space: nowrap; }
 .row h3 { font-family: var(--head); font-size: 19px; font-weight: 700; line-height: 1.4; word-break: keep-all; }
 .row p { font-size: 15px; color: var(--muted); max-width: 40em; word-break: keep-all; }
 .row p + p { margin-top: 10px; }
-.limits { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--line); margin-bottom: 14px; max-width: 40em; }
-.limits div { padding: 10px 12px 10px 0; }
-.limits div + div { padding-left: 12px; border-left: 1px solid var(--line); }
-.limits dt { font-size: 12.5px; color: var(--muted); word-break: keep-all; }
-.limits dd { font-family: var(--head); font-size: 26px; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; }
-.limits dd small { font-family: var(--body); font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 2px; }
 
 footer { border-top: 1px solid var(--line); padding: 22px 0 40px; font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
@@ -82,13 +76,6 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
   .hero { grid-template-columns: minmax(0, 1fr); }
   .row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
   .top nav { display: none; }
-}
-@media (max-width: 520px) {
-  .limits { grid-template-columns: minmax(0, 1fr); }
-  .limits div, .limits div + div { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-left: 0; }
-  .limits div + div { border-top: 1px solid var(--line); }
-  .limits dt { font-size: 14px; }
-  .limits dd { font-size: 20px; }
 }
 </style>
 </head>
@@ -106,7 +93,7 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
 
   <section class="hero">
     <figure class="film" id="demo">
-      <video src="assets/demo.webm" poster="assets/poster.png" controls muted playsinline preload="metadata" aria-label="Taskhand 소개 영상, 1분 11초"></video>
+      <video src="assets/demo.webm" poster="assets/poster.png" controls muted playsinline preload="metadata" aria-label="Taskhand 소개 영상, 1분 25초"></video>
       <figcaption class="cap">실제 앱 화면을 녹화한 소개 영상</figcaption>
     </figure>
 
@@ -127,17 +114,11 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
   <section class="spec" aria-labelledby="spec-h">
     <h2 id="spec-h">알아 둘 것</h2>
     <div class="row">
-      <h3>무료판에서 되는 것</h3>
+      <h3>전부 무료</h3>
       <div>
-        <dl class="limits">
-          <div><dt>내 자동화</dt><dd>5<small>개</small></dd></div>
-          <div><dt>예약</dt><dd>2<small>개</small></dd></div>
-          <div><dt>일 순서</dt><dd>2<small>개</small></dd></div>
-          <div><dt>사이트 감시</dt><dd>2<small>곳</small></dd></div>
-          <div><dt>키 만료 예고</dt><dd>2<small>곳</small></dd></div>
-        </dl>
-        <p>폴더 정리·백업·디스크 감시, 아침 브리핑·주간 보고, 화면 펫·꾸미기도 무료판에 들어 있습니다.
-          AI 를 고르면 말로 부탁하기·고쳐 달라기·도우미도 개수 제한 없이 켜집니다. Claude Code 를 쓰면 토큰 사용량 탭이 덤으로 열립니다.</p>
+        <p>유료판도, 개수 제한도 없습니다. 내 자동화·예약·일 순서·사이트 감시·키 만료 예고를 필요한 만큼 만들고, 실행 횟수도 세지 않습니다.</p>
+        <p>메일·메신저로 일 맡기기와 원격 실행, 슬랙·Teams·웹훅 알림, 나만의 앱(exe 내보내기까지), 폴더 정리·백업·디스크 감시, 아침 브리핑·주간 보고, 화면 펫과 꾸미기가 모두 들어 있습니다.
+          Claude Code 를 쓰면 토큰 사용량 탭이 덤으로 열립니다.</p>
       </div>
     </div>
     <div class="row">
@@ -159,11 +140,11 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
 </div>
 
 <script>
-// 무료판 받는 곳 — 저장소를 만들면 이 줄만 바꾼다
+// 받는 곳 — 바뀌면 이 줄만 바꾼다
 var RELEASE_URL = 'https://github.com/swbins/taskhand/releases/latest';
 document.querySelectorAll('[data-release]').forEach(function (a) {
   if (RELEASE_URL) a.href = RELEASE_URL;
-  else a.addEventListener('click', function (e) { e.preventDefault(); alert('아직 받는 곳이 없습니다 — 무료판을 올리면 열립니다.'); });
+  else a.addEventListener('click', function (e) { e.preventDefault(); alert('아직 받는 곳이 없습니다.'); });
 });
 
 </script>
