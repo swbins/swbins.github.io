@@ -10,73 +10,75 @@
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 /* 받기 주소는 아래 <script> 의 RELEASE_URL 한 곳 — 무료판 저장소를 만들면 바꾼다 */
-:root { --gutter: clamp(16px, 5vw, 64px); }
+/* ── 종이 노트 (허브·메신저와 같은 집) ── */
+:root {
+  --bg: #f4efe6; --ink: #2b2723; --muted: #6d655c; --line: #d9d0c2; --accent: #9a3f1d;
+  --btn: #2b2723; --btnInk: #f4efe6; --btnHover: #9a3f1d; --filmBg: #e9e2d5;
+  /* 한글은 고정폭 글꼴이 없으니 본문 글꼴로 떨어지게 */
+  --head: "Gowun Batang", Batang, serif; --body: "Noto Sans KR", "Malgun Gothic", sans-serif;
+  --mono: "JetBrains Mono", Consolas, "Noto Sans KR", "Malgun Gothic", monospace;
+  --gutter: clamp(16px, 5vw, 64px); --radius: 3px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #1f1c19; --ink: #ece4d6; --muted: #a59b8d; --line: #3a342e; --accent: #d7774f; --btn: #ece4d6; --btnInk: #1f1c19; --btnHover: #d7774f; --filmBg: #2a2622; }
+}
+:root[data-theme="dark"] { --bg: #1f1c19; --ink: #ece4d6; --muted: #a59b8d; --line: #3a342e; --accent: #d7774f; --btn: #ece4d6; --btnInk: #1f1c19; --btnHover: #d7774f; --filmBg: #2a2622; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-text-size-adjust: 100%; }
 body { background: var(--bg); color: var(--ink); font-family: var(--body); line-height: 1.65; min-height: 100vh; }
 a { color: inherit; }
 img, video { display: block; max-width: 100%; }
+b, strong { font-weight: 700; }
 
 .wrap { max-width: 1180px; margin: 0 auto; padding: 0 var(--gutter); }
 header.top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 28px 0 0; }
 .brand { font-family: var(--head); font-weight: 700; font-size: 20px; letter-spacing: -0.01em; text-decoration: none; }
-.top nav { display: flex; gap: 20px; font-size: 14px; color: var(--muted); }
+.top nav { display: flex; gap: 24px; font-size: 14px; color: var(--muted); }
 .top nav a { text-decoration: none; }
 .top nav a:hover { color: var(--ink); }
 
-.hero { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 5vw, 72px); align-items: start; padding: clamp(40px, 8vw, 96px) 0 clamp(40px, 6vw, 80px); }
-.kicker { font-family: var(--mono); font-size: 13px; color: var(--accent); letter-spacing: 0.02em; margin-bottom: 18px; }
+/* 제목은 한 줄로 넓게, 그 아래 영상(왼쪽·크게)과 받기(오른쪽) */
+.title { padding: clamp(40px, 7vw, 72px) 0 clamp(24px, 3vw, 32px); }
+.kicker { font-size: 13px; font-weight: 500; letter-spacing: 0.02em; color: var(--accent); margin-bottom: 16px; }
+h1 { font-family: var(--head); font-weight: 700; font-size: clamp(34px, 5.2vw, 60px); line-height: 1.18; letter-spacing: -0.02em; word-break: keep-all; max-width: 12em; }
 h1 em { font-style: normal; color: var(--accent); }
-h1 { font-family: var(--head); font-weight: var(--h1w); font-size: clamp(34px, 5.2vw, 60px); line-height: 1.18; letter-spacing: var(--h1ls); word-break: keep-all; }
-.lines { list-style: none; margin: 32px 0 36px; border-top: var(--rule); }
-.lines li { padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 16.5px; word-break: keep-all; display: grid; grid-template-columns: 2.2em 1fr; }
-.lines li b { font-weight: 600; }
-.lines .n { font-family: var(--mono); font-size: 13px; color: var(--muted); padding-top: 3px; }
+h1 .keep { white-space: nowrap; }
 
-.get { display: inline-flex; flex-direction: column; gap: 2px; text-decoration: none; background: var(--btn); color: var(--btnInk); padding: 16px 26px; border-radius: var(--radius); border: var(--btnBorder); }
-.get strong { font-size: 18px; font-weight: 700; }
+.hero { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: clamp(28px, 4vw, 48px); align-items: start; padding-bottom: clamp(48px, 7vw, 88px); }
+.film { margin: 0; }
+.film video { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--filmBg); border: 1px solid var(--ink); border-radius: var(--radius); }
+.cap { font-size: 13px; color: var(--muted); padding-top: 10px; }
+
+.lines { list-style: none; border-top: 2px solid var(--ink); margin-bottom: 28px; }
+.lines li { padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15.5px; word-break: keep-all; display: grid; grid-template-columns: 2em 1fr; }
+.lines .n { font-family: var(--mono); font-size: 12px; color: var(--muted); padding-top: 4px; font-variant-numeric: tabular-nums; }
+
+.get { display: flex; flex-direction: column; gap: 2px; text-decoration: none; background: var(--btn); color: var(--btnInk); padding: 16px 24px; border-radius: var(--radius); }
+.get strong { font-size: 18px; }
 .get span { font-size: 13px; opacity: 0.8; }
 .get:hover { background: var(--btnHover); }
 .get:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
-.small { margin-top: 16px; font-size: 13.5px; color: var(--muted); max-width: 34em; word-break: keep-all; }
+.small { margin-top: 14px; font-size: 13px; color: var(--muted); word-break: keep-all; }
 
-.film { border: var(--frame); border-radius: var(--radius); overflow: hidden; background: var(--filmBg); }
-.film video { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--filmBg); }
-.cap { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); padding: 10px 2px 0; }
-.cap code { font-family: var(--mono); }
-
-.facts { border-top: var(--rule); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-bottom: 64px; }
-.facts div { padding: 20px 24px 22px 0; }
-.facts div + div { padding-left: 24px; border-left: 1px solid var(--line); }
-.facts h2 { font-family: var(--head); font-size: 17px; font-weight: 700; margin-bottom: 6px; }
-.facts p { font-size: 14.5px; color: var(--muted); word-break: keep-all; }
+/* 알아 둘 것 — 제품 설명서처럼 이름 | 설명 줄 */
+.spec { border-top: 2px solid var(--ink); margin-bottom: 72px; }
+.spec > h2 { font-size: 13px; font-weight: 500; letter-spacing: 0.02em; color: var(--muted); padding: 14px 0 6px; }
+.row { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(28px, 4vw, 48px); padding: 20px 0 22px; border-top: 1px solid var(--line); }
+.row h3 { font-family: var(--head); font-size: 19px; font-weight: 700; line-height: 1.4; word-break: keep-all; }
+.row p { font-size: 15px; color: var(--muted); max-width: 40em; word-break: keep-all; }
+.row p + p { margin-top: 10px; }
 
 footer { border-top: 1px solid var(--line); padding: 22px 0 40px; font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
 
-/* ── 종이 노트 (허브·메신저와 같은 집) ── */
-:root {
-  --bg: #f4efe6; --ink: #2b2723; --muted: #6d655c; --line: #d9d0c2; --accent: #9a3f1d;
-  --head: "Gowun Batang", Batang, serif; --body: "Noto Sans KR", "Malgun Gothic", sans-serif; --mono: "JetBrains Mono", Consolas, monospace;
-  --h1w: 700; --h1ls: -0.02em; --rule: 2px solid #2b2723; --radius: 3px;
-  --btn: #2b2723; --btnInk: #f4efe6; --btnHover: #9a3f1d; --btnBorder: 0;
-  --frame: 1px solid #2b2723; --filmBg: #e9e2d5;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #1f1c19; --ink: #ece4d6; --muted: #a59b8d; --line: #3a342e; --accent: #d7774f;
-    --rule: 2px solid #ece4d6; --btn: #ece4d6; --btnInk: #1f1c19; --btnHover: #d7774f; --frame: 1px solid #ece4d6; --filmBg: #2a2622;
-  }
-}
-
 @media (max-width: 860px) {
   .hero { grid-template-columns: minmax(0, 1fr); }
-  .facts { grid-template-columns: minmax(0, 1fr); }
-  .facts div, .facts div + div { padding: 16px 0; border-left: 0; }
-  .facts div + div { border-top: 1px solid var(--line); }
+  .row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
   .top nav { display: none; }
 }
+@media (max-width: 520px) {
+      }
 </style>
 </head>
 <body>
@@ -86,10 +88,18 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     <nav><a href="#demo">영상</a><a href="#get">받기</a><a href="../">다른 앱</a></nav>
   </header>
 
+  <section class="title">
+    <p class="kicker">Windows 10/11 · 무료 · 내 PC 안에서만</p>
+    <h1>다녀온 곳, 오늘 하루를 <span class="keep"><em>메모 한 줄로</em> 글로</span></h1>
+  </section>
+
   <section class="hero">
+    <figure class="film" id="demo">
+      <video src="assets/demo.webm" poster="assets/poster.png" controls muted playsinline preload="metadata" aria-label="둥이로그 소개 영상, 71초"></video>
+      <figcaption class="cap">실제 앱 화면을 녹화한 소개 영상</figcaption>
+    </figure>
+
     <div>
-      <p class="kicker">Windows 10/11 · 무료 · 내 PC 안에서만</p>
-      <h1>다녀온 곳, 오늘 하루를 <em>메모 한 줄로</em> 글로</h1>
       <ol class="lines">
         <li><span class="n">01</span><span><b>사진 몇 장과 메모</b>로 블로그·카페·인스타·틱톡 글 초안을 내 말투로 씁니다.</span></li>
         <li><span class="n">02</span><span><b>썸네일·카드뉴스·협찬 배너</b>, 육아 기록을 켜면 성장 기록·예방접종 일정·앨범 PDF.</span></li>
@@ -101,16 +111,22 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
       </a>
       <p class="small">처음 실행할 때 Windows 가 「PC 보호」 창을 띄우면 <b>추가 정보 → 실행</b>을 누르세요. 코드 서명을 하지 않은 개인 앱이라 나오는 창입니다.</p>
     </div>
-
-    <figure class="film" id="demo">
-      <video src="assets/demo.webm" poster="assets/poster.png" controls muted playsinline preload="metadata" aria-label="둥이로그 소개 영상, 71초"></video>
-    </figure>
   </section>
 
-  <section class="facts" aria-label="알아 둘 것">
-    <div><h2>무료 AI 가 들어 있어요</h2><p>처음 한 번 「받기」로 PC 에 맞는 모델을 받아 이 PC 안에서만 글을 씁니다. 안 받으면 「AI 없이」로 끝까지 쓸 수 있고, 쓰는 구독 AI 가 있으면 직접 골라도 됩니다.</p></div>
-    <div><h2>아이 정보는 PC 안에만</h2><p>계정 가입·사용 통계·광고가 없습니다. 글에는 애칭만 쓰고, 사진의 GPS 위치는 지우고 저장합니다.</p></div>
-    <div><h2>올리기는 직접</h2><p>글은 초안입니다 — 읽고 다듬어 직접 올려요. 자동 올리기·자동 로그인은 하지 않고, 협찬 표기 문구는 앱이 넣어 줍니다.</p></div>
+  <section class="spec" aria-labelledby="spec-h">
+    <h2 id="spec-h">알아 둘 것</h2>
+    <div class="row">
+      <h3>무료 AI 가 들어 있어요</h3>
+      <p>처음 한 번 「받기」로 PC 에 맞는 모델을 받아 이 PC 안에서만 글을 씁니다. 안 받으면 「AI 없이」로 끝까지 쓸 수 있고, 쓰는 구독 AI 가 있으면 직접 골라도 됩니다.</p>
+    </div>
+    <div class="row">
+      <h3>아이 정보는 PC 안에만</h3>
+      <p>계정 가입·사용 통계·광고가 없습니다. 글에는 애칭만 쓰고, 사진의 GPS 위치는 지우고 저장합니다.</p>
+    </div>
+    <div class="row">
+      <h3>올리기는 직접</h3>
+      <p>글은 초안입니다 — 읽고 다듬어 직접 올려요. 자동 올리기·자동 로그인은 하지 않고, 협찬 표기 문구는 앱이 넣어 줍니다.</p>
+    </div>
   </section>
 
   <footer>

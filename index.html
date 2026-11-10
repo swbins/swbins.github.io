@@ -11,7 +11,8 @@
 <style>
 :root {
   --bg: #f4efe6; --ink: #2b2723; --muted: #6d655c; --line: #d9d0c2; --accent: #9a3f1d; --card: #fbf8f2;
-  --head: "Gowun Batang", Batang, serif; --body: "Noto Sans KR", "Malgun Gothic", sans-serif; --mono: "JetBrains Mono", Consolas, monospace;
+  --head: "Gowun Batang", Batang, serif; --body: "Noto Sans KR", "Malgun Gothic", sans-serif;
+  --mono: "JetBrains Mono", Consolas, "Noto Sans KR", "Malgun Gothic", monospace;
   --gutter: clamp(16px, 5vw, 64px);
 }
 @media (prefers-color-scheme: dark) {
@@ -21,25 +22,28 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--ink); font-family: var(--body); line-height: 1.65; min-height: 100vh; }
 a { color: inherit; }
-.wrap { max-width: 1080px; margin: 0 auto; padding: 0 var(--gutter); }
+img { display: block; max-width: 100%; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 var(--gutter); }
 header { padding: 28px 0 0; font-family: var(--head); font-weight: 700; font-size: 20px; }
-.hero { padding: clamp(40px, 8vw, 88px) 0 clamp(28px, 5vw, 48px); border-bottom: 2px solid var(--ink); }
-.kicker { font-family: var(--mono); font-size: 13px; color: var(--accent); margin-bottom: 16px; }
-h1 { font-family: var(--head); font-size: clamp(30px, 4.6vw, 52px); line-height: 1.2; letter-spacing: -0.02em; word-break: keep-all; }
-.hero p.sub { margin-top: 18px; color: var(--muted); font-size: 16.5px; max-width: 38em; word-break: keep-all; }
-.apps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 56px; margin: 0 0 56px; }
-.app { display: block; text-decoration: none; padding: 28px 0 30px; border-bottom: 1px solid var(--line); }
+.hero { padding: clamp(40px, 7vw, 72px) 0 clamp(28px, 4vw, 40px); }
+.kicker { font-size: 13px; font-weight: 500; letter-spacing: 0.02em; color: var(--accent); margin-bottom: 16px; }
+h1 { font-family: var(--head); font-size: clamp(32px, 4.6vw, 52px); line-height: 1.2; letter-spacing: -0.02em; word-break: keep-all; }
+.hero p.sub { margin-top: 16px; color: var(--muted); font-size: 16px; max-width: 36em; word-break: keep-all; }
+/* 앱마다 한 줄: 글(왼쪽 4) | 실제 화면(오른쪽 8) */
+.apps { border-top: 2px solid var(--ink); margin-bottom: 56px; }
+.app { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(28px, 4vw, 48px); align-items: start; text-decoration: none; padding: 32px 0 36px; border-bottom: 1px solid var(--line); }
+.app .no { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.app h2 { font-family: var(--head); font-size: 32px; line-height: 1.25; margin: 6px 0 2px; }
+.app .tag { font-size: 13px; font-weight: 500; color: var(--accent); }
+.app p { color: var(--muted); font-size: 15px; margin-top: 14px; word-break: keep-all; }
+.app .go { display: inline-block; margin-top: 18px; font-weight: 700; font-size: 15px; border-bottom: 2px solid var(--accent); }
 .app img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: top left; border: 1px solid var(--ink); border-radius: 3px; background: var(--card); }
-.app h2 { font-family: var(--head); font-size: 26px; margin: 18px 0 4px; }
-.app .tag { font-family: var(--mono); font-size: 12.5px; color: var(--accent); }
-.app p { color: var(--muted); font-size: 15px; margin-top: 8px; word-break: keep-all; }
-.app .go { display: inline-block; margin-top: 14px; font-weight: 700; font-size: 15px; border-bottom: 2px solid var(--accent); }
 .app:hover h2 { color: var(--accent); }
 .app:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
-footer { padding: 0 0 40px; font-size: 13px; color: var(--muted); word-break: keep-all; }
+footer { padding: 0 0 40px; font-size: 13px; color: var(--muted); word-break: keep-all; max-width: 60em; }
 @media (max-width: 760px) {
-  .apps { grid-template-columns: minmax(0, 1fr); }
-  .app { padding: 24px 0; }
+  .app { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 24px 0 28px; }
+  .app img { grid-row: 1; }
 }
 </style>
 </head>
@@ -53,18 +57,24 @@ footer { padding: 0 0 40px; font-size: 13px; color: var(--muted); word-break: ke
   </section>
   <section class="apps" aria-label="앱">
     <a class="app" href="taskhand/">
-      <img src="taskhand/assets/poster.png" alt="Taskhand 화면" loading="lazy">
-      <h2>Taskhand</h2>
-      <span class="tag">업무 자동화</span>
-      <p>반복 업무는 한 번 보여 주면 끝 — 따라 하기·예약·일 순서·사이트 감시·백업. 말로 부탁하면 무료 AI 가 자동화를 만들어요.</p>
-      <span class="go">자세히 · 받기 →</span>
+      <div>
+        <span class="no">01</span>
+        <h2>Taskhand</h2>
+        <span class="tag">업무 자동화</span>
+        <p>반복 업무는 한 번 보여 주면 끝 — 따라 하기·예약·일 순서·사이트 감시·백업. 말로 부탁하면 무료 AI 가 자동화를 만들어요.</p>
+        <span class="go">자세히 · 받기 →</span>
+      </div>
+      <img src="taskhand/assets/poster.png" alt="Taskhand 실제 화면" loading="lazy">
     </a>
     <a class="app" href="dungilog/">
-      <img src="dungilog/assets/poster.png" alt="둥이로그 화면" loading="lazy">
-      <h2>둥이로그</h2>
-      <span class="tag">후기·일상 기록</span>
-      <p>사진 몇 장과 메모로 블로그·인스타 글 초안을 내 말투로. 체험단·협찬 정리와 장부, 원하면 육아 기록까지.</p>
-      <span class="go">자세히 · 받기 →</span>
+      <div>
+        <span class="no">02</span>
+        <h2>둥이로그</h2>
+        <span class="tag">후기·일상 기록</span>
+        <p>사진 몇 장과 메모로 블로그·인스타 글 초안을 내 말투로. 체험단·협찬 정리와 장부, 원하면 육아 기록까지.</p>
+        <span class="go">자세히 · 받기 →</span>
+      </div>
+      <img src="dungilog/assets/poster.png" alt="둥이로그 실제 화면" loading="lazy">
     </a>
   </section>
   <footer>
