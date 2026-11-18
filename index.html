@@ -93,6 +93,15 @@ h1 .keep { white-space: nowrap; }
 .app .shot { display: block; }
 .app img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: top left; border: 1px solid var(--ink); border-radius: var(--radius); background: var(--card); }
 
+/* 쉬어가기 — 앱 아래 한 줄 */
+.rest { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 8px clamp(28px, 4vw, 48px); align-items: baseline;
+        border-top: 2px solid var(--ink); padding: 18px 0 22px; margin: -32px 0 72px; text-decoration: none; }
+.rest h2 { font-family: var(--head); font-weight: 700; font-size: 24px; }
+.rest h2::after { content: " →"; font-family: var(--body); font-weight: 400; font-size: 18px; color: var(--accent); }
+.rest p { font-size: 15px; color: var(--muted); word-break: keep-all; }
+.rest:hover h2 { color: var(--accent); }
+.rest:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
 footer { border-top: 1px solid var(--line); padding: 22px 0 40px; font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; }
 footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
 
@@ -109,6 +118,7 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
   .app { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 24px 0 32px; }
   .app .shot { grid-row: 1; }
   .app h3 { font-size: 30px; }
+  .rest { grid-template-columns: minmax(0, 1fr); margin-top: -16px; }
 }
 @media (max-width: 420px) {
   .promise div { padding-right: 12px; }
@@ -121,7 +131,7 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
 <div class="wrap">
   <header class="top">
     <a class="brand" href="./">swbins</a>
-    <nav aria-label="앱"><a href="#taskhand">Taskhand</a><a href="#dungilog">둥이로그</a><a href="#usage-tray">Usage Tray</a><a href="https://github.com/swbins">GitHub</a></nav>
+    <nav aria-label="앱"><a href="#taskhand">Taskhand</a><a href="#dungilog">둥이로그</a><a href="#usage-tray">Usage Tray</a><a href="rest/">쉬어가기</a><a href="https://github.com/swbins">GitHub</a></nav>
   </header>
 
   <section class="hero">
@@ -193,6 +203,11 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
       <a class="shot" href="usage-tray/" tabindex="-1" aria-hidden="true"><img src="usage-tray/assets/poster.png" alt="" loading="lazy"></a>
     </article>
   </section>
+
+  <a class="rest" href="rest/">
+    <h2>쉬어가기</h2>
+    <p>앱 말고, 잠깐 놀다 가는 곳 — 「나는 어떤 일 유형?」 테스트 · 1분 추리 「야근 범인을 찾아라」 · 30초 숨 고르기</p>
+  </a>
 
   <footer>
     <span>swbins · <a href="https://github.com/swbins">GitHub</a></span>
