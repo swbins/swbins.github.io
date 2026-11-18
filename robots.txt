@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://swbins.github.io/sitemap.xml
