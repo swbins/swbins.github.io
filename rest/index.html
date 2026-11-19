@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>쉬어가기 — 일 유형 테스트 · 추리 게임 · 오늘의 운세 · 타로 한 장</title>
-<meta name="description" content="일하다 잠깐 쉬어 가는 곳. 질문 9개로 보는 「나는 어떤 일 유형?」, 폭설에 갇힌 산장에서 사라진 그림을 쫓는 추리 게임 「한겨울 사진관 사건 수첩」, 날마다 바뀌는 오늘의 운세, 타로 한 장.">
+<title>쉬어가기 — 심리테스트 · 추리 게임 · 오늘의 운세 · 타로</title>
+<meta name="description" content="일하다 잠깐 쉬어 가는 곳. 「나는 어떤 일 유형?」 「나의 회의 유형」 「점심 메뉴로 보는 일 스타일」 심리테스트 셋, 폭설에 갇힌 산장에서 사라진 그림을 쫓는 추리 게임 「한겨울 사진관 사건 수첩」, 날마다 바뀌는 오늘의 운세, 타로 한 장·세 장.">
 <link rel="canonical" href="https://swbins.github.io/rest/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="swbins">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:url" content="https://swbins.github.io/rest/">
 <meta property="og:title" content="쉬어가기 — 나는 어떤 일 유형?">
-<meta property="og:description" content="일 유형 테스트, 추리 게임 「눈 내린 산장, 사라진 그림」, 날마다 바뀌는 오늘의 운세, 타로 한 장.">
+<meta property="og:description" content="심리테스트 셋(일 유형·회의 유형·점심 메뉴), 추리 게임 「눈 내린 산장, 사라진 그림」, 날마다 바뀌는 오늘의 운세, 타로 한 장·세 장.">
 <meta property="og:image" content="https://swbins.github.io/rest/assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,7 +60,7 @@ h1 em { font-style: normal; color: var(--accent); }
 .collage { position: relative; padding: 0 0 8% 8%; }
 .collage .main { width: 100%; height: auto; aspect-ratio: 1040 / 712; object-fit: cover; border: 1px solid var(--ink); border-radius: var(--radius); box-shadow: 8px 8px 0 var(--ink); background: var(--soft); }
 .collage .pol { position: absolute; width: 30%; background: var(--card); border: 1px solid var(--ink); padding: 6px 6px 22px; box-shadow: 4px 4px 0 rgba(0,0,0,.18); }
-.collage .pol img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.collage .pol img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; }
 .collage .pol span { position: absolute; left: 0; right: 0; bottom: 3px; text-align: center; font-family: var(--head); font-weight: 700; font-size: 12px; }
 .collage .p1 { left: 0; bottom: 0; transform: rotate(-4deg); }
 .collage .p2 { right: -2%; bottom: -4%; width: 18%; padding-bottom: 6px; transform: rotate(6deg); }
@@ -70,13 +70,13 @@ h1 em { font-style: normal; color: var(--accent); }
 .games-h { border-top: 2px solid var(--ink); display: flex; justify-content: space-between; align-items: baseline; padding: 12px 0 18px; }
 .games-h h2 { font-size: 13px; font-weight: 500; letter-spacing: 0.02em; color: var(--muted); }
 .games-h span { font-size: 13px; color: var(--muted); }
-.games { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(14px, 2vw, 24px); margin-bottom: clamp(56px, 8vw, 96px); }
+.games { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2vw, 24px); margin-bottom: clamp(56px, 8vw, 96px); }
 .game { display: flex; flex-direction: column; text-decoration: none; background: var(--card); border: 1px solid var(--ink); border-radius: var(--radius); overflow: hidden;
         transition: transform .18s, box-shadow .18s; box-shadow: 0 0 0 var(--ink); }
 .game:hover { transform: translate(-3px, -3px); box-shadow: 6px 6px 0 var(--ink); }
 .game:active { transform: translate(0, 0); box-shadow: 0 0 0 var(--ink); }
 .game figure { position: relative; margin: 0; border-bottom: 1px solid var(--ink); }
-.game figure img { width: 100%; aspect-ratio: 4 / 3.4; object-fit: cover; background: var(--soft); }
+.game figure img { width: 100%; height: auto; aspect-ratio: 4 / 3.4; object-fit: cover; background: var(--soft); }
 .game .time { position: absolute; top: 12px; left: 12px; font-family: var(--mono); font-size: 11.5px; font-weight: 600; background: var(--bg); color: var(--ink); border: 1px solid var(--ink); padding: 2px 8px; border-radius: 99px; }
 .game .txt { padding: 14px 16px 16px; display: flex; flex-direction: column; flex: 1; }
 .game .no { font-family: var(--mono); font-size: 12px; color: var(--muted); }
@@ -227,13 +227,70 @@ h1 em { font-style: normal; color: var(--accent); }
 .t-name { font-family: var(--head); font-weight: 700; font-size: clamp(30px, 4.6vw, 46px); line-height: 1.15; margin: 8px 0 2px; }
 .t-en { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
 .t-mean { font-size: 16.5px; margin-top: 14px; word-break: keep-all; }
+/* 한 장 / 세 장 고르기 */
+.t-mode { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 26px; }
+.t-mode button { flex: 1 1 220px; text-align: left; padding: 12px 16px; border: 1px solid var(--ink); border-radius: 6px; background: var(--bg); transition: background-color .15s; }
+.t-mode button b { font-family: var(--head); font-size: 19px; margin-right: 8px; }
+.t-mode button span { font-size: 13px; color: var(--muted); }
+.t-mode button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.t-mode button[aria-pressed="true"] span { color: inherit; opacity: .75; }
+/* 그림이 없는 카드 — CSS 로 그린 면(검은 바탕·금색 숫자) */
+.tface { container-type: inline-size; position: relative; display: block; width: 100%; aspect-ratio: 832 / 1216; background: #2b2723; color: #e6c37a; overflow: hidden; }
+.tface .tin { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 12cqw 6cqw 11cqw; text-align: center; }
+.tface .tin::before, .tface .tin::after { content: ""; position: absolute; pointer-events: none; }
+.tface .tin::before { inset: 5cqw; border: 1.5px solid rgba(230,195,122,.8); }
+.tface .tin::after { inset: 8cqw; border: 1px solid rgba(230,195,122,.35); }
+.tface .num { font-family: var(--head); font-weight: 700; font-size: 13cqw; line-height: 1; letter-spacing: .04em; }
+.tface .orb { display: grid; place-items: center; width: 54cqw; aspect-ratio: 1; border: 1.5px solid currentColor; border-radius: 50%; font-family: var(--head), serif; font-weight: 700; font-size: 25cqw; line-height: 1;
+              background: radial-gradient(circle, rgba(230,195,122,.2), transparent 70%); }
+.tface .nm { font-family: var(--head); font-weight: 700; font-size: 12cqw; line-height: 1.2; word-break: keep-all; }
+.tc .f .tface { height: 100%; }
+.tc.rev .f .tface { transform: rotate(180deg); }
+.t-card .tface { border: 1px solid var(--ink); border-radius: 8px; box-shadow: 10px 10px 0 var(--ink); }
+.t-card.rev .tface { transform: rotate(180deg); box-shadow: -10px -10px 0 var(--ink); }
+/* 세 장 펼치기 */
+.spread.three { padding-bottom: 52px; }
+.spread.three .tc.flip { transform: translateY(-22px) !important; z-index: 3; }
+.tc[data-pos]::after { content: attr(data-pos); position: absolute; left: 50%; bottom: -34px; transform: translateX(-50%); font-family: var(--head); font-weight: 700; font-size: 14px;
+                       background: var(--accent); color: #fff; padding: 1px 9px; border-radius: 99px; white-space: nowrap; }
+.t-res3 { max-width: 920px; margin: 0 auto; }
+.t3-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 3vw, 32px); margin: 18px 0 26px; }
+.t3-pos { display: block; font-family: var(--mono); font-size: 12.5px; font-weight: 600; color: var(--accent); margin-bottom: 10px; }
+.t3-card { width: 100%; max-width: 210px; }
+.t3-card img, .t3-card .tface { width: 100%; aspect-ratio: 832 / 1216; object-fit: cover; border: 1px solid var(--ink); border-radius: 6px; box-shadow: 6px 6px 0 var(--ink); }
+.t3-card.rev img, .t3-card.rev .tface { transform: rotate(180deg); box-shadow: -6px -6px 0 var(--ink); }
+.t3-name { font-family: var(--head); font-weight: 700; font-size: clamp(20px, 2.4vw, 25px); line-height: 1.2; margin-top: 16px; word-break: keep-all; }
+.t3-ori { font-size: 12.5px; color: var(--muted); }
+.t3-mean { font-size: 14.5px; margin-top: 6px; word-break: keep-all; }
+.t3-flow { font-family: var(--head); font-weight: 700; font-size: clamp(18px, 2.4vw, 22px); line-height: 1.5; word-break: keep-all; border-top: 2px solid var(--ink); padding-top: 16px; }
+.t-res3.pop .t3-col { animation: txtin .5s ease-out both; }
+.t-res3.pop .t3-col:nth-child(2) { animation-delay: .12s; }
+.t-res3.pop .t3-col:nth-child(3) { animation-delay: .24s; }
+
+/* 그림 없는 테스트 — 도장 한 글자 */
+.p-glyph { display: grid; place-items: center; width: 84px; height: 84px; border: 1px solid var(--ink); border-radius: 50%; background: var(--accent); color: #fff; font-family: var(--head); font-weight: 700; font-size: 25px; }
+.res-seal { position: relative; display: grid; place-items: center; aspect-ratio: 1; border: 1px solid var(--ink); border-radius: 6px; box-shadow: 10px 10px 0 var(--ink); overflow: hidden;
+            background-color: var(--soft); background-image: radial-gradient(var(--line) 1.6px, transparent 1.7px); background-size: 22px 22px; }
+.res-seal b { display: grid; place-items: center; width: 44%; aspect-ratio: 1; background: var(--accent); color: #fff; font-family: var(--head); font-weight: 700; font-size: clamp(64px, 11vw, 136px); line-height: 1;
+              border-radius: 10px; transform: rotate(-6deg); box-shadow: 6px 6px 0 var(--ink); }
+.res-seal span { position: absolute; left: 0; right: 0; bottom: 7%; text-align: center; font-family: var(--head); font-weight: 700; font-size: 15px; color: var(--muted); }
+.res-more { margin-top: 10px; font-size: 13.5px; color: var(--muted); word-break: keep-all; }
+.res-more a { color: var(--ink); text-underline-offset: 3px; }
+/* 표지 카드 — 그림 대신 쪽지 */
+.game .cv { position: relative; display: grid; place-items: center; aspect-ratio: 4 / 3.4; overflow: hidden;
+            background-color: var(--soft); background-image: radial-gradient(var(--line) 1.6px, transparent 1.7px); background-size: 20px 20px; }
+.game .cv b { font-family: var(--head); font-weight: 700; font-size: clamp(40px, 5vw, 58px); line-height: 1.1; background: var(--card); border: 1px solid var(--ink); padding: 8px 22px 12px; box-shadow: 5px 5px 0 var(--ink); transform: rotate(-3deg); }
+.game .cv i { position: absolute; display: grid; place-items: center; width: 44px; height: 44px; font-style: normal; font-family: var(--head); font-weight: 700; font-size: 22px; color: #fff; background: var(--accent); border-radius: 6px; box-shadow: 2px 2px 0 var(--ink); }
+.game .cv i:nth-of-type(1) { right: 12%; top: 16%; transform: rotate(8deg); }
+.game .cv i:nth-of-type(2) { left: 10%; bottom: 14%; transform: rotate(-10deg); }
+.game .cv i:nth-of-type(3) { right: 20%; bottom: 10%; transform: rotate(4deg); background: var(--ink); color: var(--bg); }
 
 footer { border-top: 1px solid var(--line); padding: 22px 0 40px; font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; }
 footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
 
 @media (max-width: 1100px) {
   .games { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .game figure img { aspect-ratio: 16 / 10; }
+  .game figure img, .game .cv { aspect-ratio: 16 / 10; }
   .game.night figure img { aspect-ratio: 16 / 10; object-position: center 30%; }
   .top nav { gap: 16px; }
 }
@@ -242,6 +299,8 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
   .top nav { display: none; }
   .result, .t-res { grid-template-columns: minmax(0, 1fr); }
   .t-cats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .res-seal { aspect-ratio: 16 / 10; }
+  .res-seal b { width: auto; height: 56%; }
 }
 @media (max-width: 600px) {
   .games { grid-template-columns: minmax(0, 1fr); }
@@ -252,9 +311,20 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
   .res-img { box-shadow: 6px 6px 0 var(--ink); }
   .f-row { grid-template-columns: auto minmax(0, 1fr); }
   .f-row p { grid-column: 1 / -1; }
-  .f-lucky { grid-template-columns: minmax(0, 1fr); }
+  .f-lucky { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tc { margin: 0 -14px; }
+  .spread.three .tc { margin: 0 -17px; }
   .t-card { max-width: 240px; }
+  .p-glyph { width: 64px; height: 64px; font-size: 20px; }
+  .res-seal { box-shadow: 6px 6px 0 var(--ink); }
+  .t3-row { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .t3-col { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 0 16px; align-items: start; }
+  .t3-col .t3-pos { grid-column: 2; grid-row: 1; margin: 0 0 2px; }
+  .t3-col .t3-card { grid-column: 1; grid-row: 1 / span 2; }
+  .t3-col .t3-txt { grid-column: 2; grid-row: 2; }
+  .t3-name { margin-top: 0; }
+  .t3-card img, .t3-card .tface { box-shadow: 4px 4px 0 var(--ink); }
+  .t3-card.rev img, .t3-card.rev .tface { box-shadow: -4px -4px 0 var(--ink); }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -266,7 +336,7 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
 <div class="wrap">
   <header class="top">
     <a class="brand" href="../">swbins</a>
-    <nav aria-label="놀이"><a href="#test">일 유형 테스트</a><a href="case/">추리 게임</a><a href="#fortune">오늘의 운세</a><a href="#tarot">타로</a><a href="../">앱</a></nav>
+    <nav aria-label="놀이"><a href="#test">심리테스트</a><a href="case/">추리 게임</a><a href="#fortune">오늘의 운세</a><a href="#tarot">타로</a><a href="../">앱</a></nav>
   </header>
 
   <main id="home">
@@ -274,7 +344,7 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
       <div>
         <p class="kicker">쉬어가기 · 가입·저장 없음</p>
         <h1>일하다 잠깐,<br><em>쉬어가기</em></h1>
-        <p class="sub">하나에 1~3분이면 끝나는 놀이 네 개. 고른 답은 어디에도 남지 않고, 창을 닫으면 그걸로 끝입니다.</p>
+        <p class="sub">하나에 1~3분이면 끝나는 놀이 여섯 개. 고른 답은 어디에도 남지 않고, 창을 닫으면 그걸로 끝입니다.</p>
         <a class="btn go" href="#test">테스트부터 해 보기</a>
       </div>
       <div class="collage" aria-hidden="true">
@@ -284,8 +354,8 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
       </div>
     </section>
 
-    <div class="games-h"><h2>오늘의 놀이</h2><span>네 개 · 아무거나 먼저</span></div>
-    <section class="games" aria-label="놀이 네 개">
+    <div class="games-h"><h2>오늘의 놀이</h2><span>여섯 개 · 아무거나 먼저</span></div>
+    <section class="games" aria-label="놀이 여섯 개">
       <a class="game" href="#test">
         <figure><img src="assets/cover-test.webp" alt="돋보기 속 다른 내 모습" width="640" height="640" loading="lazy"><span class="time">2분 · 질문 9개</span></figure>
         <div class="txt"><span class="no">01</span><h3>나는 어떤 일 유형?</h3><p>회사·집에서 흔히 겪는 장면 아홉 개. 제일 나 같은 걸 고르면 됩니다.</p><span class="start">시작</span></div>
@@ -296,11 +366,19 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
       </a>
       <a class="game" href="#fortune">
         <figure><img src="assets/cover-fortune.webp" alt="책상 위 운세 쪽지와 달력" width="640" height="640" loading="lazy"><span class="time">30초 · 매일 바뀜</span></figure>
-        <div class="txt"><span class="no">03</span><h3>오늘의 운세</h3><p>일운·금전운·대인운에 행운의 물건까지. 내일 오면 또 바뀌어요.</p><span class="start">오늘 운세 보기</span></div>
+        <div class="txt"><span class="no">03</span><h3>오늘의 운세</h3><p>일운·금전운·대인운·퇴근운에 행운의 숫자, 점심 메뉴까지. 내일 오면 또 바뀌어요.</p><span class="start">오늘 운세 보기</span></div>
       </a>
       <a class="game" href="#tarot">
-        <figure><img src="assets/cover-tarot.webp" alt="엎어 둔 타로 카드를 한 장 뒤집는 손" width="640" height="640" loading="lazy"><span class="time">1분 · 카드 한 장</span></figure>
-        <div class="txt"><span class="no">04</span><h3>타로 한 장</h3><p>고민 하나 고르고, 엎어 둔 카드 중 한 장을 뒤집어 보세요.</p><span class="start">카드 뽑기</span></div>
+        <figure><img src="assets/cover-tarot.webp" alt="엎어 둔 타로 카드를 한 장 뒤집는 손" width="640" height="640" loading="lazy"><span class="time">1분 · 한 장 또는 세 장</span></figure>
+        <div class="txt"><span class="no">04</span><h3>타로</h3><p>메이저 카드 22장. 고민 하나에 한 장을 뽑거나, 과거·현재·미래 세 장을 펼쳐 보세요.</p><span class="start">카드 뽑기</span></div>
+      </a>
+      <a class="game" href="#meeting">
+        <figure><div class="cv" aria-hidden="true"><b>회의</b><i>말</i><i>록</i><i>시</i></div><span class="time">2분 · 질문 9개</span></figure>
+        <div class="txt"><span class="no">05</span><h3>나의 회의 유형</h3><p>정적을 못 참는 쪽인가요, 회의록을 혼자 다 쓰는 쪽인가요. 회의실 장면 아홉 개.</p><span class="start">시작</span></div>
+      </a>
+      <a class="game" href="#lunch">
+        <figure><div class="cv" aria-hidden="true"><b>점심</b><i>늘</i><i>새</i><i>빨</i></div><span class="time">2분 · 질문 8개</span></figure>
+        <div class="txt"><span class="no">06</span><h3>점심 메뉴로 보는 일 스타일</h3><p>늘 먹던 거, 신메뉴, 제일 빨리 나오는 거. 메뉴 고르는 버릇이 일하는 버릇이에요.</p><span class="start">시작</span></div>
       </a>
     </section>
   </main>
@@ -309,8 +387,9 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
   <section class="play" id="test" aria-labelledby="test-h" hidden>
     <a class="back" href="#" data-back>← 놀이 목록</a>
     <div class="p-head">
-      <img src="assets/cover-test.webp" alt="" width="640" height="640">
-      <div><span class="no">01 · 질문 9개</span><h2 id="test-h">나는 어떤 일 유형?</h2><p>회사·집에서 흔히 겪는 장면 아홉 개. 제일 나 같은 걸 고르면 됩니다. 정답은 없고, 맞아도 틀려도 웃고 넘기면 돼요.</p></div>
+      <img id="test-cover" src="assets/cover-test.webp" alt="" width="640" height="640">
+      <span class="p-glyph" id="test-glyph" aria-hidden="true" hidden></span>
+      <div><span class="no" id="test-no">01 · 질문 9개</span><h2 id="test-h">나는 어떤 일 유형?</h2><p id="test-lead">회사·집에서 흔히 겪는 장면 아홉 개. 제일 나 같은 걸 고르면 됩니다. 정답은 없고, 맞아도 틀려도 웃고 넘기면 돼요.</p></div>
     </div>
     <div id="quiz" class="quiz">
       <div class="q-top"><span class="q-num" id="q-num"><b>01</b> / 09</span></div>
@@ -326,6 +405,7 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     <div id="result" class="result" hidden>
       <div class="res-art">
         <img class="res-img" id="r-img" alt="" width="560" height="560">
+        <div class="res-seal" id="r-seal" hidden><b id="r-mark"></b><span id="r-sealtxt"></span></div>
         <span class="stamp">결과</span>
       </div>
       <div class="res-txt">
@@ -340,6 +420,7 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
         </div>
         <p class="toast" id="r-toast" role="status" aria-live="polite"></p>
         <p class="applink" id="r-app"></p>
+        <p class="res-more" id="r-more"></p>
       </div>
     </div>
   </section>
@@ -385,10 +466,14 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     <a class="back" href="#" data-back>← 놀이 목록</a>
     <div class="p-head">
       <img src="assets/cover-tarot.webp" alt="" width="640" height="640">
-      <div><span class="no">04 · 카드 한 장</span><h2 id="tarot-h">타로 한 장</h2><p>고민 하나를 고르고, 엎어 둔 카드 중 마음 가는 한 장을 뒤집어 보세요. 재미로 보세요.</p></div>
+      <div><span class="no">04 · 메이저 카드 22장</span><h2 id="tarot-h">타로 한 장 · 세 장</h2><p>고민 하나를 고르고, 엎어 둔 카드 중 마음 가는 걸 뒤집어 보세요. 한 장은 지금 고민에 한마디, 세 장은 과거·현재·미래의 흐름. 재미로 보세요.</p></div>
     </div>
     <div class="tarot">
       <div id="t-step1">
+        <div class="t-mode">
+          <button type="button" data-mode="one" aria-pressed="true"><b>한 장</b><span>지금 고민에 한마디</span></button>
+          <button type="button" data-mode="three" aria-pressed="false"><b>세 장</b><span>과거 · 현재 · 미래</span></button>
+        </div>
         <p class="t-ask">지금 제일 마음 쓰이는 건?</p>
         <div class="t-cats">
           <button type="button" data-cat="work"><b>일</b><span>회사·하는 일</span></button>
@@ -399,11 +484,11 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
       </div>
       <div id="t-step2" class="t-pick" hidden>
         <p class="t-ask" id="t-q"></p>
-        <p>마음 가는 카드 한 장을 누르세요.</p>
+        <p id="t-hint">마음 가는 카드 한 장을 누르세요.</p>
         <div class="spread" id="spread"></div>
       </div>
       <div id="t-res" class="t-res" hidden>
-        <div class="t-card" id="t-card"><img id="t-img" alt="" width="360" height="526"></div>
+        <div class="t-card" id="t-card"></div>
         <div class="t-txt">
           <span class="t-ori" id="t-ori"></span>
           <p class="t-name" id="t-name"></p>
@@ -417,6 +502,18 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
           </div>
           <p class="toast" id="t-toast" role="status" aria-live="polite"></p>
         </div>
+      </div>
+      <div id="t-res3" class="t-res3" hidden>
+        <span class="t-ori" id="t3-ori"></span>
+        <div class="t3-row" id="t3-row"></div>
+        <p class="t3-flow" id="t3-flow"></p>
+        <p class="res-tip" id="t3-tip"></p>
+        <div class="acts">
+          <button type="button" class="btn" id="t3-save">그림으로 저장</button>
+          <button type="button" class="link" id="t3-share">펼친 카드 공유하기</button>
+          <button type="button" class="ghost" id="t3-again">다시 펼치기</button>
+        </div>
+        <p class="toast" id="t3-toast" role="status" aria-live="polite"></p>
       </div>
     </div>
   </section>
@@ -445,11 +542,19 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
 
   /* ---------- 한 번에 놀이 하나 — 주소 해시로 ---------- */
   var PLAYS = ['test', 'fortune', 'tarot'];
+  // 주소 해시 → 화면. 심리테스트 셋은 한 화면(#test)을 같이 쓴다
+  var HASH_SEC = { test: 'test', meeting: 'test', lunch: 'test', fortune: 'fortune', tarot: 'tarot' };
+  var TEST_OF = { test: 'work', meeting: 'meeting', lunch: 'lunch' };
+  function own(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
   if (location.hash === '#case') { location.replace('case/'); return; }   // 옛 「야근 범인」 공유 주소 → 새 추리 게임
   var cameFromHome = false;
   function route() {
     var h = location.hash.slice(1);
-    var on = PLAYS.indexOf(h) >= 0 ? h : '';
+    var on = own(HASH_SEC, h) ? HASH_SEC[h] : '';
+    if (on === 'test' && (!T || T.id !== TEST_OF[h])) {
+      setTest(TEST_OF[h]);
+      if (location.search) { try { history.replaceState(null, '', location.pathname + '#' + h); } catch (e) {} }
+    }
     $('home').hidden = !!on;
     PLAYS.forEach(function (k) { $(k).hidden = k !== on; });
     document.body.setAttribute('data-play', on);
@@ -458,7 +563,7 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
   }
   window.addEventListener('hashchange', function (e) {
     var prev = (e.oldURL.split('#')[1] || '');
-    cameFromHome = PLAYS.indexOf(prev) < 0;
+    cameFromHome = !own(HASH_SEC, prev);
     route();
   });
   // 결과 주소(?r= 등)로 바꾼 뒤 뒤로 가면 hashchange 가 안 올 수 있다
@@ -499,10 +604,27 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     if (line) lines.push(line);
     return lines;
   }
+  var HEAD = '"Gowun Batang", Batang, serif', BODY = '"Noto Sans KR", "Malgun Gothic", sans-serif', MONO = '"JetBrains Mono", Consolas, monospace';
+  // 그림이 없는 타로 카드 면 — 화면의 .tface 와 같은 꼴
+  function drawFace(ctx, x, y, w, h, f) {
+    ctx.save();
+    ctx.fillStyle = '#2b2723'; ctx.fillRect(x, y, w, h);
+    ctx.strokeStyle = 'rgba(230,195,122,.85)'; ctx.lineWidth = Math.max(1.5, w * 0.007);
+    ctx.strokeRect(x + w * 0.05, y + w * 0.05, w * 0.9, h - w * 0.1);
+    ctx.strokeStyle = 'rgba(230,195,122,.35)'; ctx.lineWidth = Math.max(1, w * 0.004);
+    ctx.strokeRect(x + w * 0.08, y + w * 0.08, w * 0.84, h - w * 0.16);
+    ctx.fillStyle = '#e6c37a'; ctx.strokeStyle = '#e6c37a'; ctx.textAlign = 'center';
+    ctx.font = '700 ' + Math.round(w * 0.13) + 'px ' + HEAD; ctx.fillText(f.num, x + w / 2, y + h * 0.15);
+    ctx.lineWidth = Math.max(1.5, w * 0.007);
+    ctx.beginPath(); ctx.arc(x + w / 2, y + h / 2, w * 0.27, 0, Math.PI * 2); ctx.stroke();
+    ctx.textBaseline = 'middle'; ctx.font = '700 ' + Math.round(w * 0.25) + 'px ' + HEAD; ctx.fillText(f.sym, x + w / 2, y + h / 2 + w * 0.01);
+    ctx.textBaseline = 'alphabetic'; ctx.font = '700 ' + Math.round(w * 0.12) + 'px ' + HEAD; ctx.fillText(f.ko, x + w / 2, y + h * 0.9);
+    ctx.restore();
+  }
+  // 그린 뒤 마지막 글자 아래 y 를 돌려준다(넘치면 saveCard 가 캔버스를 늘려 다시 그린다)
   function drawCard(canvas, o) {
     var W = canvas.width, H = canvas.height, ctx = canvas.getContext('2d');
     var P = Math.round(W * 0.085), inner = W - P * 2, u = W / 1080;
-    var HEAD = '"Gowun Batang", Batang, serif', BODY = '"Noto Sans KR", "Malgun Gothic", sans-serif', MONO = '"JetBrains Mono", Consolas, monospace';
     ctx.fillStyle = '#f4efe6'; ctx.fillRect(0, 0, W, H);
     ctx.strokeStyle = '#2b2723'; ctx.lineWidth = 2 * u; ctx.strokeRect(P / 2, P / 2, W - P, H - P);
     ctx.textBaseline = 'alphabetic';
@@ -510,23 +632,56 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     ctx.fillStyle = '#9a3f1d'; ctx.font = '500 ' + Math.round(30 * u) + 'px ' + BODY; ctx.fillText(o.kicker, P, y);
     y += 30 * u;
     ctx.fillStyle = '#2b2723'; ctx.fillRect(P, y, inner, 3 * u);
-    if (o.img) {
-      var ih = Math.round(o.imgH * u), iy = y + 28 * u, sw = o.img.naturalWidth, sh = o.img.naturalHeight;
+    if (o.img || o.face) {
+      var ih = Math.round(o.imgH * u), iy = y + 28 * u;
       if (o.imgW) {            // 세로 카드 한 장(타로) — 가운데, 역방향이면 뒤집어서
         var iw = Math.round(o.imgW * u), ix = (W - iw) / 2;
         ctx.save();
         if (o.imgRot) { ctx.translate(ix + iw / 2, iy + ih / 2); ctx.rotate(Math.PI); ctx.translate(-(ix + iw / 2), -(iy + ih / 2)); }
-        ctx.drawImage(o.img, 0, 0, sw, sh, ix, iy, iw, ih);
+        if (o.img) ctx.drawImage(o.img, 0, 0, o.img.naturalWidth, o.img.naturalHeight, ix, iy, iw, ih);
+        else drawFace(ctx, ix, iy, iw, ih, o.face);
         ctx.restore();
-        ctx.lineWidth = 1.5 * u; ctx.strokeRect(ix, iy, iw, ih);
+        ctx.strokeStyle = '#2b2723'; ctx.lineWidth = 1.5 * u; ctx.strokeRect(ix, iy, iw, ih);
       } else {
+        var sw = o.img.naturalWidth, sh = o.img.naturalHeight;
         var r = inner / ih, cw = sw, ch = sw / r; if (ch > sh) { ch = sh; cw = sh * r; }
         ctx.drawImage(o.img, (sw - cw) / 2, (sh - ch) / 2, cw, ch, P, iy, inner, ih);
         ctx.lineWidth = 1.5 * u; ctx.strokeRect(P, iy, inner, ih);
       }
       y = iy + ih;
     }
-    y += (o.img ? 80 : 90) * u;
+    if (o.seal) {              // 그림 없는 테스트 — 점 무늬 바탕에 도장 한 글자
+      var sh2 = Math.round(440 * u), sy = y + 28 * u, ss = 220 * u;
+      ctx.save();
+      ctx.fillStyle = '#ece5d8'; ctx.fillRect(P, sy, inner, sh2);
+      ctx.fillStyle = '#d9d0c2';
+      for (var gx = P + 11 * u; gx < P + inner; gx += 22 * u) for (var gy = sy + 11 * u; gy < sy + sh2; gy += 22 * u) { ctx.beginPath(); ctx.arc(gx, gy, 1.8 * u, 0, Math.PI * 2); ctx.fill(); }
+      ctx.translate(W / 2, sy + sh2 / 2); ctx.rotate(-6 * Math.PI / 180);
+      ctx.fillStyle = '#2b2723'; ctx.fillRect(-ss / 2 + 8 * u, -ss / 2 + 8 * u, ss, ss);
+      ctx.fillStyle = '#9a3f1d'; ctx.fillRect(-ss / 2, -ss / 2, ss, ss);
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = '700 ' + Math.round(150 * u) + 'px ' + HEAD;
+      ctx.fillText(o.seal, 0, 6 * u);
+      ctx.restore();
+      ctx.strokeStyle = '#2b2723'; ctx.lineWidth = 1.5 * u; ctx.strokeRect(P, sy, inner, sh2);
+      y = sy + sh2;
+    }
+    if (o.cards) {             // 세 장 펼치기 — 나란히, 아래에 과거·현재·미래
+      var n = o.cards.length, gap = 44 * u, cW = Math.min((inner - gap * (n - 1)) / n, 250 * u), cH = cW * 1216 / 832;
+      var x0 = (W - (cW * n + gap * (n - 1))) / 2, cy = y + 30 * u;
+      o.cards.forEach(function (cd, i) {
+        var cx = x0 + i * (cW + gap);
+        ctx.save();
+        if (cd.rot) { ctx.translate(cx + cW / 2, cy + cH / 2); ctx.rotate(Math.PI); ctx.translate(-(cx + cW / 2), -(cy + cH / 2)); }
+        if (cd.img) ctx.drawImage(cd.img, 0, 0, cd.img.naturalWidth, cd.img.naturalHeight, cx, cy, cW, cH);
+        else drawFace(ctx, cx, cy, cW, cH, cd.face);
+        ctx.restore();
+        ctx.strokeStyle = '#2b2723'; ctx.lineWidth = 1.5 * u; ctx.strokeRect(cx, cy, cW, cH);
+        ctx.fillStyle = '#9a3f1d'; ctx.font = '700 ' + Math.round(28 * u) + 'px ' + HEAD; ctx.textAlign = 'center';
+        ctx.fillText(cd.pos, cx + cW / 2, cy + cH + 44 * u); ctx.textAlign = 'left';
+      });
+      y = cy + cH + 64 * u;
+    }
+    y += (o.seal ? 104 : o.img || o.face || o.cards ? 80 : 90) * u;
     ctx.fillStyle = '#2b2723'; ctx.font = '700 ' + Math.round(o.titleSize * u) + 'px ' + HEAD;
     wrapText(ctx, o.title, inner).forEach(function (l) { ctx.fillText(l, P, y); y += o.titleSize * 1.28 * u; });
     if (o.sub) { y -= 4 * u; ctx.fillStyle = '#9a3f1d'; ctx.font = '500 ' + Math.round(30 * u) + 'px ' + BODY; ctx.fillText(o.sub, P, y); y += 50 * u; }
@@ -549,6 +704,18 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
         y += 26 * u;
       });
     }
+    if (o.list) {              // 이름표 + 글 줄(점수 없이)
+      y += 6 * u;
+      o.list.forEach(function (row) {
+        ctx.fillStyle = '#d9d0c2'; ctx.fillRect(P, y - 34 * u, inner, 1.5 * u);
+        y += 18 * u;
+        ctx.fillStyle = '#9a3f1d'; ctx.font = '700 ' + Math.round(31 * u) + 'px ' + HEAD; ctx.fillText(row.label, P, y);
+        y += 48 * u;
+        ctx.fillStyle = '#4a443d'; ctx.font = '400 ' + Math.round(29 * u) + 'px ' + BODY;
+        wrapText(ctx, row.text, inner).forEach(function (l) { ctx.fillText(l, P, y); y += 46 * u; });
+        y += 26 * u;
+      });
+    }
     if (o.tip) {
       y += 24 * u;
       ctx.fillStyle = '#d9d0c2'; ctx.fillRect(P, y - 30 * u, inner, 1.5 * u);
@@ -560,6 +727,12 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     ctx.fillText(o.foot, P, H - P - 10 * u);
     ctx.fillStyle = '#9a3f1d'; ctx.font = '700 ' + Math.round(30 * u) + 'px ' + HEAD;
     var mark = 'swbins'; ctx.fillText(mark, W - P - ctx.measureText(mark).width, H - P - 10 * u);
+    return y;
+  }
+  function renderCard(c, opts) {
+    c.width = 1080; c.height = 1350;
+    var y = drawCard(c, opts), room = c.height - 92 - 60;   // 92 = 바깥 여백(P), 60 = 맨 아래 주소 줄 자리
+    if (y > room) { c.height = Math.ceil(y + 92 + 70); drawCard(c, opts); }
   }
   function saveCard(opts, name, toastEl, ev) {
     var c = $('card');
@@ -567,7 +740,7 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
       document.fonts.load('700 84px "Gowun Batang"'), document.fonts.load('400 40px "Noto Sans KR"'), document.fonts.load('500 30px "Noto Sans KR"'), document.fonts.load('400 26px "JetBrains Mono"')
     ]).catch(function () {}) : Promise.resolve();
     ready.then(function () {
-      drawCard(c, opts);
+      renderCard(c, opts);
       c.toBlob(function (blob) {
         if (!blob) { toastEl.textContent = '그림을 만들지 못했어요. 화면을 캡처해 주세요.'; return; }
         var url = URL.createObjectURL(blob);
@@ -653,14 +826,182 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
       ['한도 안 넘기고 하루 작업을 끝냈을 때', 'ai'],
       ['정시에 컴퓨터를 끌 때', 'calm'] ] }
   ];
-  var KEYS = 'ABCDE';
-  var answers = [], cur = 0, busy = false;
+  /* ---------- 5. 나의 회의 유형 ---------- */
+  var MEET_TYPES = {
+    talk: { name: '정적을 못 참는 분위기 메이커', mark: '말',
+      desc: '회의실에 3초 넘는 정적이 흐르면 견디질 못해요. 덕분에 회의가 굴러가는데, 끝나고 보면 정한 건 별로 없을 때가 있습니다.',
+      tip: '오늘 할 일: 다음 회의에서 말을 꺼내기 전에 「그래서 오늘 정할 건?」 한 줄을 먼저 떠올려 보기.' },
+    note: { name: '회의록을 혼자 다 쓰는 서기', mark: '록',
+      desc: '누가 무슨 말을 했는지 제일 정확히 아는 사람. 다만 받아 적느라 바빠서, 정작 내 의견은 회의록에 한 줄도 없을 때가 많아요.',
+      tip: '오늘 할 일: 회의록 맨 아래에 내 의견 한 줄 적어 넣기. 적는 사람에게도 발언권이 있어요.' },
+    clock: { name: '30분이면 된다는 시간 지킴이', mark: '시',
+      desc: '회의는 짧을수록 좋다고 믿어요. 안건 1번부터 시작해 제시간에 끝내는 모습에 다들 속으로 고마워합니다. 가끔 너무 빨리 끝내서 할 말이 남기도 하고요.',
+      tip: '오늘 할 일: 회의 끝에 2분만 남겨 두고 「빠진 거 없죠?」 물어보기.' },
+    quiet: { name: '마지막 5분의 조용한 한 방', mark: '침',
+      desc: '50분 동안 말이 없다가 끝나기 직전 한마디로 판을 바꿔요. 다 듣고 있었다는 게 그때 밝혀집니다.',
+      tip: '오늘 할 일: 그 한 방을 회의 중간에 던져 보기. 시간이 남아 있을 때 더 잘 먹혀요.' },
+    yes: { name: '일단 끄덕이는 평화주의자', mark: '평',
+      desc: '회의가 험악해지지 않는 건 당신 덕이 커요. 다만 「저도 좋습니다」 뒤에 숨은 진짜 생각은 아무도 모릅니다.',
+      tip: '오늘 할 일: 「좋습니다」 뒤에 「다만 하나만요」를 붙여 보기.' }
+  };
+  var MEET_QS = [
+    { q: '회의 시작 5분 전, 나는', a: [
+      ['벌써 들어가서 먼저 온 사람이랑 수다 중', 'talk'],
+      ['지난 회의록부터 열어 둔다', 'note'],
+      ['안건이 몇 개인지 세고, 몇 시에 끝날지 계산한다', 'clock'],
+      ['카메라 끄고 음소거부터 확인', 'quiet'],
+      ['누가 들어오나 보고 분위기를 짐작한다', 'yes'] ] },
+    { q: '회의가 시작됐는데 아무도 입을 안 연다.', a: [
+      ['못 참고 내가 먼저 연다', 'talk'],
+      ['「지난번 정리부터 할게요」 하고 화면을 띄운다', 'note'],
+      ['「안건 1번부터 바로 갈게요」', 'clock'],
+      ['누가 열겠지. 기다린다', 'quiet'] ] },
+    { q: '회의 중 내 노트에 제일 많이 적힌 것은?', a: [
+      ['거의 없다. 말하느라 바빴다', 'talk'],
+      ['누가 무슨 말 했는지 거의 전부', 'note'],
+      ['「지금 25분 지남」', 'clock'],
+      ['딱 한 줄. 근데 그게 핵심이다', 'quiet'],
+      ['다들 좋다고 한 것들', 'yes'] ] },
+    { q: '회의가 예정 시간을 10분 넘겼다.', a: [
+      ['이야기가 재밌어서 몰랐다', 'talk'],
+      ['정리할 게 늘어서 손이 바쁘다', 'note'],
+      ['「다음 일정이 있어서요」 먼저 말한다', 'clock'],
+      ['다들 괜찮아 보이니 나도 괜찮은 척', 'yes'] ] },
+    { q: '의견이 둘로 갈렸다.', a: [
+      ['양쪽 다 더 들어 보자며 판을 키운다', 'talk'],
+      ['두 의견을 표로 나눠 적는다', 'note'],
+      ['「다음 회의 때 정하죠」로 마무리', 'clock'],
+      ['한참 듣다가 「근데 이건 어때요」 하나 던진다', 'quiet'],
+      ['둘 다 맞는 말 같다', 'yes'] ] },
+    { q: '「혹시 다른 의견 있으신가요?」', a: [
+      ['있다. 사실 세 개 있다', 'talk'],
+      ['「방금 말씀, 이렇게 적어도 될까요?」', 'note'],
+      ['없다고 해야 빨리 끝난다', 'clock'],
+      ['있지만 지금은 아니다. 끝나고 메신저로', 'quiet'],
+      ['「저도 좋습니다」', 'yes'] ] },
+    { q: '회의가 끝나고 제일 먼저 하는 일은?', a: [
+      ['옆 사람이랑 회의 뒷이야기', 'talk'],
+      ['회의록 정리해서 바로 공유', 'note'],
+      ['달력에서 다음 회의를 찾아 줄일 수 있나 본다', 'clock'],
+      ['아까 못 한 말을 정리해서 한 사람에게만 보낸다', 'quiet'],
+      ['「아까 분위기 괜찮았죠?」 확인한다', 'yes'] ] },
+    { q: '화상 회의 때 내 화면은', a: [
+      ['카메라 켜고 손짓까지 보인다', 'talk'],
+      ['회의록 창이 화면 절반', 'note'],
+      ['구석에 시계', 'clock'],
+      ['카메라는 꺼져 있지만 다 듣고 있다', 'quiet'],
+      ['열심히 끄덕이는 내 얼굴', 'yes'] ] },
+    { q: '「오늘 회의 어땠어요?」에 내 대답은', a: [
+      ['「재밌었어요. 또 해요」', 'talk'],
+      ['「정리해서 보내 드릴게요」', 'note'],
+      ['「다음엔 20분이면 될 것 같아요」', 'clock'],
+      ['「한 가지만 짚고 싶은 게 있는데요」', 'quiet'],
+      ['「다 좋았어요」', 'yes'] ] }
+  ];
 
+  /* ---------- 6. 점심 메뉴로 보는 일 스타일 ---------- */
+  var LUNCH_TYPES = {
+    same: { name: '늘 먹던 거 — 루틴 장인', mark: '늘',
+      desc: '메뉴판을 안 봐도 주문할 수 있는 단골집이 있어요. 일도 한번 정한 방식대로 해서 실수가 거의 없습니다. 바뀌는 걸 조금 귀찮아할 뿐.',
+      tip: '오늘 할 일: 늘 하던 일 하나에서 순서 하나만 바꿔 보기. 생각보다 빨라질 수도 있어요.' },
+    new: { name: '신메뉴부터 — 새 길 개척자', mark: '새',
+      desc: '처음 보는 메뉴가 있으면 일단 시켜 봐요. 일에서도 남들이 안 해 본 방법부터 찾습니다. 성공률은 반반, 이야깃거리는 늘 넉넉해요.',
+      tip: '오늘 할 일: 새로 써 본 방법 중 괜찮았던 걸 하나 적어서 팀에 알려 주기.' },
+    vote: { name: '다들 뭐 드실래요 — 조율 담당', mark: '합',
+      desc: '점심 단톡방은 늘 당신이 엽니다. 일도 혼자보다 같이 정하는 게 마음 편해요. 덕분에 팀이 덜 삐걱대는데, 정작 내가 먹고 싶은 건 자주 뒤로 밀립니다.',
+      tip: '오늘 할 일: 후보를 내놓을 때 내 1순위를 맨 앞에 두기.' },
+    quick: { name: '제일 빨리 나오는 걸로 — 효율파', mark: '빨',
+      desc: '맛집보다 회전 빠른 집. 줄이 길면 미련 없이 돌아섭니다. 일도 가장 짧은 길부터 찾아서, 마감 앞에서 특히 든든한 사람이에요.',
+      tip: '오늘 할 일: 아낀 시간에 쉬는 것도 일정에 넣기. 빨리 끝낸 자리에 일이 또 들어오면 끝이 없어요.' },
+    desk: { name: '자리에서 대충 — 몰입형', mark: '몰',
+      desc: '하던 일이 끝나야 배가 고파져요. 한번 붙잡으면 놓지 않는 집중력이 무기인데, 점심이 세 시가 되는 날도 있습니다.',
+      tip: '오늘 할 일: 12시에 알람 맞춰 두고, 울리면 일단 일어나기.' }
+  };
+  var LUNCH_QS = [
+    { q: '11시 50분. 머릿속에 떠오르는 건', a: [
+      ['어제 그 집. 오늘도 거기', 'same'],
+      ['지난주에 새로 생긴 가게', 'new'],
+      ['「오늘 점심 어디 가요?」 보낼 타이밍', 'vote'],
+      ['줄 안 서는 집이 어디였더라', 'quick'],
+      ['아직 하던 거 마무리 중. 점심은 그다음', 'desk'] ] },
+    { q: '메뉴판을 펼쳤다.', a: [
+      ['볼 필요 없다. 늘 시키는 거', 'same'],
+      ['「이건 뭐예요?」 처음 보는 이름부터', 'new'],
+      ['「다들 뭐 시켜요?」 듣고 맞춰서 고른다', 'vote'],
+      ['제일 빨리 나오는 거', 'quick'] ] },
+    { q: '같이 간 사람이 「아무거나」 라고 한다.', a: [
+      ['그럼 늘 가던 데로', 'same'],
+      ['기회다. 가 보고 싶던 데로', 'new'],
+      ['후보 세 개를 내놓고 고르게 한다', 'vote'],
+      ['제일 가까운 데로', 'quick'],
+      ['「저는 오늘 자리에서 먹을게요」', 'desk'] ] },
+    { q: '가려던 집에 줄이 20분이다.', a: [
+      ['그래도 선다. 여기가 맛있다', 'same'],
+      ['이 김에 옆 가게를 가 본다', 'new'],
+      ['다들 어떻게 할지 물어본다', 'vote'],
+      ['바로 돌아선다', 'quick'] ] },
+    { q: '음식이 나왔다. 나는', a: [
+      ['늘 먹던 순서대로 먹는다', 'same'],
+      ['사진부터 한 장', 'new'],
+      ['「조금씩 나눠 먹을까요?」', 'vote'],
+      ['말없이 먹기 시작', 'quick'],
+      ['한 손엔 숟가락, 한 손엔 업무 메신저', 'desk'] ] },
+    { q: '점심 먹고 20분이 남았다.', a: [
+      ['늘 가던 카페, 늘 마시던 음료', 'same'],
+      ['안 가 본 골목 한 바퀴', 'new'],
+      ['다 같이 커피. 계산은 내가 나눠서', 'vote'],
+      ['일찍 들어가서 눈 좀 붙인다', 'quick'],
+      ['자리로 돌아가 오후 일을 미리 시작', 'desk'] ] },
+    { q: '회사에서 처음 해 보는 일이 떨어졌다.', a: [
+      ['예전에 비슷하게 했던 방식부터 꺼낸다', 'same'],
+      ['안 써 본 방법을 써 볼 기회다', 'new'],
+      ['누구랑 같이 할지부터 정한다', 'vote'],
+      ['제일 빨리 끝내는 길부터 찾는다', 'quick'],
+      ['일단 붙잡고, 끝날 때까지 안 놓는다', 'desk'] ] },
+    { q: '회식 장소를 정하라고 한다면', a: [
+      ['늘 가던 그 집. 실패가 없다', 'same'],
+      ['요즘 뜨는 곳을 찾아 예약', 'new'],
+      ['투표부터 올린다', 'vote'],
+      ['회사에서 제일 가까운 곳', 'quick'],
+      ['「아무 데나 좋아요, 저는 조금 늦게 갈게요」', 'desk'] ] }
+  ];
+
+  /* ---------- 심리테스트 셋 — 같은 엔진, 같은 화면 ---------- */
+  var TESTS = {
+    work: { hash: 'test', title: '나는 어떤 일 유형?', no: '01 · 질문 9개', cover: 'assets/cover-test.webp', img: true, file: '일유형',
+      lead: '회사·집에서 흔히 겪는 장면 아홉 개. 제일 나 같은 걸 고르면 됩니다. 정답은 없고, 맞아도 틀려도 웃고 넘기면 돼요.',
+      ev: 'rest-test', evt: { done: '쉬어가기: 일 유형 테스트 완료', save: '쉬어가기: 결과 그림 저장', share: '쉬어가기: 결과 공유' },
+      types: TYPES, order: ORDER, qs: QS },
+    meeting: { hash: 'meeting', title: '나의 회의 유형', no: '05 · 질문 9개', glyph: '회의', file: '회의유형',
+      lead: '회의실에서 흔히 보는 장면 아홉 개. 제일 나 같은 걸 고르면 됩니다. 어느 유형이든 회의에 한 명씩은 꼭 필요해요.',
+      ev: 'rest-meeting', evt: { done: '쉬어가기: 회의 유형 테스트 완료', save: '쉬어가기: 회의 유형 그림 저장', share: '쉬어가기: 회의 유형 공유' },
+      types: MEET_TYPES, order: ['talk', 'note', 'clock', 'quiet', 'yes'], qs: MEET_QS },
+    lunch: { hash: 'lunch', title: '점심 메뉴로 보는 일 스타일', no: '06 · 질문 8개', glyph: '점심', file: '점심유형',
+      lead: '점심 고르는 버릇이 일하는 버릇이랑 닮았다는 이야기가 있죠. 질문 여덟 개, 배고플 때 하면 더 정확합니다.',
+      ev: 'rest-lunch', evt: { done: '쉬어가기: 점심 유형 테스트 완료', save: '쉬어가기: 점심 유형 그림 저장', share: '쉬어가기: 점심 유형 공유' },
+      types: LUNCH_TYPES, order: ['same', 'new', 'vote', 'quick', 'desk'], qs: LUNCH_QS }
+  };
+  Object.keys(TESTS).forEach(function (k) { TESTS[k].id = k; });
+  // 공유 주소: 일 유형은 옛 주소 그대로 ?r=repeat, 나머지는 ?r=meeting-talk
+  function rParam(key) { return T.id === 'work' ? key : T.id + '-' + key; }
+
+  var KEYS = 'ABCDE';
+  var T = null, answers = [], cur = 0, busy = false, shownKey = null;
+
+  function setTest(id) {
+    T = TESTS[id]; answers = []; cur = 0; busy = false; shownKey = null;
+    var cov = $('test-cover'), gl = $('test-glyph');
+    if (T.cover) { cov.src = T.cover; cov.hidden = false; gl.hidden = true; }
+    else { cov.hidden = true; gl.hidden = false; gl.textContent = T.glyph; }
+    $('test-no').textContent = T.no; $('test-h').textContent = T.title; $('test-lead').textContent = T.lead;
+    $('quiz').hidden = false; $('reveal').hidden = true; $('result').hidden = true;
+    showQ();
+  }
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function showQ() {
-    var item = QS[cur];
-    $('q-num').innerHTML = '<b>' + pad(cur + 1) + '</b> / ' + pad(QS.length);
-    $('q-bar').style.width = ((cur + 1) / QS.length * 100) + '%';
+    var item = T.qs[cur];
+    $('q-num').innerHTML = '<b>' + pad(cur + 1) + '</b> / ' + pad(T.qs.length);
+    $('q-bar').style.width = ((cur + 1) / T.qs.length * 100) + '%';
     $('q-mark').textContent = 'Q' + (cur + 1);
     $('q-text').textContent = item.q;
     $('q-back').hidden = cur === 0;
@@ -695,45 +1036,49 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     busy = true;
     answers[cur] = i;
     btn.classList.add('picked');
-    if (cur < QS.length - 1) {
+    if (cur < T.qs.length - 1) {
       turn(function () { cur++; showQ(); busy = false; var f = $('q-opts').querySelector('button'); if (f) f.focus({ preventScroll: true }); });
       return;
     }
-    var score = {};
-    ORDER.forEach(function (k) { score[k] = 0; });
-    answers.forEach(function (ai, qi) { score[QS[qi].a[ai][1]]++; });
+    var score = {}, QL = T.qs;
+    T.order.forEach(function (k) { score[k] = 0; });
+    answers.forEach(function (ai, qi) { score[QL[qi].a[ai][1]]++; });
     // 동점이면 마지막 질문에서 고른 쪽이 이긴다(그것도 아니면 목록 순서)
-    var last = QS[QS.length - 1].a[answers[QS.length - 1]][1];
-    var best = ORDER.reduce(function (acc, k) {
+    var last = QL[QL.length - 1].a[answers[QL.length - 1]][1];
+    var best = T.order.reduce(function (acc, k) {
       if (score[k] > score[acc] || (score[k] === score[acc] && k === last)) return k;
       return acc;
-    }, ORDER[0]);
-    count('rest-test-done', '쉬어가기: 일 유형 테스트 완료');
+    }, T.order[0]);
+    count(T.ev + '-done', T.evt.done);
     setTimeout(function () { busy = false; reveal(best); }, RM ? 0 : 240);
   }
   $('q-back').addEventListener('click', function () { if (cur > 0 && !busy) { cur--; showQ(); } });
 
   // 결과 공개 — 유형 이름이 잠깐 돌다가 멈춘다
   function reveal(key) {
-    new Image().src = 'assets/type-' + key + '.webp';
+    if (T.img) new Image().src = 'assets/type-' + key + '.webp';
     if (RM) { showResult(key, false); return; }
     $('quiz').hidden = true; $('reveal').hidden = false;
-    var n = 0, spin = $('spin');
-    var t = setInterval(function () { spin.textContent = TYPES[ORDER[n++ % ORDER.length]].name; }, 110);
-    setTimeout(function () { clearInterval(t); $('reveal').hidden = true; showResult(key, false); }, 1100);
+    var n = 0, spin = $('spin'), tt = T;
+    var iv = setInterval(function () { spin.textContent = tt.types[tt.order[n++ % tt.order.length]].name; }, 110);
+    setTimeout(function () { clearInterval(iv); $('reveal').hidden = true; showResult(key, false); }, 1100);
   }
 
-  var shownKey = null;
   function showResult(key, shared) {
-    var t = TYPES[key];
+    var t = T.types[key];
     shownKey = key;
-    $('r-img').src = 'assets/type-' + key + '.webp';
-    $('r-img').alt = t.name + ' 그림';
+    var img = $('r-img'), seal = $('r-seal');
+    if (T.img) {
+      img.src = 'assets/type-' + key + '.webp'; img.alt = t.name + ' 그림'; img.hidden = false; seal.hidden = true;
+    } else {
+      img.hidden = true; img.removeAttribute('src'); img.alt = '';
+      seal.hidden = false; $('r-mark').textContent = t.mark; $('r-sealtxt').textContent = T.title;
+    }
     $('quiz').hidden = true; $('reveal').hidden = true;
     var res = $('result');
     res.hidden = false;
     res.classList.remove('pop'); void res.offsetWidth; res.classList.add('pop');
-    $('r-from').textContent = shared ? '누군가 받은 결과 — 나는 뭐가 나올까?' : '내 결과';
+    $('r-from').textContent = shared ? '누군가 받은 결과 — 나는 뭐가 나올까?' : '내 결과 · ' + T.title;
     $('r-name').textContent = t.name;
     $('r-desc').textContent = t.desc;
     $('r-tip').innerHTML = '';
@@ -745,37 +1090,47 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     $('r-save').className = shared ? 'link' : 'btn';
     $('r-toast').textContent = '';
     var app = $('r-app');
-    app.innerHTML = '';
-    if (t.appName) {
-      app.appendChild(document.createTextNode('이런 분에게 맞는 앱 — ' + t.app + ' '));
-      var a = document.createElement('a'); a.href = t.appUrl; a.textContent = t.appName;
-      app.appendChild(a);
-      app.appendChild(document.createTextNode(' (무료)'));
-    } else {
-      app.appendChild(document.createTextNode('앱이 딱히 필요 없는 분. 타로나 한 장 뽑고 가세요.'));
+    app.innerHTML = ''; app.hidden = T.id !== 'work';
+    if (T.id === 'work') {
+      if (t.appName) {
+        app.appendChild(document.createTextNode('이런 분에게 맞는 앱 — ' + t.app + ' '));
+        var a = document.createElement('a'); a.href = t.appUrl; a.textContent = t.appName;
+        app.appendChild(a);
+        app.appendChild(document.createTextNode(' (무료)'));
+      } else {
+        app.appendChild(document.createTextNode('앱이 딱히 필요 없는 분. 타로나 한 장 뽑고 가세요.'));
+      }
     }
+    // 다른 테스트로 건너가는 길
+    var more = $('r-more'); more.innerHTML = '';
+    more.appendChild(document.createTextNode('다른 테스트도 있어요 — '));
+    Object.keys(TESTS).filter(function (k) { return k !== T.id; }).forEach(function (k, i) {
+      if (i) more.appendChild(document.createTextNode(' · '));
+      var l = document.createElement('a'); l.href = '#' + TESTS[k].hash; l.textContent = TESTS[k].title; more.appendChild(l);
+    });
     if (!shared) {
-      try { history.replaceState(null, '', '?r=' + key + '#test'); } catch (e) {}
+      try { history.replaceState(null, '', '?r=' + rParam(key) + '#' + T.hash); } catch (e) {}
       window.scrollTo(0, 0);
     }
   }
   $('r-again').addEventListener('click', function () {
     answers = []; cur = 0;
-    try { history.replaceState(null, '', location.pathname + '#test'); } catch (e) {}
+    try { history.replaceState(null, '', location.pathname + '#' + T.hash); } catch (e) {}
     $('result').hidden = true; $('quiz').hidden = false; showQ();
     window.scrollTo(0, 0);
   });
   $('r-save').addEventListener('click', function () {
     var key = shownKey; if (!key) return;
-    var t = TYPES[key], img = $('r-img');
-    var o = { kicker: '쉬어가기 · 나는 어떤 일 유형?', title: t.name, titleSize: 84, body: t.desc, bodySize: 40, tip: t.tip, foot: 'swbins.github.io/rest' };
-    if (img.complete && img.naturalWidth) { o.img = img; o.imgH = 500; o.titleSize = 72; o.bodySize = 36; }
-    saveCard(o, '쉬어가기-일유형-' + key + '.png', $('r-toast'), ['rest-test-save', '쉬어가기: 결과 그림 저장']);
+    var t = T.types[key], img = $('r-img');
+    var o = { kicker: '쉬어가기 · ' + T.title, title: t.name, titleSize: 84, body: t.desc, bodySize: 40, tip: t.tip, foot: 'swbins.github.io/rest' };
+    if (T.img && img.complete && img.naturalWidth) { o.img = img; o.imgH = 500; o.titleSize = 72; o.bodySize = 36; }
+    else if (!T.img) { o.seal = t.mark; o.titleSize = 72; o.bodySize = 36; }
+    saveCard(o, '쉬어가기-' + T.file + '-' + key + '.png', $('r-toast'), [T.ev + '-save', T.evt.save]);
   });
   $('r-share').addEventListener('click', function () {
     var key = shownKey; if (!key) return;
-    count('rest-test-share', '쉬어가기: 결과 공유');
-    share('나는 어떤 일 유형?', '나는 「' + TYPES[key].name + '」 래요. 당신은?', BASE + '?r=' + key, $('r-toast'));
+    count(T.ev + '-share', T.evt.share);
+    share(T.title, '나는 「' + T.types[key].name + '」 래요. 당신은?', BASE + '?r=' + rParam(key), $('r-toast'));
   });
 
   /* ---------- 3. 오늘의 운세 — 날짜(+생년월일)로 정해지는 씨앗 ---------- */
@@ -800,43 +1155,104 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     var p = s.split('-'), d = new Date(+p[0], +p[1] - 1, +p[2]);
     return (+p[1]) + '월 ' + (+p[2]) + '일 ' + '일월화수목금토'[d.getDay()] + '요일';
   }
+  // 항목마다 [낮은 날, 보통 날, 좋은 날] 세 묶음 — 점수에 맞는 묶음에서 한 줄
   var LINES = {
     work: [
-      ['같은 일을 두 번 하게 되기 쉬운 날. 저장부터 하고 시작하세요.', '메일은 보내기 전에 한 번 더. 첨부 파일이 빠지기 쉬운 날이에요.', '급한 부탁이 몰리는 날. 다 받지 말고 하나는 내일로.'],
-      ['평범하게 흘러가는 날. 미뤄 둔 작은 일 하나 끝내기 좋아요.', '회의는 짧게, 메모는 길게.', '오전에 집중이 잘 돼요. 어려운 일은 점심 전에.'],
-      ['막혔던 일이 풀리는 날. 오늘 끝낸 건 오래 갑니다.', '말을 꺼내면 잘 받아들여지는 날. 제안할 게 있으면 오늘.', '손이 빠른 날. 쌓아 둔 일을 몰아서 치워도 괜찮아요.'] ],
+      ['같은 일을 두 번 하게 되기 쉬운 날. 저장부터 하고 시작하세요.', '메일은 보내기 전에 한 번 더. 첨부 파일이 빠지기 쉬운 날이에요.', '급한 부탁이 몰리는 날. 다 받지 말고 하나는 내일로.',
+       '「잠깐 시간 돼요?」가 잠깐이 아닌 날. 몇 분인지 먼저 물어보기.', '엑셀 수식이 하나쯤 어긋나 있을 수 있어요. 합계부터 확인.', '회의가 회의를 낳는 날. 결론은 꼭 메모로 남겨 두기.',
+       '파일 이름에 「최종」을 붙이지 마세요. 오늘은 「최종2」가 나와요.', '오전엔 손이 안 붙는 날. 쉬운 일 하나로 시동부터 걸기.', '답장 기다리다 멈춰 서기 쉬운 날. 기다리는 동안 할 일을 따로 두기.',
+       '비밀번호가 하나쯤 기억 안 나는 날. 침착하게 「비밀번호 찾기」.'],
+      ['평범하게 흘러가는 날. 미뤄 둔 작은 일 하나 끝내기 좋아요.', '회의는 짧게, 메모는 길게.', '오전에 집중이 잘 돼요. 어려운 일은 점심 전에.',
+       '크게 터지는 일도, 크게 잘되는 일도 없는 날. 사실 그게 제일 좋은 날이에요.', '할 일 목록을 다시 쓰면 반은 이미 한 일이에요.', '질문 하나가 한 시간을 아껴 주는 날. 모르면 바로 묻기.',
+       '메일함 숫자 줄이기 좋은 날. 읽고 넘길 건 넘기기.', '두 시에서 세 시 사이가 고비. 일어나서 물 한 잔.', '남의 일을 살짝 거들면 내 일도 풀리는 날.',
+       '큰 그림보다 작은 마무리가 빛나는 날.'],
+      ['막혔던 일이 풀리는 날. 오늘 끝낸 건 오래 갑니다.', '말을 꺼내면 잘 받아들여지는 날. 제안할 게 있으면 오늘.', '손이 빠른 날. 쌓아 둔 일을 몰아서 치워도 괜찮아요.',
+       '보고가 한 번에 통과될 기운. 첫 장에 공을 들이세요.', '「이거 누가 했어요?」 소리를 들을 수 있는 날. 좋은 뜻으로요.', '어제 안 되던 게 오늘은 되는 날. 한 번만 다시 해 보기.',
+       '아이디어가 샤워할 때 말고 책상에서 떠오르는 드문 날.', '일정이 딱딱 맞아떨어지는 날. 미팅 잡기 좋아요.', '오늘 정리해 둔 문서가 다음 달의 나를 살립니다.',
+       '집중이 오래 가는 날. 알림만 꺼 두면 끝까지 갑니다.'] ],
     money: [
-      ['충동 장바구니 주의. 결제는 하룻밤 자고 나서.', '작은 구독료가 새는 날. 안 쓰는 거 하나 끊어 보세요.', '점심값이 생각보다 나가는 날.'],
-      ['들어오는 것도 나가는 것도 고만고만.', '영수증을 정리하면 잊었던 돈이 보여요.', '큰 지출은 다음으로, 작은 저축은 오늘.'],
-      ['뜻밖의 적립금이나 환급이 보일 수 있는 날.', '아껴 둔 쿠폰을 쓰기 좋은 날.', '돈 이야기를 꺼내기 좋은 날. 정산은 오늘 하세요.'] ],
+      ['충동 장바구니 주의. 결제는 하룻밤 자고 나서.', '작은 구독료가 새는 날. 안 쓰는 거 하나 끊어 보세요.', '점심값이 생각보다 나가는 날.',
+       '「오늘만 할인」이라는 말에 약해지는 날. 내일도 할인해요.', '배달비가 음식값을 넘보는 날. 포장이 답일 수도.', '편의점에서 「1+1」을 두 번 집기 쉬운 날.',
+       '커피를 두 잔 사게 되는 날. 한 잔은 사무실 믹스로.', '카드 명세서에 놀랄 수 있는 날. 놀라고 끝내지 말고 한 줄만 따져 보기.', '빌려준 돈 이야기는 오늘 말고 다음에.',
+       '장바구니에 담기만 해도 기분은 반쯤 풀려요. 딱 거기까지만.'],
+      ['들어오는 것도 나가는 것도 고만고만.', '영수증을 정리하면 잊었던 돈이 보여요.', '큰 지출은 다음으로, 작은 저축은 오늘.',
+       '지갑 속 쿠폰 유효기간 확인하기 좋은 날.', '쓴 만큼 적어 두면 덜 쓰게 되는 날.', '비싼 것 하나보다 쓸 만한 것 하나.',
+       '점심을 도시락으로 바꾸면 그게 오늘의 재테크.', '잔액은 그대로인데 마음은 넉넉한 날.', '사고 싶은 건 메모해 두고 일주일 뒤에 다시 보기.',
+       '포인트가 조금 쌓여 있을지도. 앱 한 번 열어 보기.'],
+      ['뜻밖의 적립금이나 환급이 보일 수 있는 날.', '아껴 둔 쿠폰을 쓰기 좋은 날.', '돈 이야기를 꺼내기 좋은 날. 정산은 오늘 하세요.',
+       '오래 고민한 물건, 오늘 사면 후회 없을 기운.', '누가 커피를 사 줄지도 모르는 날.', '잊고 있던 계좌에 몇천 원이 남아 있을지도.',
+       '할인 문자가 진짜로 쓸모 있는 날.', '정산해 보면 내가 받을 쪽인 날.', '작게 모으기 시작하기 좋은 날. 첫 만 원이 제일 어렵습니다.',
+       '지갑은 가벼워도 마음은 든든한 날. 꼭 필요한 데만 썼으니까.'] ],
     people: [
-      ['말끝이 날카롭게 들리기 쉬운 날. 메신저엔 한 문장 더 붙이기.', '답장이 늦어도 너무 마음 쓰지 마세요. 다들 바빠요.', '오해가 생기면 글보다 말로 푸는 게 빨라요.'],
-      ['조용히 지나가는 날. 먼저 안부 한 줄이면 충분.', '옆자리 사람과 커피 한 잔이 하루를 바꿔요.', '듣는 쪽이 이기는 날.'],
-      ['오래 연락 못 한 사람에게서 소식이 올 수 있어요.', '칭찬 한마디가 두 배로 돌아오는 날.', '부탁하면 기꺼이 도와줄 사람이 있는 날.'] ],
+      ['말끝이 날카롭게 들리기 쉬운 날. 메신저엔 한 문장 더 붙이기.', '답장이 늦어도 너무 마음 쓰지 마세요. 다들 바빠요.', '오해가 생기면 글보다 말로 푸는 게 빨라요.',
+       '「ㅇㅇ」 두 글자가 차갑게 읽히는 날. 「네, 좋아요」로.', '단톡방에서 내 말이 묻히기 쉬운 날. 중요한 건 따로 보내기.', '농담이 농담으로 안 들릴 수 있는 날. 오늘은 아껴 두기.',
+       '부탁을 거절할 일이 생길 수도. 짧고 부드럽게.', '피곤한 사람이 많은 날. 다들 날이 서 있어도 내 탓은 아니에요.', '회의에서 말이 엇갈리기 쉬운 날. 끝나고 한 번 더 확인.',
+       '메일 받는 사람 칸을 다시 보세요. 이름이 틀리기 쉬운 날이에요.'],
+      ['조용히 지나가는 날. 먼저 안부 한 줄이면 충분.', '옆자리 사람과 커피 한 잔이 하루를 바꿔요.', '듣는 쪽이 이기는 날.',
+       '칭찬도 잔소리도 없는 무난한 날.', '점심 같이 먹자는 말이 반갑게 들리는 날.', '「고마워요」를 한 번 더 말하면 하루가 부드러워져요.',
+       '오랜만에 가족에게 전화 한 통.', '같은 팀 사람의 새로운 면을 보게 되는 날.', '말수는 적어도 눈치는 잘 통하는 날.',
+       '내 편이 적어도 한 명은 있다는 걸 알게 되는 날.'],
+      ['오래 연락 못 한 사람에게서 소식이 올 수 있어요.', '칭찬 한마디가 두 배로 돌아오는 날.', '부탁하면 기꺼이 도와줄 사람이 있는 날.',
+       '처음 말 섞은 사람과 금방 친해지는 날.', '내 농담에 다들 웃는 날. 아껴 둔 거 하나 꺼내도 돼요.', '단톡방 분위기를 내가 살리는 날.',
+       '서먹했던 사이가 커피 한 잔에 풀리는 날.', '「덕분이에요」라는 말을 듣게 되는 날.', '새로 알게 된 사람이 좋은 인연이 될 기운.',
+       '꺼내기 어려웠던 이야기, 오늘은 잘 전해져요.'] ],
+    leave: [
+      ['퇴근 10분 전에 「잠깐만요」가 올 기운. 짐은 미리 싸 두기.', '정시 퇴근은 어려울 수도. 저녁 약속은 30분 늦춰 두세요.', '엘리베이터가 층마다 서는 날.',
+       '막차보다 막판 회의가 무서운 날.', '버스를 눈앞에서 놓치기 쉬운 날. 다음 차는 금방 와요.', '퇴근길에 비 올 기운. 우산 있는지 확인.',
+       '일은 끝났는데 메신저가 안 끝나는 날. 알림은 집에 가서 끄기.', '「내일 아침까지 되죠?」를 듣기 쉬운 날. 「점심까지」로 협상해 보기.', '지하철이 꽉 차는 날. 한 정거장 걸어 보는 것도 방법.',
+       '퇴근하고 할 일을 많이 잡지 마세요. 오늘은 눕는 게 일정이에요.'],
+      ['늦지도 이르지도 않게, 딱 평소 시간.', '퇴근길 노래 하나 잘 고르면 반은 성공.', '저녁 메뉴 고민이 퇴근보다 오래 걸리는 날.',
+       '집에 가는 길에 편의점 신상 하나 집어 보기.', '퇴근 뒤 30분은 아무것도 안 하기로 정하기.', '퇴근길에 문득 좋은 생각이 나는 날. 메모해 두기.',
+       '버스가 적당히 와 주는 날.', '칼퇴는 아니어도 억울하지 않은 퇴근.', '오늘 못 한 일은 내일의 내가 해요. 걱정은 책상에 두고 가기.',
+       '저녁 약속 잡기 무난한 날.'],
+      ['정시 퇴근 각. 5분 전부터 조용히 정리 시작.', '일이 일찍 끝나서 해 있을 때 나가는 날.', '퇴근길 신호가 계속 초록불인 날.',
+       '지하철에 빈자리가 나는 날.', '오늘 저녁 약속은 즐거울 기운.', '「먼저 들어가 보세요」를 듣게 되는 날.',
+       '퇴근하고 하려던 일이 실제로 되는 드문 날.', '금요일 같은 기분으로 나가는 날. 요일은 상관없어요.', '집에 가는 길에 맛있는 냄새가 나면 그게 오늘 저녁이에요.',
+       '마감을 깔끔하게 닫고 가볍게 나가는 날.'] ],
     sum: [
-      ['오늘은 힘을 아끼는 날. 잘한 것 하나만 세어 보고 일찍 쉬세요.', '무리하지 않는 게 이기는 날.'],
-      ['무난한 하루. 작은 것 하나를 끝내면 기분이 좋아져요.', '평소대로가 제일 좋은 날.'],
-      ['일도 사람도 잘 풀리는 날. 미뤄 둔 걸 꺼내 보세요.', '운이 따라 주는 날. 망설이던 걸 시작해도 좋아요.'] ]
+      ['오늘은 힘을 아끼는 날. 잘한 것 하나만 세어 보고 일찍 쉬세요.', '무리하지 않는 게 이기는 날.', '계획대로 안 돼도 괜찮은 날. 반만 해도 잘한 거예요.',
+       '조용히 버티면 지나가는 날. 저녁엔 좋아하는 걸 먹어요.', '큰 결정은 내일로. 오늘은 작은 것만.', '운이 잠깐 쉬는 날. 나도 같이 쉬면 됩니다.',
+       '서두르면 꼬이는 날. 한 박자 늦게 가도 늦지 않아요.', '기대를 낮추면 의외로 괜찮게 끝나는 날.'],
+      ['무난한 하루. 작은 것 하나를 끝내면 기분이 좋아져요.', '평소대로가 제일 좋은 날.', '특별할 건 없지만 나쁠 것도 없는 날. 그거면 충분해요.',
+       '오전엔 흐리고 오후엔 갬. 기분 이야기예요.', '하던 걸 하던 대로. 오늘은 그게 제일 빨라요.', '작은 친절 하나가 하루 점수를 올려 주는 날.',
+       '커피 한 잔이 제 몫을 하는 날.', '딱 중간. 점심 메뉴만 잘 고르면 위로 올라가요.'],
+      ['일도 사람도 잘 풀리는 날. 미뤄 둔 걸 꺼내 보세요.', '운이 따라 주는 날. 망설이던 걸 시작해도 좋아요.', '손대는 일마다 깔끔하게 끝나는 날.',
+       '기분 좋은 소식이 하나쯤 들어올 날.', '오늘의 나는 생각보다 잘하고 있어요.', '웃을 일이 평소보다 한두 번 많은 날.',
+       '타이밍이 잘 맞는 날. 엘리베이터도, 점심 줄도.', '하고 싶은 말을 해도 되는 날. 잘 전해져요.'] ]
   };
-  var ITEMS = ['파란 볼펜', '포스트잇', '따뜻한 보리차', '이어폰', '작은 화분', '손수건', '텀블러', '연필', '동전 하나', '우산', '초콜릿 한 조각', '메모장'];
-  var COLORS = [['먹색', '#2b2723'], ['벽돌색', '#9a3f1d'], ['쑥색', '#6b7a4a'], ['하늘색', '#8fb3e8'], ['겨자색', '#d9a63a'], ['연보라', '#a99ac9'], ['베이지', '#d9c7a5'], ['남색', '#2d3a66']];
-  var TODOS = ['책상 위 하나만 치우기', '물 한 컵 더 마시기', '미뤄 둔 답장 하나 보내기', '점심 뒤 10분 걷기', '오늘 한 일 세 줄 적기', '안 쓰는 탭 다 닫기', '퇴근 시간 정해 두고 지키기', '고마운 사람에게 한마디'];
+  var ITEMS = ['파란 볼펜', '포스트잇', '따뜻한 보리차', '이어폰', '작은 화분', '손수건', '텀블러', '연필', '동전 하나', '우산', '초콜릿 한 조각', '메모장',
+    '형광펜', '클립 하나', '고무줄', '귤', '핸드크림', '안경닦이', '충전 케이블', '사탕', '립밤', '탁상 달력', '머리끈', '스테이플러',
+    '마스킹 테이프', '껌', '견과류 한 봉지', '물티슈', '마우스 패드', '책갈피', '열쇠고리', '바나나', '녹차 티백', '지우개', '수첩 맨 뒷장', '사원증 줄'];
+  var COLORS = [['먹색', '#2b2723'], ['벽돌색', '#9a3f1d'], ['쑥색', '#6b7a4a'], ['하늘색', '#8fb3e8'], ['겨자색', '#d9a63a'], ['연보라', '#a99ac9'], ['베이지', '#d9c7a5'], ['남색', '#2d3a66'],
+    ['올리브색', '#7a7a3a'], ['살구색', '#f0b48a'], ['회색', '#9a958e'], ['청록색', '#2f7f7a'], ['자주색', '#8a3a6a'], ['크림색', '#f3e6c4'], ['진초록', '#2f5a3a'], ['주황색', '#e07a2e']];
+  var TODOS = ['책상 위 하나만 치우기', '물 한 컵 더 마시기', '미뤄 둔 답장 하나 보내기', '점심 뒤 10분 걷기', '오늘 한 일 세 줄 적기', '안 쓰는 탭 다 닫기', '퇴근 시간 정해 두고 지키기', '고마운 사람에게 한마디',
+    '모니터 한 번 닦기', '의자 높이 맞추기', '즐겨찾기 하나 정리하기', '바탕화면 파일 다섯 개 지우기', '내일 할 일 세 개만 적어 두기', '창밖 1분 보기', '계단으로 한 층 걷기', '어깨 열 번 돌리기',
+    '메일 제목 하나 또렷하게 쓰기', '점심 메뉴를 남에게 맡겨 보기', '사진첩에서 안 쓰는 사진 열 장 지우기', '「나중에 볼 글」 하나 지금 읽기', '동료에게 「오늘 고생했어요」', '커피 대신 따뜻한 차 한 잔',
+    '노래 한 곡 듣는 동안 아무것도 안 하기', '안 보는 알림 하나 끄기', '서랍 한 칸 정리하기', '오늘 쓴 돈 적어 두기', '평소보다 10분 일찍 눕기', '휴대폰 충전기 챙기기', '오래된 메모 하나 지우기', '바꿀 때 된 비밀번호 하나 바꾸기'];
+  var MENUS = ['김치찌개', '된장찌개', '제육볶음', '칼국수', '비빔밥', '돈가스', '쌀국수', '순댓국', '냉면', '김밥에 라면', '샐러드', '짜장면', '짬뽕', '부대찌개', '초밥',
+    '카레', '떡볶이', '콩나물국밥', '육개장', '마라탕', '백반', '오므라이스', '우동', '햄버거', '닭갈비', '순두부찌개', '생선구이', '덮밥', '수제비', '김치볶음밥'];
+  var HUSH = ['「그거 제가 할게요」', '「금방 해요」', '「다음 주면 돼요」', '「아무거나요」', '「제가 알아서 할게요」', '「원래 그래요」', '「잠깐이면 돼요」', '「이번만요」',
+    '「다들 그렇게 해요」', '「대충 해 주세요」', '「급한 거 아니에요」', '「간단한 건데요」', '「내일 할게요」', '「지난번에 말씀드렸는데」', '「바쁘세요?」', '「저만 그런가요?」',
+    '「이거 왜 이래요?」', '「아 맞다」', '「한 번만 더 볼게요」', '「그건 좀…」', '「누가 했어요?」', '「제가 해 봤는데요」', '「별거 아니에요」', '「나중에 얘기해요」'];
   var SCORE = [1, 2, 3, 3, 4, 4, 5];
   function bucket(s) { return s <= 2 ? 0 : s === 3 ? 1 : 2; }
   function fortuneOf(date, birth) {
     var R = seeded(hashStr('fortune|' + date + '|' + (birth || '')));
     var f = { date: date, personal: !!birth, rows: [] };
     var total = 0;
-    [['work', '일운'], ['money', '금전운'], ['people', '대인운']].forEach(function (k) {
+    [['work', '일운'], ['money', '금전운'], ['people', '대인운'], ['leave', '퇴근운']].forEach(function (k) {
       var s = pickOf(R, SCORE); total += s;
       f.rows.push({ key: k[0], label: k[1], score: s, text: pickOf(R, LINES[k[0]][bucket(s)]) });
     });
-    f.sum = pickOf(R, LINES.sum[total <= 7 ? 0 : total <= 10 ? 1 : 2]);
+    f.sum = pickOf(R, LINES.sum[total <= 9 ? 0 : total <= 13 ? 1 : 2]);
     f.item = pickOf(R, ITEMS);
     f.color = pickOf(R, COLORS);
     var hr = 9 + Math.floor(R() * 12), mm = R() < 0.5 ? '00' : '30';
     f.time = (hr < 12 ? '오전 ' + hr : '오후 ' + (hr === 12 ? 12 : hr - 12)) + ':' + mm;
     f.todo = pickOf(R, TODOS);
+    f.num = 1 + Math.floor(R() * 45);
+    f.menu = pickOf(R, MENUS);
+    f.hush = pickOf(R, HUSH);
     return f;
   }
   var fNow = null, fBirth = null, fShared = false;
@@ -857,7 +1273,8 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
       d.appendChild(b); d.appendChild(pips); d.appendChild(t); rows.appendChild(d);
     });
     var lucky = $('f-lucky'); lucky.innerHTML = '';
-    [['행운의 물건', f.item], ['행운의 색', f.color[0], f.color[1]], ['행운의 시간', f.time]].forEach(function (x) {
+    [['행운의 물건', f.item], ['행운의 색', f.color[0], f.color[1]], ['행운의 숫자', String(f.num)],
+     ['행운의 시간', f.time], ['행운의 점심', f.menu], ['오늘 아껴 둘 말', f.hush]].forEach(function (x) {
       var d = document.createElement('div'), s = document.createElement('small'), v = document.createElement('span');
       s.textContent = x[0];
       if (x[2]) { var sw = document.createElement('i'); sw.className = 'sw'; sw.style.background = x[2]; v.appendChild(sw); }
@@ -908,7 +1325,7 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     var f = fNow; if (!f) return;
     saveCard({ kicker: '쉬어가기 · 오늘의 운세', title: dateLabel(f.date), titleSize: 76, sub: f.personal ? '나만의 운세' : '모두의 운세',
       body: f.sum, bodySize: 36, rows: f.rows,
-      tip: '행운의 물건 ' + f.item + ' · 색 ' + f.color[0] + ' · 시간 ' + f.time + '   오늘 할 일: ' + f.todo, foot: 'swbins.github.io/rest · 재미로 보세요' },
+      tip: '행운의 물건 ' + f.item + ' · 색 ' + f.color[0] + ' · 숫자 ' + f.num + ' · 시간 ' + f.time + ' · 점심 ' + f.menu + ' · 아껴 둘 말 ' + f.hush + '   오늘 할 일: ' + f.todo, foot: 'swbins.github.io/rest · 재미로 보세요' },
       '쉬어가기-운세-' + f.date + '.png', $('f-toast'), ['rest-fortune-save', '쉬어가기: 운세 그림 저장']);
   });
   $('f-share').addEventListener('click', function () {
@@ -918,9 +1335,10 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     share('오늘의 운세', dateLabel(f.date) + ' 운세 — ' + f.sum, BASE + '?d=' + f.date + '#fortune', $('f-toast'));
   });
 
-  /* ---------- 4. 타로 한 장 ---------- */
+  /* ---------- 4. 타로 — 메이저 22장, 한 장 / 세 장(과거·현재·미래) ---------- */
   var CATS = { work: '일', money: '돈', people: '사람', today: '오늘' };
   var CATQ = { work: '일 고민 — 카드는 뭐라고 할까?', money: '돈 고민 — 카드는 뭐라고 할까?', people: '사람 고민 — 카드는 뭐라고 할까?', today: '오늘 하루 — 카드는 뭐라고 할까?' };
+  // sym 은 그림이 없는 카드 면 가운데 한 글자
   var TAROT = {
     fool: { ko: '바보', en: '0 · The Fool', up: '새로 시작하기 좋은 때. 계획이 덜 됐어도 첫발이 중요해요.', rev: '성급함 주의. 뛰기 전에 발밑부터 보세요.',
       work: '새 일은 작게 시작해 보세요. 완벽한 계획은 나중에.', money: '즉흥 결제만 조심하면 괜찮아요.', people: '처음 보는 사람에게 먼저 말 걸어 보기.', today: '안 가 본 길로 한 번 돌아가 보기.' },
@@ -930,6 +1348,10 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
       work: '서두르지 말고 자료부터 차분히 읽어 보기.', money: '느낌이 안 좋으면 오늘은 결제하지 않기.', people: '듣기만 해도 많은 걸 알게 되는 날.', today: '혼자 있는 시간 30분 만들기.' },
     empress: { ko: '여황제', en: 'III · The Empress', up: '돌보면 자라는 때. 꾸준함이 열매가 됩니다.', rev: '남 챙기느라 나를 잊고 있어요.',
       work: '키우고 있는 일에 물 주듯 조금씩 손대기.', money: '작게 모은 것이 쌓이는 때. 끊지 말고 이어 가기.', people: '먼저 챙겨 주면 돌아오는 날.', today: '맛있는 거 하나 나에게 사 주기.' },
+    emperor: { ko: '황제', en: 'IV · The Emperor', sym: '帝', up: '틀을 잡으면 일이 굴러가는 때. 정리하는 사람이 이겨요.', rev: '고집이 원칙처럼 보이는 중. 한 발만 물러서 보세요.',
+      work: '누가 무엇을 언제까지 할지 한 장에 정해 두기.', money: '고정 지출부터 한 줄씩 적어 보기.', people: '정할 건 정해 주면 다들 편해하는 날.', today: '책상 위를 반듯하게 해 두고 시작하기.' },
+    hierophant: { ko: '교황', en: 'V · The Hierophant', sym: '敎', up: '해 본 사람의 방법이 통하는 때. 선배 말이 맞을 때가 많아요.', rev: '규칙이 일을 막고 있다면 왜 생긴 규칙인지부터 물어보기.',
+      work: '처음 하는 일은 해 본 사람에게 먼저 묻기.', money: '유행하는 방법 말고 오래 쓴 방법으로.', people: '선배나 어른과 밥 한 끼가 도움이 되는 날.', today: '좋은 습관 하나를 오늘도 지키기.' },
     lovers: { ko: '연인', en: 'VI · The Lovers', up: '마음이 맞는 쪽을 고르는 때. 선택이 중요해요.', rev: '둘 다 갖고 싶어서 아무것도 못 고르는 중.',
       work: '같이 할 사람을 고르는 게 일의 절반.', money: '두 개 중 하나만. 둘 다는 다음에.', people: '솔직하게 말하면 가까워지는 날.', today: '오래 고민한 선택 하나 끝내기.' },
     chariot: { ko: '전차', en: 'VII · The Chariot', up: '밀고 나가면 되는 때. 방향만 잃지 않으면 돼요.', rev: '속도는 나는데 방향이 흔들려요.',
@@ -940,36 +1362,87 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
       work: '알림 끄고 한 가지에만 집중하는 시간 갖기.', money: '가계부 한 번 펼쳐 보기.', people: '도움을 청하면 생각보다 쉽게 풀려요.', today: '산책하면서 생각 정리하기.' },
     wheel: { ko: '운명의 수레바퀴', en: 'X · Wheel of Fortune', up: '흐름이 바뀌는 때. 좋은 쪽으로 굴러가요.', rev: '지금은 잠깐 내리막. 곧 다시 올라와요.',
       work: '바뀌는 상황에 올라타 보기. 버티는 것보다 쉬워요.', money: '들쭉날쭉한 때. 큰 결정은 조금 미루기.', people: '뜻밖의 연락이 반가운 날.', today: '평소와 다른 메뉴 골라 보기.' },
+    justice: { ko: '정의', en: 'XI · Justice', sym: '正', up: '따져 보면 답이 나오는 때. 공정하게 나누면 뒤탈이 없어요.', rev: '한쪽 말만 듣고 정하려는 중일지도.',
+      work: '근거 하나를 붙여서 말하기. 설득이 쉬워져요.', money: '정산은 10원 단위까지 맞추기.', people: '양쪽 말을 다 듣고 나서 말하기.', today: '미뤄 둔 결정 하나, 좋은 점·나쁜 점 적고 정하기.' },
+    hanged: { ko: '매달린 사람', en: 'XII · The Hanged Man', sym: '逆', up: '잠깐 멈춰야 보이는 게 있는 때. 거꾸로 보면 답이 보여요.', rev: '멈춘 게 아니라 그냥 미루는 중일 수도.',
+      work: '막힌 일은 반대쪽 끝에서 다시 보기.', money: '사고 싶은 건 사흘만 기다려 보기.', people: '내 쪽에서 한 번 양보해 보기.', today: '10분 동안 아무것도 안 하기.' },
+    death: { ko: '죽음', en: 'XIII · Death', sym: '終', up: '하나가 끝나야 다음이 오는 때. 무서운 카드가 아니라 정리의 카드예요.', rev: '끝난 걸 붙잡고 있어서 다음이 못 오는 중.',
+      work: '안 쓰는 파일, 안 하게 된 일을 목록에서 지우기.', money: '안 쓰는 구독 하나 해지하기.', people: '지난 서운함은 오늘로 털기.', today: '서랍 한 칸 비우기.' },
+    temperance: { ko: '절제', en: 'XIV · Temperance', sym: '和', up: '적당히가 제일 어려운데, 오늘은 그게 되는 때.', rev: '한쪽으로 너무 쏠려 있어요. 균형부터.',
+      work: '50분 일하고 10분 쉬기. 오늘은 이 박자로.', money: '쓰는 만큼 조금은 모으기.', people: '다른 의견 사이에 다리를 놓아 주는 날.', today: '커피 한 잔, 물 한 잔 번갈아 마시기.' },
+    devil: { ko: '악마', en: 'XV · The Devil', sym: '縛', up: '끊기 어려운 것에 묶여 있는 때. 알아채는 게 먼저예요.', rev: '묶여 있던 줄이 느슨해지는 중. 지금 끊으면 돼요.',
+      work: '습관처럼 하는데 아무도 안 보는 일 하나 찾기.', money: '자동 결제 목록 한 번 훑어보기.', people: '눈치 보느라 한 약속은 다시 생각해 보기.', today: '폰 보는 시간 30분 줄이기.' },
+    tower: { ko: '탑', en: 'XVI · The Tower', sym: '塔', up: '계획이 흔들릴 수 있는 때. 무너진 자리에 더 튼튼하게 다시 쌓으면 돼요.', rev: '바꿔야 할 걸 알면서 버티는 중.',
+      work: '오늘은 저장을 자주, 백업은 꼭.', money: '비상금이 얼마인지 확인해 두기.', people: '갑작스러운 말에는 바로 답하지 말고 하루 두기.', today: '일정이 틀어져도 웃고 넘기기.' },
     star: { ko: '별', en: 'XVII · The Star', up: '희망이 보이는 때. 천천히 회복돼요.', rev: '기대가 너무 커서 지쳐 있어요.',
       work: '멀리 있는 목표를 한 줄로 적어 두기.', money: '작은 목표부터 하나씩.', people: '좋은 말을 해 주는 사람 곁에 있기.', today: '밤하늘 한 번 올려다보기.' },
+    moon: { ko: '달', en: 'XVIII · The Moon', sym: '月', up: '흐릿하고 헷갈리는 때. 확실해질 때까지 기다려도 괜찮아요.', rev: '안개가 걷히는 중. 오해가 풀려요.',
+      work: '애매한 지시는 다시 물어서 확인하기.', money: '잘 모르는 투자 이야기는 흘려듣기.', people: '짐작으로 서운해하지 말고 물어보기.', today: '일찍 자기. 밤에 하는 생각은 대개 부풀려져 있어요.' },
     sun: { ko: '태양', en: 'XIX · The Sun', up: '다 잘 풀리는 밝은 때. 마음껏 웃어도 돼요.', rev: '좋은 일이 있는데 못 보고 지나치는 중.',
       work: '잘한 걸 알려도 되는 날. 숨기지 마세요.', money: '기분 좋게 쓰되 영수증은 챙기기.', people: '먼저 밝게 인사하면 하루가 밝아져요.', today: '햇볕 10분 쬐기.' },
+    judgement: { ko: '심판', en: 'XX · Judgement', sym: '審', up: '다시 부르는 소리가 들리는 때. 미뤄 둔 걸 다시 꺼낼 때예요.', rev: '지난 일로 나를 너무 몰아세우는 중.',
+      work: '예전에 접어 둔 아이디어 다시 꺼내 보기.', money: '잊고 있던 환급이나 포인트 찾아보기.', people: '오래 연락 안 한 사람에게 먼저 연락하기.', today: '지난 한 주 잘한 일 하나 떠올리기.' },
     world: { ko: '세계', en: 'XXI · The World', up: '한 바퀴를 끝내는 때. 마무리가 곧 시작이에요.', rev: '거의 다 왔는데 마지막 한 걸음이 남았어요.',
       work: '끝나 가는 일을 깔끔하게 닫기.', money: '정산·정리를 끝내기 좋은 때.', people: '고마웠던 사람에게 인사하기.', today: '하나 끝내고 스스로 칭찬하기.' }
   };
+  var TIMG = { fool: 1, magician: 1, priestess: 1, empress: 1, lovers: 1, chariot: 1, strength: 1, hermit: 1, wheel: 1, star: 1, sun: 1, world: 1 };   // 그림이 있는 카드
   var TKEYS = Object.keys(TAROT);
-  var tCat = null, tNow = null;
-  function tStep(n) { $('t-step1').hidden = n !== 1; $('t-step2').hidden = n !== 2; $('t-res').hidden = n !== 3; }
+  var POS = ['과거', '현재', '미래'];
+  var tCat = null, tNow = null, tNow3 = null, tMode = 'one';
+  function tStep(n) { $('t-step1').hidden = n !== 1; $('t-step2').hidden = n !== 2; $('t-res').hidden = n !== 3; $('t-res3').hidden = n !== 4; }
   function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function tNum(k) { return TAROT[k].en.split(' · ')[0]; }
+  function faceOf(k) { return { num: tNum(k), sym: TAROT[k].sym || '', ko: TAROT[k].ko }; }
+  // 카드 앞면 — 그림이 있으면 그림, 없으면 CSS 로 그린 면
+  function face(k) {
+    if (TIMG[k]) { var im = document.createElement('img'); im.src = 'assets/tarot-' + k + '.webp'; im.alt = TAROT[k].ko + ' 카드'; return im; }
+    var d = document.createElement('span'); d.className = 'tface';
+    d.setAttribute('role', 'img'); d.setAttribute('aria-label', TAROT[k].ko + ' 카드');
+    var tin = document.createElement('span'); tin.className = 'tin'; d.appendChild(tin);
+    ['num', 'orb', 'nm'].forEach(function (c, i) { var s = document.createElement('span'); s.className = c; s.textContent = [tNum(k), TAROT[k].sym, TAROT[k].ko][i]; tin.appendChild(s); });
+    return d;
+  }
+  function oriText(o) { return o === 'r' ? '역방향' : '정방향'; }
+  document.querySelectorAll('[data-mode]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      tMode = b.getAttribute('data-mode');
+      document.querySelectorAll('[data-mode]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    });
+  });
   document.querySelectorAll('[data-cat]').forEach(function (b) {
     b.addEventListener('click', function () {
       tCat = b.getAttribute('data-cat');
+      var three = tMode === 'three', n = three ? 7 : 5, mid = (n - 1) / 2, picked = [];
       $('t-q').textContent = CATQ[tCat];
-      var deal = shuffle(TKEYS).slice(0, 5), sp = $('spread');
-      sp.innerHTML = ''; sp.classList.remove('done');
+      $('t-hint').textContent = three ? '마음 가는 카드 세 장을 차례로 누르세요. 처음 고른 카드가 과거, 마지막이 미래예요.' : '마음 가는 카드 한 장을 누르세요.';
+      var deal = shuffle(TKEYS).slice(0, n), sp = $('spread');
+      sp.innerHTML = ''; sp.className = 'spread' + (three ? ' three' : '');
       deal.forEach(function (k, i) {
         var rev = Math.random() < 0.3;
         var c = document.createElement('button');
         c.type = 'button'; c.className = 'tc' + (rev ? ' rev' : '');
-        var r = (i - 2) * 5; c.style.setProperty('--r', r + 'deg'); c.style.transform = 'rotate(' + r + 'deg) translateY(' + Math.abs(i - 2) * 6 + 'px)';
+        var r = (i - mid) * (three ? 4 : 5); c.style.setProperty('--r', r + 'deg'); c.style.transform = 'rotate(' + r + 'deg) translateY(' + Math.abs(i - mid) * (three ? 5 : 6) + 'px)';
         c.setAttribute('aria-label', (i + 1) + '번째 카드');
-        c.innerHTML = '<span class="in"><span class="b"><img src="assets/tarot-back.webp" alt=""></span><span class="f"><img alt=""></span></span>';
-        c.querySelector('.f img').src = 'assets/tarot-' + k + '.webp';
+        c.innerHTML = '<span class="in"><span class="b"><img src="assets/tarot-back.webp" alt=""></span><span class="f" aria-hidden="true"></span></span>';
+        var fe = face(k); if (fe.tagName === 'IMG') fe.alt = '';
+        c.querySelector('.f').appendChild(fe);
         c.addEventListener('click', function () {
-          if (sp.classList.contains('done')) return;
-          sp.classList.add('done'); c.classList.add('flip');
-          count('rest-tarot-draw', '쉬어가기: 타로 한 장 뽑기');
-          setTimeout(function () { showTarot(k, rev ? 'r' : 'u', tCat, false); }, RM ? 0 : 1100);
+          if (sp.classList.contains('done') || c.classList.contains('flip')) return;
+          c.classList.add('flip');
+          if (!three) {
+            sp.classList.add('done');
+            count('rest-tarot-draw', '쉬어가기: 타로 한 장 뽑기');
+            setTimeout(function () { showTarot(k, rev ? 'r' : 'u', tCat, false); }, RM ? 0 : 1100);
+            return;
+          }
+          picked.push({ k: k, o: rev ? 'r' : 'u' });
+          c.setAttribute('data-pos', POS[picked.length - 1]);
+          c.setAttribute('aria-label', (i + 1) + '번째 카드 · ' + POS[picked.length - 1]);
+          if (picked.length === 3) {
+            sp.classList.add('done');
+            count('rest-tarot3-draw', '쉬어가기: 타로 세 장 펼치기');
+            setTimeout(function () { showTarot3(picked, tCat, false); }, RM ? 0 : 1300);
+          }
         });
         sp.appendChild(c);
       });
@@ -978,9 +1451,9 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
   });
   function showTarot(k, o, cat, shared) {
     var t = TAROT[k]; tNow = { k: k, o: o, cat: cat };
-    $('t-img').src = 'assets/tarot-' + k + '.webp'; $('t-img').alt = t.ko + ' 카드';
-    $('t-card').classList.toggle('rev', o === 'r');
-    $('t-ori').textContent = (shared ? '공유받은 카드 · ' : '') + CATS[cat] + ' 고민 · ' + (o === 'r' ? '역방향' : '정방향');
+    var tc = $('t-card'); tc.innerHTML = ''; tc.appendChild(face(k));
+    tc.classList.toggle('rev', o === 'r');
+    $('t-ori').textContent = (shared ? '공유받은 카드 · ' : '') + CATS[cat] + ' 고민 · ' + oriText(o);
     $('t-name').textContent = t.ko;
     $('t-en').textContent = t.en;
     $('t-mean').textContent = o === 'r' ? t.rev : t.up;
@@ -994,16 +1467,62 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     var res = $('t-res'); res.classList.remove('pop'); void res.offsetWidth; res.classList.add('pop');
     if (!shared) { try { history.replaceState(null, '', '?t=' + k + '&o=' + o + '&c=' + cat + '#tarot'); } catch (e) {} window.scrollTo(0, 0); }
   }
-  $('t-again').addEventListener('click', function () {
+  function flowText(list) {
+    return '「' + TAROT[list[0].k].ko + '」에서 시작해 지금은 「' + TAROT[list[1].k].ko + '」, 앞으로는 「' + TAROT[list[2].k].ko + '」 쪽으로 흘러가요.';
+  }
+  function showTarot3(list, cat, shared) {
+    tNow3 = { list: list, cat: cat };
+    $('t3-ori').textContent = (shared ? '공유받은 펼치기 · ' : '') + CATS[cat] + ' 고민 · 과거 · 현재 · 미래';
+    var row = $('t3-row'); row.innerHTML = '';
+    list.forEach(function (p, i) {
+      var t = TAROT[p.k];
+      var col = document.createElement('div'); col.className = 't3-col';
+      var pos = document.createElement('span'); pos.className = 't3-pos'; pos.textContent = (i + 1) + ' · ' + POS[i];
+      var cd = document.createElement('div'); cd.className = 't3-card' + (p.o === 'r' ? ' rev' : ''); cd.appendChild(face(p.k));
+      var tx = document.createElement('div'); tx.className = 't3-txt';
+      var nm = document.createElement('p'); nm.className = 't3-name'; nm.textContent = t.ko;
+      var or = document.createElement('p'); or.className = 't3-ori'; or.textContent = t.en + ' · ' + oriText(p.o);
+      var mn = document.createElement('p'); mn.className = 't3-mean'; mn.textContent = p.o === 'r' ? t.rev : t.up;
+      tx.appendChild(nm); tx.appendChild(or); tx.appendChild(mn);
+      col.appendChild(pos); col.appendChild(cd); col.appendChild(tx); row.appendChild(col);
+    });
+    $('t3-flow').textContent = flowText(list);
+    $('t3-tip').innerHTML = '<b>앞으로를 위한 한 줄:</b> ';
+    $('t3-tip').appendChild(document.createTextNode(TAROT[list[2].k][cat]));
+    $('t3-again').textContent = shared ? '나도 펼쳐 보기' : '다시 펼치기';
+    $('t3-again').className = shared ? 'btn' : 'ghost';
+    $('t3-save').className = shared ? 'link' : 'btn';
+    $('t3-toast').textContent = '';
+    tStep(4);
+    var res = $('t-res3'); res.classList.remove('pop'); void res.offsetWidth; res.classList.add('pop');
+    if (!shared) { try { history.replaceState(null, '', '?t3=' + enc3(list) + '&c=' + cat + '#tarot'); } catch (e) {} window.scrollTo(0, 0); }
+  }
+  // 세 장 공유 주소: ?t3=fool.u-sun.r-world.u
+  function enc3(list) { return list.map(function (p) { return p.k + '.' + p.o; }).join('-'); }
+  function dec3(s) {
+    var parts = (s || '').split('-'), out = [];
+    if (parts.length !== 3) return null;
+    for (var i = 0; i < 3; i++) {
+      var kv = parts[i].split('.');
+      if (!own(TAROT, kv[0]) || (kv[1] !== 'u' && kv[1] !== 'r')) return null;
+      if (out.some(function (p) { return p.k === kv[0]; })) return null;
+      out.push({ k: kv[0], o: kv[1] });
+    }
+    return out;
+  }
+  function backToPick() {
     try { history.replaceState(null, '', location.pathname + '#tarot'); } catch (e) {}
     tStep(1); window.scrollTo(0, 0);
-  });
+  }
+  $('t-again').addEventListener('click', backToPick);
+  $('t3-again').addEventListener('click', backToPick);
   $('t-save').addEventListener('click', function () {
     var n = tNow; if (!n) return;
-    var t = TAROT[n.k], img = $('t-img');
-    var o = { kicker: '쉬어가기 · 타로 한 장 · ' + CATS[n.cat] + ' 고민', title: t.ko, titleSize: 68, sub: t.en + ' · ' + (n.o === 'r' ? '역방향' : '정방향'),
-      body: n.o === 'r' ? t.rev : t.up, bodySize: 34, tip: '한 줄 조언: ' + t[n.cat], foot: 'swbins.github.io/rest · 재미로 보세요' };
-    if (img.complete && img.naturalWidth) { o.img = img; o.imgW = 336; o.imgH = 491; o.imgRot = n.o === 'r'; }
+    var t = TAROT[n.k], img = $('t-card').querySelector('img');
+    var o = { kicker: '쉬어가기 · 타로 한 장 · ' + CATS[n.cat] + ' 고민', title: t.ko, titleSize: 68, sub: t.en + ' · ' + oriText(n.o),
+      body: n.o === 'r' ? t.rev : t.up, bodySize: 34, tip: '한 줄 조언: ' + t[n.cat], foot: 'swbins.github.io/rest · 재미로 보세요',
+      imgW: 336, imgH: 491, imgRot: n.o === 'r' };
+    if (img && img.complete && img.naturalWidth) o.img = img; else o.face = faceOf(n.k);
     saveCard(o, '쉬어가기-타로-' + n.k + '.png', $('t-toast'), ['rest-tarot-save', '쉬어가기: 타로 그림 저장']);
   });
   $('t-share').addEventListener('click', function () {
@@ -1011,16 +1530,41 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     count('rest-tarot-share', '쉬어가기: 타로 공유');
     share('타로 한 장', CATS[n.cat] + ' 고민에 「' + TAROT[n.k].ko + '」 카드가 나왔어요.', BASE + '?t=' + n.k + '&o=' + n.o + '&c=' + n.cat + '#tarot', $('t-toast'));
   });
+  $('t3-save').addEventListener('click', function () {
+    var n = tNow3; if (!n) return;
+    var cols = $('t3-row').querySelectorAll('.t3-card');
+    var cards = n.list.map(function (p, i) {
+      var im = cols[i] && cols[i].querySelector('img');
+      return { img: im && im.complete && im.naturalWidth ? im : null, face: faceOf(p.k), rot: p.o === 'r', pos: POS[i] };
+    });
+    var o = { kicker: '쉬어가기 · 타로 세 장 · ' + CATS[n.cat] + ' 고민', title: '과거 · 현재 · 미래', titleSize: 56, cards: cards,
+      body: flowText(n.list), bodySize: 32,
+      list: n.list.map(function (p, i) { var t = TAROT[p.k]; return { label: POS[i] + ' — ' + t.ko + ' (' + oriText(p.o) + ')', text: p.o === 'r' ? t.rev : t.up }; }),
+      tip: '앞으로를 위한 한 줄: ' + TAROT[n.list[2].k][n.cat], foot: 'swbins.github.io/rest · 재미로 보세요' };
+    saveCard(o, '쉬어가기-타로3-' + n.list.map(function (p) { return p.k; }).join('-') + '.png', $('t3-toast'), ['rest-tarot3-save', '쉬어가기: 타로 세 장 그림 저장']);
+  });
+  $('t3-share').addEventListener('click', function () {
+    var n = tNow3; if (!n) return;
+    count('rest-tarot3-share', '쉬어가기: 타로 세 장 공유');
+    share('타로 세 장', CATS[n.cat] + ' 고민 — ' + flowText(n.list), BASE + '?t3=' + enc3(n.list) + '&c=' + n.cat + '#tarot', $('t3-toast'));
+  });
 
   /* ---------- 시작 ---------- */
-  showQ();
   var qs = new URLSearchParams(location.search);
-  var r = qs.get('r'), tk = qs.get('t');
-  if (r && TYPES[r]) {
-    showResult(r, true);
-    if (location.hash !== '#test') history.replaceState(null, '', location.pathname + location.search + '#test');
-  } else if (tk && TAROT[tk]) {
-    showTarot(tk, qs.get('o') === 'r' ? 'r' : 'u', CATS[qs.get('c')] ? qs.get('c') : 'today', true);
+  var r = qs.get('r') || '', tk = qs.get('t'), t3 = dec3(qs.get('t3'));
+  var rid = 'work', rkey = r, dash = r.indexOf('-');
+  if (dash > 0) { rid = r.slice(0, dash); rkey = r.slice(dash + 1); }
+  var qc = own(CATS, qs.get('c') || '') ? qs.get('c') : 'today';
+  if (r && own(TESTS, rid) && own(TESTS[rid].types, rkey)) {
+    setTest(rid);
+    showResult(rkey, true);
+    var hh = '#' + T.hash;
+    if (location.hash !== hh) history.replaceState(null, '', location.pathname + location.search + hh);
+  } else if (tk && own(TAROT, tk)) {
+    showTarot(tk, qs.get('o') === 'r' ? 'r' : 'u', qc, true);
+    if (location.hash !== '#tarot') history.replaceState(null, '', location.pathname + location.search + '#tarot');
+  } else if (t3) {
+    showTarot3(t3, qc, true);
     if (location.hash !== '#tarot') history.replaceState(null, '', location.pathname + location.search + '#tarot');
   } else if (fShared && location.hash !== '#fortune') {
     history.replaceState(null, '', location.pathname + location.search + '#fortune');
