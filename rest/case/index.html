@@ -292,12 +292,12 @@ a { color: var(--accent); }
   var P = {
     han:  { name: '한겨울', img: 'img/det.webp' },
     cat:  { name: '도토리', img: 'img/cat.webp' },
-    yoon: { name: '윤석주 화백', img: 'img/yoon.webp', role: '산장 주인 · 화가' },
-    seo:  { name: '서지후', img: 'img/seo.webp', role: '미술 평론가' },
-    kang: { name: '강민아', img: 'img/kang.webp', role: '산장 아르바이트' },
-    oh:   { name: '오태석', img: 'img/oh.webp', role: '화상(그림 중개상)' }
+    yoon: { name: '윤석주 화백', img: 'img/yoon.webp', role: '산장 주인 · 화가', bg: 'studio' },
+    seo:  { name: '서지후', img: 'img/seo.webp', role: '미술 평론가', bg: 'living' },
+    kang: { name: '강민아', img: 'img/kang.webp', role: '산장 아르바이트', bg: 'hall1' },
+    oh:   { name: '오태석', img: 'img/oh.webp', role: '화상(그림 중개상)', bg: 'living' }
   };
-  var BG = { lodge: 'img/lodge.webp', studio: 'img/studio.webp' };
+  var BG = { lodge: 'img/lodge.webp', studio: 'img/studio.webp', hall1: 'img/hall1.webp', living: 'img/living.webp' };
 
   /* ── 단서 ── */
   var CLUES = {
@@ -339,7 +339,7 @@ a { color: var(--accent); }
       ['han', '「공개 전 작품은 보장하지 않음」… 그림이 사라져도 화백님은 한 푼도 못 받는다는 얘기군요.']
     ], clues: ['easel', 'policy'] },
 
-    p_hall: { bg: 'lodge', lines: [
+    p_hall: { bg: 'hall1', lines: [
       ['', '2층 복도. 작업실 앞에서 계단까지 나무 바닥에 걸레 자국이 줄줄이 남아 있다.'],
       ['han', '현관 신발장에 산장 실내화가 네 켤레. 하나씩 뒤집어 볼까요.'],
       ['cat', '(도토리가 한 켤레 앞에서 코를 킁킁거린다.)'],
@@ -348,7 +348,7 @@ a { color: var(--accent); }
       ['han', '다른 실내화는 바싹 말라 있어요. 청소하던 사람은 장화를 신었을 테고요.']
     ], clues: ['shoes'] },
 
-    p_living: { bg: 'lodge', lines: [
+    p_living: { bg: 'living', lines: [
       ['', '1층 거실. 난로가 아직 따뜻하다. 소파 옆 탁자에 두꺼운 미술 평론집이 엎어져 있다.'],
       ['han', '거실은 복도 반대편이네요. 여기 앉아 있으면 2층 작업실 쪽은 보이지 않아요.'],
       ['han', '창밖 마당은 아홉 시에 눈이 그친 뒤로 발자국 하나 없고요. 범인은 산장 안에 있어요.']
@@ -422,18 +422,20 @@ a { color: var(--accent); }
               stove: ['거실 난로 속', '화상이 수천만 원짜리 그림을 태울 리 없죠. 팔려고 가져간 거예요.'] } }
   ];
 
-  var HOME_BG = 'lodge', DED_BG = 'studio';
+  var HOME_BG = 'lodge', DED_BG = 'living';
   var SUSPECTS = ['yoon', 'seo', 'kang', 'oh'], CULPRIT_NAME = '오태석';
   var WHERE = { easel: '작업실을 살펴보세요.', cover: '화백님께 그림을 마지막으로 본 때를 물어보세요.', ohword: '오태석에게 사라진 그림을 어떻게 생각하는지 물어보세요.', mop: '강민아에게 저녁에 뭘 했는지 물어보세요.', shoes: '현관 신발장을 살펴보세요.' };
   var PLACES = [['p_studio', '2층 작업실', '그림이 있던 곳'], ['p_hall', '복도 · 현관 신발장', '오가는 길목'], ['p_living', '1층 거실', '난로 앞']];
 
   var SOLVE_LINES = [
+    ['bg', 'living'],
       ['han', '모두 거실로 모여 주세요. 그림을 가져간 사람이 이 안에 있습니다.'],
       ['cg', 'img/c1-gather.webp', '난로 앞, 네 사람의 눈이 한겨울에게 모였다.'],
       ['oh', '허허, 탐정 놀이도 정도껏 하시죠.'],
       ['han', '사진은 거짓말을 안 해요. 오늘 밤, 한 장면이 어긋나 있었을 뿐이죠.']
   ];
   var FINALE = [
+    ['bg', 'living'],
       ['han', '이 그림은 공개 전까지 천에 덮여 있었고, 화백님은 크기를 누구에게도 말하지 않았어요. 어제 크기를 물은 오 사장님께도요.'],
       ['han', '그런데 오 사장님은 아까 「손바닥만 한 그림」이라고 하셨죠. 덮개를 걷어 본 사람만 알 수 있는 크기예요.'],
       ['oh', '그, 그건… 화백님 그림이 원래 작다고 들어서…'],

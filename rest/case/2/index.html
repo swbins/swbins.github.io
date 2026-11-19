@@ -293,13 +293,13 @@ a { color: var(--accent); }
   var P = {
     han:  { name: '한겨울', img: '../img/det.webp' },
     cat:  { name: '도토리', img: '../img/cat.webp' },
-    baek: { name: '백영란 관장', img: '../img/baek.webp', role: '등대 박물관 관장' },
-    cha:  { name: '차도윤', img: '../img/cha.webp', role: '지역 신문 사진기자' },
-    nam:  { name: '남궁철', img: '../img/nam.webp', role: '등대지기' },
-    eun:  { name: '나은별', img: '../img/eun.webp', role: '고등학생 · 군고구마 노점' }
+    baek: { name: '백영란 관장', img: '../img/baek.webp', role: '등대 박물관 관장', bg: 'office2' },
+    cha:  { name: '차도윤', img: '../img/cha.webp', role: '지역 신문 사진기자', bg: 'beach' },
+    nam:  { name: '남궁철', img: '../img/nam.webp', role: '등대지기', bg: 'lighthouse' },
+    eun:  { name: '나은별', img: '../img/eun.webp', role: '고등학생 · 군고구마 노점', bg: 'townhall' }
   };
-  var BG = { harbor: '../img/harbor.webp', museum: '../img/museum.webp' };
-  var HOME_BG = 'harbor', DED_BG = 'museum';
+  var BG = { harbor: '../img/harbor.webp', museum: '../img/museum.webp', office2: '../img/office2.webp', townhall: '../img/townhall.webp', beach: '../img/beach.webp', lighthouse: '../img/lighthouse.webp' };
+  var HOME_BG = 'harbor', DED_BG = 'townhall';
   var SUSPECTS = ['baek', 'cha', 'nam', 'eun'], CULPRIT_NAME = '차도윤';
 
   /* ── 단서 ── */
@@ -341,7 +341,7 @@ a { color: var(--accent); }
       ['han', '20시 06분 열림, 20시 14분 닫힘. 불꽃이 한창일 때 8분… 모두 하늘만 보는 때를 노렸네요.']
     ], clues: ['case', 'door'] },
 
-    p_office: { bg: 'museum', lines: [
+    p_office: { bg: 'office2', lines: [
       ['', '관장실. 벽 열쇠걸이에 오래된 열쇠가 줄지어 걸려 있다.'],
       ['baek', '진열장 예비 열쇠는 저기 걸어 둬요. 오늘 오후엔 신문사 차 기자님이 인터뷰하러 이 방에 왔었고요.'],
       ['cat', '(도토리가 열쇠걸이 아래 바닥 냄새를 맡더니 재채기를 한다.)'],
@@ -350,7 +350,7 @@ a { color: var(--accent); }
       ['han', '이 마을에서 모래가 있는 곳은 방파제 아래 백사장뿐이죠.']
     ], clues: ['spare'] },
 
-    p_hall: { bg: 'harbor', lines: [
+    p_hall: { bg: 'townhall', lines: [
       ['', '마을 회관 앞. 게시판에 축제 일정표가 붙어 있고, 지붕 위 시계탑이 또박또박 시각을 가리킨다.'],
       ['han', '19시 40분 시험 발사 3발, 20시부터 20분간 본 불꽃. 시험 발사는 안내 방송도 없이 했네요.'],
       ['eun', '맞아요. 7시 40분에 갑자기 펑펑 해서 고구마 떨어뜨릴 뻔했어요.'],
@@ -428,12 +428,14 @@ a { color: var(--accent); }
   ];
 
   var SOLVE_LINES = [
+    ['bg', 'townhall'],
     ['han', '모두 회관 앞으로 모여 주세요. 시계를 가져간 사람이 이 안에 있어요.'],
     ['cg', '../img/c2-gather.webp', '회관 시계탑 아래, 한겨울이 사람들 앞에 섰다.'],
     ['cha', '또 사진 이야기예요? 제 사진엔 시각까지 찍혀 있는데.'],
     ['han', '네, 시각이 찍혀 있죠. 그래서 문제예요.']
   ];
   var FINALE = [
+    ['bg', 'townhall'],
     ['han', '차 기자님 사진은 20시 10분에 「보내졌어요」. 하지만 찍힌 건 7시 40분이에요. 뒤에 찍힌 회관 시계탑이 그렇게 말하고 있죠.'],
     ['han', '그 시각엔 시험 불꽃 세 발이 터졌어요. 안내 방송도 없었으니, 진짜 불꽃놀이처럼 보이는 사진을 미리 찍어 둘 수 있었던 거예요.'],
     ['eun', '맞아요, 저 그때 봤어요! 백사장에서 셀카 찍는 거!'],
