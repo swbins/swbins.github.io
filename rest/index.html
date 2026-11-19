@@ -84,16 +84,21 @@ h1 em { font-style: normal; color: var(--accent); }
 .game p { font-size: 14px; color: var(--muted); word-break: keep-all; flex: 1; }
 .game .start { align-self: flex-start; margin-top: 14px; background: var(--btn); color: var(--btnInk); font-weight: 700; font-size: 14px; padding: 8px 16px; border-radius: var(--radius); }
 .game:hover .start { background: var(--btnHover); }
-/* 추리 카드만 밤 표지 */
-.game.night { background: #0b0d12; color: #e7e9ef; border-color: #0b0d12; }
-.game.night:hover { box-shadow: 6px 6px 0 #e0a24a; }
-.game.night figure { border-bottom-color: #252a35; }
-.game.night figure::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(11,13,18,.92)); }
-.game.night .copy { position: absolute; left: 14px; right: 14px; bottom: 12px; z-index: 1; font-family: var(--head); font-weight: 700; font-size: 17px; line-height: 1.4; color: #fff; word-break: keep-all; }
-.game.night .time { background: #e0a24a; color: #0b0d12; border-color: #e0a24a; }
-.game.night .no, .game.night p { color: #8b93a3; }
-.game.night .start { background: #e0a24a; color: #0b0d12; }
-.game.night:hover .start { background: #f1bd6a; }
+/* 추리 카드만 사건 파일 — 게임 화면(필름 띠·마닐라지·붉은 도장)과 같은 결 */
+.game.night { background-color: #dcc79c; color: #23201b; border-color: #23201b; border-radius: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.game.night:hover { box-shadow: 6px 6px 0 #a5302a; }
+.game.night figure { border-bottom: 0; background: #1b1712; padding: 11px 0;
+  background-image: repeating-linear-gradient(90deg, #d8ccb0 0 8px, transparent 8px 19px), repeating-linear-gradient(90deg, #d8ccb0 0 8px, transparent 8px 19px);
+  background-size: 100% 4px, 100% 4px; background-position: 4px 3px, 4px calc(100% - 3px); background-repeat: no-repeat; }
+.game.night figure img { display: block; }
+.game.night .copy { position: absolute; left: 12px; bottom: 22px; z-index: 1; max-width: calc(100% - 24px); font-family: var(--head); font-weight: 700; font-size: 15.5px; line-height: 1.45; color: #23201b; background: #f4efe4; padding: 6px 10px; box-shadow: 3px 3px 0 rgba(0,0,0,.45); transform: rotate(-1deg); word-break: keep-all; }
+.game.night .time { top: 22px; background: #f4efe4; color: #a5302a; border: 2px solid #a5302a; border-radius: 0; transform: rotate(-4deg); letter-spacing: .06em; }
+.game.night .no { color: #6b5f4a; }
+.game.night .no::after { content: " · CASE FILE"; letter-spacing: .12em; }
+.game.night p { color: #4d463c; }
+.game.night .start { background: #23201b; color: #f4efe4; border-radius: 0; box-shadow: 3px 3px 0 #a5302a; }
+.game.night:hover .start { background: #23201b; }
 
 /* ── 놀이 한 판(한 번에 하나) ── */
 .back { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); padding: 22px 0 4px; }
@@ -361,7 +366,7 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
         <div class="txt"><span class="no">01</span><h3>나는 어떤 일 유형?</h3><p>회사·집에서 흔히 겪는 장면 아홉 개. 제일 나 같은 걸 고르면 됩니다.</p><span class="start">시작</span></div>
       </a>
       <a class="game night" href="case/">
-        <figure><img src="case/img/lodge.webp" alt="눈 덮인 밤 산장, 불 켜진 창" width="1216" height="832" loading="lazy"><span class="time">10분 추리 게임</span><span class="copy">폭설에 갇힌 산장.<br>공개 전 그림이 사라졌다.</span></figure>
+        <figure><img src="case/img/cover.webp" alt="눈 덮인 밤 산장 앞, 필름 카메라를 든 탐정 한겨울과 고양이 도토리" width="1216" height="832" loading="lazy"><span class="time">10분 추리 게임</span><span class="copy">폭설에 갇힌 산장.<br>공개 전 그림이 사라졌다.</span></figure>
         <div class="txt"><span class="no">02</span><h3>한겨울 사진관 사건 수첩</h3><p>사진관 탐정과 고양이 조수가 되어 단서를 모으고, 네 사람을 심문하고, 범인을 지목하세요. 지금 제5화까지 — 진행은 저절로 저장돼요.</p><span class="start">사건 시작</span></div>
       </a>
       <a class="game" href="#fortune">
