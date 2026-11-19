@@ -188,6 +188,7 @@ a { color: var(--accent); }
   <div class="bar">
     <a class="home" href="../../../">← 쉬어가기</a>
     <span class="ttl">제2화 번외편 · 군고구마 돈통의 천 원</span>
+    <button type="button" id="b-snd" aria-pressed="false" title="효과음 켜기·끄기">🔇 소리</button>
     <button type="button" id="b-hint" hidden>🐈 도토리</button>
     <button type="button" class="nb" id="b-note" hidden>수첩 <b id="nb-n">0</b>/<span id="nb-t">9</span></button>
   </div>
@@ -470,6 +471,44 @@ a { color: var(--accent); }
     ['han', '사진은 거짓말을 안 해요. 오늘은 사진 대신 접힌 천 원 일곱 장이 말해 줬네요.'],
     ['cat', '냐아.']
   ];
+  /* ── 효과음 (Web Audio, 파일 없음 · 기본 꺼짐) ── */
+  var SFX_ON = false, actx = null;
+  try { SFX_ON = localStorage.getItem('swbins-case-sfx') === '1'; } catch (e) {}
+  function sndBtn() { var b = document.getElementById('b-snd'); if (b) { b.textContent = SFX_ON ? '🔈 소리' : '🔇 소리'; b.setAttribute('aria-pressed', SFX_ON ? 'true' : 'false'); } }
+  function tone(f, t0, d, type, v, f2) {
+    var o = actx.createOscillator(), g = actx.createGain(); o.type = type || 'sine';
+    o.frequency.setValueAtTime(f, t0); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + d);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(v || 0.1, t0 + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+    o.connect(g); g.connect(actx.destination); o.start(t0); o.stop(t0 + d + 0.02);
+  }
+  function noise(t0, d, v) {
+    var n = Math.floor(actx.sampleRate * d), buf = actx.createBuffer(1, n, actx.sampleRate), ch = buf.getChannelData(0);
+    for (var i = 0; i < n; i++) ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+    var s = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
+    f.type = 'highpass'; f.frequency.value = 1800; g.gain.value = v || 0.2; s.buffer = buf; s.connect(f); f.connect(g); g.connect(actx.destination); s.start(t0);
+  }
+  function sfx(k) {
+    if (!SFX_ON) return;
+    try {
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+      var t = actx.currentTime + 0.01;
+      if (k === 'clue') { tone(1318.5, t, 0.18, 'sine', 0.09); tone(1760, t + 0.09, 0.3, 'sine', 0.08); }
+      else if (k === 'bad') { tone(196, t, 0.24, 'square', 0.045, 130); }
+      else if (k === 'ok') { tone(659.3, t, 0.12, 'triangle', 0.11); tone(987.8, t + 0.08, 0.22, 'triangle', 0.11); }
+      else if (k === 'shutter') { noise(t, 0.05, 0.2); noise(t + 0.07, 0.04, 0.14); }
+      else if (k === 'solve' || k === 'five') {
+        [523.3, 659.3, 784, 1046.5].forEach(function (f, i) { tone(f, t + i * 0.11, 0.42, 'triangle', 0.1); });
+        if (k === 'five') { [1568, 2093, 2637].forEach(function (f, i) { tone(f, t + 0.5 + i * 0.07, 0.3, 'sine', 0.06); }); }
+      }
+    } catch (e) {}
+  }
+  (function () {
+    var b = document.getElementById('b-snd'); if (!b) return; sndBtn();
+    b.addEventListener('click', function () { SFX_ON = !SFX_ON; try { localStorage.setItem('swbins-case-sfx', SFX_ON ? '1' : '0'); } catch (e) {} sndBtn(); sfx('ok'); });
+  })();
+  /* ── 효과음 끝 ── */
+
   /* ── 저장 ── */
   var st;
   function fresh() { return { scene: 'title', clues: [], seen: {}, asked: {}, step: 0, miss: 0, solved: false, t0: Date.now() }; }
@@ -494,7 +533,7 @@ a { color: var(--accent); }
     var l = queue.shift(), who = l[0], p = P[who];
     if (who === 'bg') { setBg(l[1]); step(); return; }
     var cg = $('t-cg');
-    if (who === 'cg') { cg.src = l[1]; cg.hidden = false; cg.style.animation = 'none'; void cg.offsetWidth; cg.style.animation = ''; l = ['', l[2] || '']; who = ''; p = null; }
+    if (who === 'cg') { sfx('shutter'); cg.src = l[1]; cg.hidden = false; cg.style.animation = 'none'; void cg.offsetWidth; cg.style.animation = ''; l = ['', l[2] || '']; who = ''; p = null; }
     else cg.hidden = true;
     $('t-name').textContent = p ? p.name : '';
     var line = $('t-line'); line.className = 'line' + (who ? '' : ' narr');
@@ -517,7 +556,7 @@ a { color: var(--accent); }
   function gain(ids) {
     var got = [];
     (ids || []).forEach(function (id) { if (st.clues.indexOf(id) < 0) { st.clues.push(id); got.push(CLUES[id][0]); } });
-    if (got.length) toast('수첩에 적었다 — ' + got.join(' · '));
+    if (got.length) { toast('수첩에 적었다 — ' + got.join(' · ')); sfx('clue'); }
     $('nb-n').textContent = st.clues.length;
     save();
   }
@@ -607,8 +646,8 @@ a { color: var(--accent); }
     $('d-q').textContent = (st.step + 1) + ' / ' + STEPS.length + ' · ' + s.q; $('d-sub').textContent = s.sub;
     $('d-say').hidden = true;
     var box = $('d-opts'); box.innerHTML = ''; box.className = 'opts';
-    function wrong(btn, why) { st.miss++; save(); lives(); if (btn) btn.classList.add('no'); var say = $('d-say'); say.textContent = why; say.hidden = false; }
-    function right() { st.step++; save(); if (st.step >= STEPS.length) finale(); else deduce(); }
+    function wrong(btn, why) { sfx('bad'); st.miss++; save(); lives(); if (btn) btn.classList.add('no'); var say = $('d-say'); say.textContent = why; say.hidden = false; }
+    function right() { sfx('ok'); st.step++; save(); if (st.step >= STEPS.length) finale(); else deduce(); }
     if (s.type === 'who') {
       box.className = 'opts pics';
       SUSPECTS.forEach(function (k) {
@@ -675,7 +714,7 @@ a { color: var(--accent); }
   }
   function showEnd() {
       setBg(HOME_BG); show('end');
-      var stars = Math.max(1, 5 - st.miss);
+      var stars = Math.max(1, 5 - st.miss); sfx(stars === 5 ? 'five' : 'solve');
       $('e-stars').textContent = '★★★★★'.slice(0, stars) + '☆☆☆☆☆'.slice(0, 5 - stars);
       $('e-rank').textContent = ['', '탐정 조수 — 실수 N번. 도토리가 많이 도와줬네요.', '견습 탐정 — 실수 N번.', '탐정 — 실수 N번, 제법이에요.', '일류 탐정 — 실수 한 번, 거의 완벽해요.', '명탐정 — 한 번도 틀리지 않았어요.'][stars].replace('N', st.miss);
   }
