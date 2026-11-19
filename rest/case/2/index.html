@@ -233,7 +233,7 @@ a { color: var(--accent); }
         <a class="btn ghost" href="../" style="text-decoration:none">제1화 하러 가기</a>
       </div>
       <p class="toast" id="e-toast" hidden></p>
-      <p style="color:var(--muted);font-size:14px;margin:0">제3화는 준비 중이에요. <a href="../../">다른 놀이</a>도 있어요.</p>
+      <p style="margin:0"><a class="btn" href="../3/" style="text-decoration:none;display:inline-block">다음 사건 — 제3화 「폐교 음악실의 마지막 노래」</a></p>
       <p class="applink">추리 끝, 다시 일하러 갈 시간이라면 — 매일 손으로 반복하는 일은 <a href="../../../taskhand/">Taskhand</a> 에게 한 번 보여 주면 다음부터 혼자 합니다(무료).</p>
     </section>
   </div>
@@ -588,7 +588,7 @@ a { color: var(--accent); }
   }
 
   /* ── 시작 · 이어하기 · 다시 ── */
-  function begin() { st = fresh(); save(); count('rest-case2-start', '쉬어가기: 추리 제2화 시작'); setBg(S.intro.bg); play(S.intro.lines, hub); }
+  function begin() { st = fresh(); save(); $('nb-n').textContent = 0; count('rest-case2-start', '쉬어가기: 추리 제2화 시작'); setBg(S.intro.bg); play(S.intro.lines, hub); }
   function resume() {
     $('nb-n').textContent = st.clues.length;
     if (st.scene === 'end') showEnd(); else if (st.scene === 'ded') deduce(); else hub();

@@ -585,7 +585,7 @@ a { color: var(--accent); }
   }
 
   /* ── 시작 · 이어하기 · 다시 ── */
-  function begin() { st = fresh(); save(); count('rest-case1-start', '쉬어가기: 추리 제1화 시작'); setBg(S.intro.bg); play(S.intro.lines, hub); }
+  function begin() { st = fresh(); save(); $('nb-n').textContent = 0; count('rest-case1-start', '쉬어가기: 추리 제1화 시작'); setBg(S.intro.bg); play(S.intro.lines, hub); }
   function resume() {
     $('nb-n').textContent = st.clues.length;
     if (st.scene === 'end') showEnd(); else if (st.scene === 'ded') deduce(); else hub();
