@@ -255,6 +255,7 @@ a { color: var(--accent); }
       <h2>폐교 음악실의 마지막 노래</h2>
       <div class="stars" id="e-stars"></div>
       <p class="rank" id="e-rank"></p>
+      <div id="e-side" style="margin:2px 0 6px"></div>
       <ol>
         <li>금고는 부서지지 않았고, 비밀번호 0412를 아는 사람은 교장과 관리인뿐 — 교장은 강당 맨 앞줄에 있었다.</li>
         <li>「보일러를 고쳤다」던 30분 동안, 보일러 기록계의 줄은 한 번도 끊기지 않았다.</li>
@@ -667,6 +668,7 @@ a { color: var(--accent); }
       var stars = Math.max(1, 5 - st.miss);
       $('e-stars').textContent = '★★★★★'.slice(0, stars) + '☆☆☆☆☆'.slice(0, 5 - stars);
       $('e-rank').textContent = ['', '탐정 조수 — 실수 N번. 도토리가 많이 도와줬네요.', '견습 탐정 — 실수 N번.', '탐정 — 실수 N번, 제법이에요.', '일류 탐정 — 실수 한 번, 거의 완벽해요.', '명탐정 — 한 번도 틀리지 않았어요.'][stars].replace('N', st.miss);
+      /*side*/ (function () { var el = $('e-side'); if (!el) return; if (stars === 5) { try { localStorage.setItem('swbins-side-3', '1'); } catch (e) {} el.innerHTML = '<a class="btn" href="../side/3/" style="text-decoration:none;display:inline-block">★ 번외편 열림 — 「교가 4절」</a>'; } else { el.innerHTML = '<p style="margin:0;color:var(--muted);font-size:14px">🔒 별 다섯 개(실수 없이)로 풀면 번외편 「교가 4절」이 열려요. 「처음부터 다시」로 다시 도전!</p>'; } })(); /*/side*/
   }
 
   /* ── 시작 · 이어하기 · 다시 ── */

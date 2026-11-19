@@ -254,6 +254,7 @@ a { color: var(--accent); }
       <h2>눈 내린 산장, 사라진 그림</h2>
       <div class="stars" id="e-stars"></div>
       <p class="rank" id="e-rank"></p>
+      <div id="e-side" style="margin:2px 0 6px"></div>
       <ol>
         <li>그림은 공개 전까지 천에 덮여 있었고, 크기는 아무도 몰랐다.</li>
         <li>그런데 오태석은 「손바닥만 한 그림」이라고 말했다 — 덮개를 걷어 본 사람만 아는 크기.</li>
@@ -661,6 +662,7 @@ a { color: var(--accent); }
       var stars = Math.max(1, 5 - st.miss);
       $('e-stars').textContent = '★★★★★'.slice(0, stars) + '☆☆☆☆☆'.slice(0, 5 - stars);
       $('e-rank').textContent = ['', '탐정 조수 — 실수 N번. 도토리가 많이 도와줬네요.', '견습 탐정 — 실수 N번.', '탐정 — 실수 N번, 제법이에요.', '일류 탐정 — 실수 한 번, 거의 완벽해요.', '명탐정 — 한 번도 틀리지 않았어요.'][stars].replace('N', st.miss);
+      /*side*/ (function () { var el = $('e-side'); if (!el) return; if (stars === 5) { try { localStorage.setItem('swbins-side-1', '1'); } catch (e) {} el.innerHTML = '<a class="btn" href="side/1/" style="text-decoration:none;display:inline-block">★ 번외편 열림 — 「사라진 아침 빵」</a>'; } else { el.innerHTML = '<p style="margin:0;color:var(--muted);font-size:14px">🔒 별 다섯 개(실수 없이)로 풀면 번외편 「사라진 아침 빵」이 열려요. 「처음부터 다시」로 다시 도전!</p>'; } })(); /*/side*/
   }
 
   /* ── 시작 · 이어하기 · 다시 ── */

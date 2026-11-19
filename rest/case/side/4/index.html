@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>번외편 — 30년 같은 글씨 · 한겨울 사진관 사건 수첩</title>
+<meta name="description" content="한겨울 사진관 사건 수첩 제4화 번외편 「30년 같은 글씨」. 본편을 별 다섯 개로 풀면 열립니다.">
+<meta name="robots" content="noindex">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 게임 화면은 언제나 밤 산장 — 사이트 종이 결의 어두운 판 */
+:root {
+  --bg: #12100f; --ink: #efe6d6; --muted: #a39887; --line: #3a322b; --card: #1c1916; --soft: #262019;
+  --accent: #e0864f; --blue: #6f8fc9; --ok: #9fd39a; --bad: #e0675b;
+  --head: "Gowun Batang", Batang, serif; --body: "Noto Sans KR", "Malgun Gothic", sans-serif;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) { --bg: #12100f; }
+}
+:root[data-theme="light"] { --bg: #12100f; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.65 var(--body); word-break: keep-all; overflow-wrap: anywhere; -webkit-tap-highlight-color: transparent; }
+button { font: inherit; color: inherit; cursor: pointer; }
+a { color: var(--accent); }
+.game { position: relative; max-width: 980px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
+
+/* 위 막대 */
+.bar { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--line); position: relative; z-index: 5; background: var(--bg); }
+.bar .home { color: var(--muted); text-decoration: none; font-size: 14px; }
+.bar .ttl { flex: 1; font-family: var(--head); font-weight: 700; font-size: 15px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar button { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 13px; }
+.bar button:hover { border-color: var(--accent); }
+.bar button[hidden] { display: none; }
+.bar .nb b { color: var(--accent); }
+
+/* 무대 */
+.stage { position: relative; flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.bg { position: absolute; inset: 0; background: center / cover no-repeat; filter: brightness(.42) saturate(.9); transition: background-image .4s; }
+.bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(18,16,15,.15) 0%, rgba(18,16,15,.0) 40%, rgba(18,16,15,.92) 100%); }
+.snow { position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(2px 2px at 20% 30%, #fff8 50%, transparent 51%), radial-gradient(1.5px 1.5px at 70% 10%, #fff6 50%, transparent 51%), radial-gradient(2px 2px at 40% 70%, #fff5 50%, transparent 51%), radial-gradient(1px 1px at 85% 55%, #fff7 50%, transparent 51%), radial-gradient(1.5px 1.5px at 10% 85%, #fff5 50%, transparent 51%); background-size: 240px 240px; animation: snow 14s linear infinite; opacity: .7; }
+@keyframes snow { from { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; } to { background-position: 40px 240px, -30px 240px, 20px 240px, -10px 240px, 30px 240px; } }
+@media (prefers-reduced-motion: reduce) { .snow { animation: none; } }
+.layer { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; }
+.layer[hidden] { display: none; }
+
+/* 표지 */
+.title { justify-content: flex-end; padding: 24px clamp(16px, 5vw, 48px) 40px; gap: 14px; }
+.title .kicker { font-size: 13px; letter-spacing: .12em; color: var(--accent); }
+.title h1 { font-family: var(--head); font-size: clamp(30px, 6.4vw, 54px); line-height: 1.2; margin: 0; }
+.title h1 small { display: block; font-size: .42em; color: var(--muted); margin-top: 10px; font-weight: 400; }
+.title p { margin: 0; color: #d8cdbb; max-width: 34em; }
+.title .cast { display: flex; gap: 6px; align-items: flex-end; margin: 6px 0 4px; }
+.title .cast img { height: clamp(90px, 18vw, 150px); width: auto; filter: drop-shadow(0 6px 10px #0009); }
+.title .cast img.cat { height: clamp(60px, 11vw, 92px); }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { background: var(--ink); color: var(--bg); border: 0; border-radius: 4px; padding: 13px 22px; font-weight: 700; }
+.btn:hover { background: var(--accent); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn.ghost:hover { border-color: var(--accent); color: var(--accent); background: transparent; }
+.btn[hidden] { display: none; }
+
+/* 대화 */
+.talk { justify-content: flex-end; }
+.who-pic { position: absolute; bottom: 168px; left: 50%; transform: translateX(-50%); height: min(62%, 560px); pointer-events: none; transition: opacity .2s; filter: drop-shadow(0 10px 18px #000a); }
+.who-pic[hidden] { display: block; opacity: 0; }
+.who-pic.cat { height: min(34%, 280px); }
+/* 장면 컷 — 웹툰 한 칸처럼 */
+.cg { position: absolute; z-index: 1; top: 16px; left: 50%; transform: translateX(-50%); width: min(94%, 860px); aspect-ratio: 1216 / 832; max-height: calc(100% - 200px); object-fit: cover; border: 4px solid #efe6d6; border-radius: 3px; box-shadow: 0 16px 40px #000c; animation: cgIn .5s ease; }
+.cg[hidden] { display: none; }
+@keyframes cgIn { from { opacity: 0; transform: translate(-50%, 10px); } }
+@media (prefers-reduced-motion: reduce) { .cg { animation: none; } }
+.box { z-index: 2; }
+.title h1 small, .title p, .end p, .end ol { text-shadow: 0 1px 8px #000, 0 0 2px #000; }
+.box { position: relative; margin: 0 12px 14px; background: rgba(28,25,22,.94); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px 30px; min-height: 140px; cursor: pointer; }
+.box .name { position: absolute; top: -15px; left: 14px; background: var(--accent); color: #1a120c; font-weight: 700; font-size: 14px; padding: 3px 12px; border-radius: 3px; }
+.box .name:empty { display: none; }
+.box .line { font-size: 17px; white-space: pre-line; min-height: 3.2em; }
+.box .line.narr { color: #d8cdbb; font-family: var(--head); }
+.box .next { position: absolute; right: 14px; bottom: 8px; font-size: 12px; color: var(--muted); animation: blink 1.2s infinite; }
+@keyframes blink { 50% { opacity: .3; } }
+.choices { display: grid; gap: 8px; margin: 0 12px 14px; }
+.choices[hidden] { display: none; }
+.choices button { text-align: left; padding: 13px 16px; background: rgba(28,25,22,.95); border: 1px solid var(--line); border-radius: 6px; }
+.choices button:hover { border-color: var(--accent); }
+.choices button.done { color: var(--muted); }
+.choices button.done::after { content: " · 들음"; font-size: 12px; }
+.choices button.hot { border-color: var(--accent); }
+
+/* 조사 지도 */
+.hub { padding: 16px; gap: 14px; overflow-y: auto; }
+.hub h2 { font-family: var(--head); margin: 4px 0 0; font-size: 20px; }
+.hub .hint { margin: 0; color: var(--muted); font-size: 14px; }
+.places, .people { display: grid; gap: 10px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.people { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.tile { position: relative; background: rgba(28,25,22,.92); border: 1px solid var(--line); border-radius: 6px; padding: 12px; text-align: left; display: flex; flex-direction: column; gap: 4px; min-height: 86px; }
+.tile:hover { border-color: var(--accent); }
+.tile b { font-family: var(--head); font-size: 16px; }
+.tile span { font-size: 13px; color: var(--muted); }
+.tile .dot { position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.tile.clear .dot { background: var(--ok); }
+.person { align-items: center; text-align: center; padding: 10px 6px; }
+.person img { height: 110px; width: auto; object-fit: contain; }
+.solve { align-self: stretch; }
+.solve[disabled] { opacity: .45; cursor: not-allowed; background: var(--ink); }
+
+/* 추리 */
+.deduce { padding: 16px; gap: 12px; overflow-y: auto; }
+.deduce .q { font-family: var(--head); font-size: 21px; margin: 6px 0 0; }
+.deduce .sub { margin: 0; color: var(--muted); font-size: 14px; }
+.opts { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.opts.pics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.opt { background: rgba(28,25,22,.95); border: 1px solid var(--line); border-radius: 6px; padding: 12px; text-align: left; }
+.opt:hover { border-color: var(--accent); }
+.opt.no { opacity: .4; text-decoration: line-through; text-decoration-color: var(--bad); }
+.opt img { display: block; height: 120px; width: auto; margin: 0 auto 6px; }
+.opt.pic { text-align: center; }
+.opt b { display: block; font-family: var(--head); }
+.opt small { color: var(--muted); }
+.say { background: rgba(28,25,22,.95); border-left: 3px solid var(--bad); padding: 12px 14px; border-radius: 4px; margin: 0; }
+.say[hidden] { display: none; }
+.lives { color: var(--accent); letter-spacing: 2px; }
+
+/* 결과 */
+.end { padding: 24px clamp(16px, 5vw, 48px); gap: 14px; overflow-y: auto; justify-content: center; }
+.end h2 { font-family: var(--head); font-size: clamp(26px, 5vw, 40px); margin: 0; }
+.stars { font-size: 30px; color: var(--accent); letter-spacing: 4px; }
+.end .rank { font-family: var(--head); font-size: 18px; }
+.end ol { margin: 0; padding-left: 20px; color: #d8cdbb; }
+.end .applink { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
+
+/* 엔딩 — 웹툰처럼 세로로 */
+.toon { background: rgba(18,16,15,.84); }
+.toon-strip { width: 100%; max-width: 620px; margin: 0 auto; padding: 28px 14px 64px; display: flex; flex-direction: column; gap: 22px; }
+.tp { margin: 0; background: #efe6d6; padding: 6px; border-radius: 3px; box-shadow: 0 10px 30px #000a; }
+.tp img { display: block; width: 100%; height: auto; }
+.tp.scene img { aspect-ratio: 16 / 9; object-fit: cover; }
+.tp figcaption { color: #2b2723; font-family: var(--head); font-size: 16px; line-height: 1.6; padding: 10px 8px 4px; }
+.tn { margin: 6px 0; padding: 14px 16px; border: 1px solid var(--line); background: #1c1916; font-family: var(--head); color: #d8cdbb; text-align: center; font-size: 16px; }
+.tb { display: flex; gap: 10px; align-items: flex-start; }
+.tb img { width: 56px; height: 56px; flex: none; border-radius: 50%; object-fit: cover; object-position: 50% 6%; background: #efe6d6; border: 2px solid #efe6d6; }
+.tb.cat img { object-position: 50% 30%; }
+.tb > div { background: #f4efe6; color: #2b2723; border-radius: 14px; padding: 10px 14px; max-width: 82%; }
+.tb b { display: block; font-size: 12px; color: #9a3f1d; }
+.tb p { margin: 2px 0 0; font-size: 16px; line-height: 1.6; }
+.tb.me { flex-direction: row-reverse; }
+.tb.me > div { background: #e0864f; color: #1a120c; }
+.tb.me b { color: #3a1d0c; }
+.fx { opacity: 0; transform: translateY(26px); transition: opacity .6s ease, transform .6s ease; }
+.fx.in { opacity: 1; transform: none; }
+.toon-go { align-self: center; margin-top: 12px; }
+.toon-hint { text-align: center; color: var(--muted); font-size: 13px; margin: 0; }
+
+/* 수첩 */
+.sheet { position: fixed; inset: 0; z-index: 20; background: #000a; display: flex; justify-content: center; align-items: flex-end; }
+.sheet[hidden] { display: none; }
+.sheet .in { width: min(640px, 100%); max-height: 82dvh; overflow-y: auto; background: #f1e8d8; color: #2b2723; border-radius: 10px 10px 0 0; padding: 20px 20px 28px; font-family: var(--head); box-shadow: 0 -8px 30px #0008; }
+.sheet h3 { margin: 0 0 4px; display: flex; justify-content: space-between; align-items: center; }
+.sheet h3 button { background: none; border: 1px solid #a8987e; border-radius: 999px; padding: 2px 12px; font-size: 13px; font-family: var(--body); }
+.sheet .clue { padding: 8px 0; border-bottom: 1px dashed #b9a98e; }
+.sheet .clue b { color: #9a3f1d; }
+.sheet .clue p { margin: 2px 0 0; font-size: 15px; line-height: 1.6; }
+.sheet .clue.pick { cursor: pointer; }
+.sheet .clue.pick:hover { background: #e6d9c2; }
+.sheet .empty { color: #6d655c; }
+.toast { position: fixed; left: 50%; top: 64px; transform: translateX(-50%); z-index: 30; background: var(--accent); color: #1a120c; font-weight: 700; padding: 8px 16px; border-radius: 999px; font-size: 14px; box-shadow: 0 6px 20px #0008; transition: opacity .3s, transform .3s; }
+.toast[hidden] { display: block; opacity: 0; transform: translate(-50%, -10px); pointer-events: none; }
+
+@media (max-width: 640px) {
+  .places { grid-template-columns: minmax(0, 1fr); }
+  .people, .opts.pics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .opts { grid-template-columns: minmax(0, 1fr); }
+  .who-pic { bottom: 176px; height: min(52%, 420px); }
+  .box .line { font-size: 16px; }
+  .person img, .opt img { height: 96px; }
+}
+#L-lock { display: none; }
+.locked #L-lock { display: flex; }
+.locked .stage > .layer:not(#L-lock), .locked .bar button { display: none !important; }
+</style>
+<script>(function () { var ok = false; try { ok = localStorage.getItem('swbins-side-4') === '1'; } catch (e) {} if (/[?&]open=1/.test(location.search)) ok = true; if (!ok) document.documentElement.classList.add('locked'); })();</script>
+</head>
+<body>
+<div class="game">
+  <div class="bar">
+    <a class="home" href="../../../">← 쉬어가기</a>
+    <span class="ttl">제4화 번외편 · 30년 같은 글씨</span>
+    <button type="button" id="b-hint" hidden>🐈 도토리</button>
+    <button type="button" class="nb" id="b-note" hidden>수첩 <b id="nb-n">0</b>/<span id="nb-t">9</span></button>
+  </div>
+
+  <div class="stage">
+    <div class="bg" id="bg"></div>
+    <div class="snow" aria-hidden="true"></div>
+
+    <section class="layer title" id="L-lock">
+      <span class="kicker">제4화 번외편 · 잠김</span>
+      <h1>🔒 아직 열리지 않았어요<small>「30년 같은 글씨」</small></h1>
+      <p>본편 제4화를 <b>별 다섯 개</b>(추리 문제를 한 번도 틀리지 않고)로 풀면 이 번외편이 열립니다.</p>
+      <div class="btns"><a class="btn" href="../../4/" style="text-decoration:none">제4화 하러 가기</a></div>
+    </section>
+
+    <!-- 표지 -->
+    <section class="layer title" id="L-title">
+      <span class="kicker">한겨울 사진관 사건 수첩 · 제4화 번외편</span>
+      <h1>30년 같은 글씨<small>매주 한 장, 이름 없는 엽서. 30년 동안.</small></h1>
+      <div class="cast" aria-hidden="true"><img src="../../img/det.webp" alt=""><img class="cat" src="../../img/cat.webp" alt=""></div>
+      <p>「밤의 우체통」 마지막 방송 다음 날. DJ 문소라의 엽서 상자 맨 아래, 30년 동안 매주 온 발신인 없는 엽서 묶음이 있습니다. 「오늘도 잘 들었습니다.」 — 보낸 사람은 누구일까요?</p>
+      <p style="font-size:13px;color:var(--muted)">본편 제4화를 별 다섯 개로 푼 사람만 들어오는 사건 뒤 이야기. <a href="../../4/">← 제4화 본편</a></p>
+      <div class="btns">
+        <button type="button" class="btn" id="b-cont" hidden>이어서 하기</button>
+        <button type="button" class="btn" id="b-new">사건 시작</button>
+      </div>
+      <p style="font-size:13px;color:var(--muted)">진행은 이 브라우저에 저절로 저장됩니다. 등장하는 사람·장소는 모두 지어낸 것입니다.</p>
+    </section>
+
+    <!-- 대화 -->
+    <section class="layer talk" id="L-talk" hidden>
+      <img class="who-pic" id="t-pic" alt="" hidden>
+      <img class="cg" id="t-cg" alt="" hidden>
+      <div class="box" id="t-box" role="button" tabindex="0" aria-live="polite">
+        <span class="name" id="t-name"></span>
+        <div class="line" id="t-line"></div>
+        <span class="next" id="t-next">눌러서 계속 ▸</span>
+      </div>
+      <div class="choices" id="t-choices" hidden></div>
+    </section>
+
+    <!-- 조사 지도 -->
+    <section class="layer hub" id="L-hub" hidden>
+      <h2>어디를 볼까요?</h2>
+      <p class="hint" id="hub-hint">장소를 살피고 사람들에게 물어 단서를 모으세요. 단서가 충분하면 추리를 시작할 수 있어요.</p>
+      <div class="places" id="places"></div>
+      <h2>누구에게 물을까요?</h2>
+      <div class="people" id="people"></div>
+      <button type="button" class="btn solve" id="b-solve" disabled>추리 시작 — 범인을 지목한다</button>
+    </section>
+
+    <!-- 추리 -->
+    <section class="layer deduce" id="L-ded" hidden>
+      <span class="lives" id="d-lives"></span>
+      <h2 class="q" id="d-q"></h2>
+      <p class="sub" id="d-sub"></p>
+      <div class="opts" id="d-opts"></div>
+      <p class="say" id="d-say" hidden></p>
+    </section>
+
+    <!-- 엔딩 — 웹툰처럼 스크롤 -->
+    <section class="layer toon" id="L-toon" hidden>
+      <div class="toon-strip" id="toon-strip"></div>
+    </section>
+
+    <!-- 끝 -->
+    <section class="layer end" id="L-end" hidden>
+      <span class="kicker" style="color:var(--accent);font-size:13px;letter-spacing:.12em">번외편 해결 · 제4화</span>
+      <h2>30년 같은 글씨</h2>
+      <div class="stars" id="e-stars"></div>
+      <p class="rank" id="e-rank"></p>
+      <p style="margin:0">30년 동안 거꾸로 붙은 우표 한 장씩. 그는 국장이 되고도 애청자였다.</p>
+      <ol>
+        <li>천오백 장 엽서의 우표는 전부 거꾸로, 국장의 도장도 전부 거꾸로였다.</li>
+        <li>「밤 11시면 잔다」던 국장실 불은 10년 동안 일요일마다 방송이 끝날 때까지 켜져 있었다.</li>
+        <li>엽서가 딱 한 주 빠진 2003년 5월, 영업부 장만수 차장은 신혼여행 중이었다.</li>
+        <li>이름을 숨긴 건 소라가 「국장이 감싸는 DJ」 소리를 들을까 봐서였다.</li>
+      </ol>
+      <div class="btns">
+        <button type="button" class="btn" id="b-share">친구에게 풀어 보라고 보내기</button>
+        <button type="button" class="btn ghost" id="b-again">처음부터 다시</button>
+        <a class="btn ghost" href="../../4/" style="text-decoration:none">제4화 본편으로</a>
+      </div>
+      <p class="toast" id="e-toast" hidden></p>
+      <p style="color:var(--muted);font-size:14px;margin:0"><a href="../../4/">제4화 본편으로</a> · <a href="../../../">다른 놀이</a></p>
+      <p class="applink">추리 끝, 다시 일하러 갈 시간이라면 — 매일 손으로 반복하는 일은 <a href="../../../../taskhand/">Taskhand</a> 에게 한 번 보여 주면 다음부터 혼자 합니다(무료).</p>
+    </section>
+  </div>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="in" role="dialog" aria-modal="true" aria-labelledby="sheet-h">
+    <h3 id="sheet-h"><span id="sheet-t">수첩</span><button type="button" id="sheet-x">닫기</button></h3>
+    <div id="sheet-list"></div>
+  </div>
+</div>
+<p class="toast" id="toast" hidden></p>
+
+<script>
+(function () {
+  'use strict';
+  var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var KEY = 'swbins-sidecase4';
+  function $(id) { return document.getElementById(id); }
+  function count(path, title) { try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: path, title: title, event: true }); } catch (e) {} }
+
+  /* ── 등장인물 ── (bg: 심문할 때 그 사람이 있는 곳) */
+  var P = {
+    han:  { name: '한겨울', img: '../../img/det.webp' },
+    cat:  { name: '도토리', img: '../../img/cat.webp', role: '사진관 고양이', bg: 'booth' },
+    moon: { name: '문소라', img: '../../img/moon.webp', role: '「밤의 우체통」 DJ · 30년', bg: 'booth' },
+    jang: { name: '장만수 국장', img: '../../img/jang.webp', role: '새벽FM 국장', bg: 'station' },
+    lee:  { name: '이다온', img: '../../img/lee.webp', role: '막내 작가 · 엽서 담당', bg: 'onair' }
+  };
+  var BG = { station: '../../img/station.webp', booth: '../../img/booth.webp', archive: '../../img/archive.webp', onair: '../../img/onair.webp' };
+  var HOME_BG = 'booth', DED_BG = 'booth';
+  var SUSPECTS = ['moon', 'jang', 'lee', 'cat'], CULPRIT_NAME = '장만수 국장';
+
+  /* ── 단서 ── */
+  var CLUES = {
+    bundle:   ['이름 없는 엽서 묶음', '30년 동안 매주 한 장, 천오백 장이 넘는다. 늘 같은 글씨로 한 줄 — 「오늘도 잘 들었습니다.」 보낸 사람 이름은 없다.'],
+    stamp:    ['거꾸로 붙은 우표', '천오백여 장 엽서의 우표가 하나같이 거꾸로 붙어 있다. 실수가 아니라 버릇이다.'],
+    gap:      ['딱 한 주의 빈칸', '소라가 날짜순으로 꽂아 둔 묶음. 30년 동안 엽서가 안 온 주는 딱 한 번 — 2003년 5월 셋째 주.'],
+    seal:     ['결재 서류의 도장', '국장이 콘솔 위에 두고 간 폐지 정리 결재 서류. 「장만수」 도장이 전부 거꾸로 찍혀 있다.'],
+    drawer:   ['국장 자리 서랍', '부조정실 국장 자리 서랍 틈으로 빈 엽서 한 묶음. 맨 위 한 장엔 우표가 벌써 거꾸로 붙어 있다. 글은 아직 없다.'],
+    postmark: ['방송국 앞 우체통', '방송국 정문 앞 빨간 우체통. 수거는 월요일 아침 6시가 첫 번째. 엽서 소인은 30년 내내 이 우체국, 늘 월요일 아침이다. 일요일 밤에 넣었다는 뜻이다.'],
+    gate:     ['경비 일지', '1층 경비실 일지. 국장이 된 10년 동안, 일요일마다 국장실 불은 밤 12시까지 켜져 있었다. 「밤의 우체통」이 끝나는 시각이다.'],
+    board:    ['2003년 사내 소식지', '6층 자료실의 2003년 5월 사내 소식지 — 「영업부 장만수 차장 결혼. 신혼여행으로 한 주 자리 비움.」'],
+    staff:    ['1995년 직원 명부', '6층 자료실의 1995년 직원 명부. 장만수 — 영업부 신입, 야간 당직. 당직실엔 라디오가 한 대 있었다.'],
+    jangword: ['국장의 말', '「그 프로? 제대로 들어 본 적 없소. 밤 11시면 자는 사람이오.」'],
+    moonword: ['소라의 말', '「첫 엽서는 1995년 첫 방송 다음 주에 왔어요. 그 뒤로 매주. 처음 몇 해는 혹시 찾아올까 기다렸죠.」'],
+    leeword:  ['다온의 말', '「저는 엽서 담당 5년째예요. 그 묶음은 제가 오기 전부터 소라 선배가 따로 모으셨어요.」'],
+    rumor:    ['회의실의 국장', '다온의 말 — 「국장님은 회의 때마다 우리 프로에만 유독 깐깐하셨어요. 그래서 「국장이 DJ를 감싼다」는 말은 한 번도 안 나왔죠.」']
+  };
+  var KEYS = ['stamp', 'seal', 'drawer', 'gate', 'rumor'];
+  var WHERE = { stamp: '부조정실을 살펴보세요.', seal: '부조정실을 살펴보세요.', drawer: '도토리에게 거기 왜 앉아 있는지 물어보세요.',
+                gate: '1층 정문 · 경비실을 살펴보세요.', rumor: '이다온에게 국장님이 어떤 분인지 물어보세요.' };
+
+  /* ── 장면 — [말하는 사람, 대사] · '' 는 해설 · ['bg', 배경] 은 배경 바꾸기 · ['cg', 그림, 글] 은 장면 컷 ── */
+  var S = {
+    intro: { bg: 'station', lines: [
+      ['', '눈 그친 낮, 지방 방송국 「새벽FM」. 30년 동안 밤 11시를 지킨 「밤의 우체통」이 어젯밤 마지막 방송을 마쳤다.'],
+      ['han', '도토리, 오늘은 짐 정리하는 사진만 찍을 거야. 조용히.'],
+      ['cat', '…냐.'],
+      ['bg', 'booth'],
+      ['', '텅 빈 부조정실. 문소라가 30년 치 엽서 상자를 하나씩 비운다.'],
+      ['cg', '../../img/c4-box.webp', '창가 책상 위의 엽서 상자. 30년 동안 쌓인 사연들.'],
+      ['moon', '이 묶음만은 따로 모아 뒀어요. 30년 동안 매주 왔어요. 이름이 없어요.'],
+      ['moon', '늘 한 줄이에요. 「오늘도 잘 들었습니다.」'],
+      ['lee', '엽서 담당 5년째인데, 저도 늘 궁금했어요. 선배는 한 번도 안 찾아보셨대요.'],
+      ['moon', '찾으면 안 올까 봐요. …이제 마지막이니까, 한 번은 고맙다고 하고 싶어요.'],
+      ['jang', '정리 끝나면 열쇠는 경비실에 맡겨. 나는 결재할 게 남아서.'],
+      ['', '국장은 결재 서류를 콘솔 위에 내려놓고 나갔다.'],
+      ['han', '30년 치 엽서라면 30년 치 단서가 있겠네요. 같이 볼게요.']
+    ], then: 'hub' },
+
+    p_booth: { bg: 'booth', lines: [
+      ['', '부조정실. 콘솔 위엔 엽서 묶음과 국장이 두고 간 서류.'],
+      ['han', '우표가… 전부 거꾸로 붙어 있네요. 한두 장이 아니라 천오백 장 전부요. 버릇이에요.'],
+      ['han', '날짜순으로 꽂혀 있어요. 30년 동안 빠진 주가… 딱 하나. 2003년 5월 셋째 주.'],
+      ['moon', '그 주는 기억나요. 그때 처음으로 「무슨 일 있나」 걱정했거든요. 다음 주에 다시 와서 안심했고요.'],
+      ['han', '이건 국장님이 두고 간 결재 서류네요. 폐지 정리 서류.'],
+      ['han', '…도장이 전부 거꾸로 찍혀 있어요. 「장만수」가 물구나무를 섰네요.']
+    ], clues: ['bundle', 'stamp', 'gap', 'seal'] },
+
+    p_archive: { bg: 'archive', lines: [
+      ['', '6층 자료실. 30년 치 음반과 서류철이 천장까지 쌓여 있다.'],
+      ['han', '2003년 5월 사내 소식지를 찾아볼게요. 그 주에 누가 자리를 비웠는지.'],
+      ['han', '「영업부 장만수 차장 결혼. 신혼여행으로 한 주 자리 비움.」'],
+      ['cat', '(도토리가 옆 칸 서류철에 올라앉는다. 1995년 직원 명부.)'],
+      ['han', '1995년 직원 명부… 장만수, 영업부 신입. 비고 칸에 「야간 당직」. 당직실 비품 목록엔 라디오 한 대.']
+    ], clues: ['board', 'staff'] },
+
+    p_gate: { bg: 'station', lines: [
+      ['', '1층 정문. 바로 앞에 빨간 우체통이 서 있다.'],
+      ['han', '수거 시각표. 월요일 첫 수거가 아침 6시. 엽서 소인은 30년 내내 이 우체국, 늘 월요일 아침이었죠. 일요일 밤에 넣은 거예요.'],
+      ['', '경비실 아저씨가 낡은 일지를 꺼내 보였다.'],
+      ['han', '국장님이 된 뒤 10년 동안, 일요일마다 국장실 불이 밤 12시까지 켜져 있었네요.'],
+      ['han', '밤 12시면… 「밤의 우체통」이 끝나는 시각이에요.']
+    ], clues: ['postmark', 'gate'] }
+  };
+  var PLACES = [['p_booth', '부조정실', '엽서 묶음과 결재 서류'], ['p_archive', '6층 자료실', '옛 소식지 · 직원 명부'], ['p_gate', '1층 정문 · 경비실', '우체통과 경비 일지']];
+
+  /* ── 심문 ── */
+  var Q = {
+    moon: [
+      { q: '이 엽서는 언제부터 왔어요?', lines: [
+        ['moon', '1995년 첫 방송 다음 주부터요. 그 뒤로 매주.'],
+        ['moon', '처음 몇 해는 혹시 찾아올까 기다렸어요. 안 오더라고요. 그래서 그냥 매주 기다리는 걸로 했죠.']
+      ], clue: 'moonword' },
+      { q: '보낸 사람을 짐작해 본 적은요?', lines: [
+        ['moon', '택시 기사님, 야간 경비, 밤샘 공부하는 학생… 매주 다르게 상상했어요.'],
+        ['moon', '글씨가 단정해요. 꾹꾹 눌러 써요. 서두르는 사람은 아니에요.']
+      ] }
+    ],
+    jang: [
+      { q: '「밤의 우체통」 자주 들으셨어요?', lines: [
+        ['jang', '그 프로? 제대로 들어 본 적 없소. 밤 11시면 자는 사람이오.'],
+        ['jang', '폐지 서류에 도장 찍은 것도 나요. 위에서 정한 걸 막지 못했으니 할 말 없소.']
+      ], clue: 'jangword' },
+      { q: '2003년 5월엔 뭘 하셨어요?', lines: [
+        ['jang', '…그걸 왜 묻소?'],
+        ['jang', '20년도 더 된 일을 어떻게 기억하오. 바빴겠지.'],
+        ['', '국장의 귀가 빨개졌다.']
+      ] }
+    ],
+    lee: [
+      { q: '엽서 담당은 얼마나 하셨어요?', lines: [
+        ['lee', '5년이요! 그 묶음은 제가 오기 전부터 소라 선배가 따로 모으셨어요. 저는 매주 꽂아 드리기만 했고요.'],
+        ['cg', '../../img/c4-rec.webp', '녹음실에 나란히 앉은 소라와 다온. 엽서 읽는 법을 처음 배우던 날.'],
+        ['lee', '월요일 아침마다 제일 먼저 찾는 엽서였어요. 이번 주에도 왔나 하고.']
+      ], clue: 'leeword' },
+      { q: '국장님은 어떤 분이에요?', lines: [
+        ['lee', '음… 깐깐하세요. 특히 우리 프로한테요. 회의 때마다 제일 꼼꼼히 따지셨어요.'],
+        ['lee', '선배들이 그러는데, 일부러 그러시는 거래요. 「국장이 DJ를 감싼다」는 말 나올까 봐.'],
+        ['lee', '그래서 그런 말은 한 번도 안 나왔어요. 오히려 「국장이 소라 선배를 싫어한다」는 말이 돌았죠.']
+      ], clue: 'rumor' }
+    ],
+    cat: [
+      { q: '도토리, 거기 왜 앉아 있어?', lines: [
+        ['cat', '(도토리가 부조정실 구석 국장 자리 서랍 앞에 꼼짝 않고 앉아 있다.)'],
+        ['han', '서랍 틈으로… 빈 엽서 한 묶음이 보여요. 맨 위 한 장엔 우표가 벌써 붙어 있네요. 거꾸로.'],
+        ['han', '글은 아직 없어요. 이번 주 것이었을까요.']
+      ], clue: 'drawer' },
+      { q: '엽서 냄새, 알아?', lines: [
+        ['cat', '(도토리가 엽서 묶음 냄새를 맡더니, 문 쪽을 보며 꼬리를 흔든다.)'],
+        ['han', '방금 나간 사람 냄새랑 같다는 거야?']
+      ] }
+    ]
+  };
+
+  /* ── 추리 문제 ── */
+  var STEPS = [
+    { q: '30년 동안 엽서를 보낸 사람은?', sub: '한 사람을 고르세요.', type: 'who', answer: 'jang',
+      wrong: {
+        moon: '소라 씨가 자기한테 보냈다면 30년 동안 궁금해하지 않았겠죠. 오늘 고맙다고 하고 싶다고 한 것도 소라 씨예요.',
+        lee: '다온 씨는 5년 전에 왔어요. 엽서는 30년 동안 왔고요.',
+        cat: '도토리는 서랍을 찾아냈을 뿐이에요. 우표는 못 붙여요. 거꾸로든 바로든요.'
+      } },
+    { q: '엽서와 국장을 잇는 근거는?', sub: '수첩에서 단서를 하나 고르세요.', type: 'clue', answer: ['seal', 'drawer'],
+      tip: '엽서 우표는 전부 거꾸로였어요. 거꾸로 된 것을 또 어디서 봤죠?' },
+    { q: '「밤 11시면 잔다」는 국장의 말이 거짓인 근거는?', sub: '수첩에서 단서를 하나 고르세요.', type: 'clue', answer: ['gate'],
+      tip: '일요일 밤, 방송국 1층에서 누가 무엇을 적어 두었죠?' },
+    { q: '국장이 끝까지 이름을 밝히지 않은 이유는?', sub: '하나를 고르세요.', type: 'where', answer: 'rumor',
+      opts: { shy: ['그냥 부끄러워서', '처음엔 그랬을지 몰라요. 그런데 국장이 된 뒤엔 회의 때마다 일부러 우리 프로에만 깐깐했어요. 부끄러움만으로는 설명이 안 돼요.'],
+              rumor: ['국장의 애청자라는 게 알려지면 소라 씨가 「국장이 감싸는 DJ」 소리를 들을까 봐', ''],
+              spy: ['소라를 감시하려고', '감시라면 「오늘도 잘 들었습니다」라고 쓰진 않았겠죠.'],
+              warn: ['폐지를 미리 알려 주려고', '엽서엔 30년 동안 그 한 줄뿐이었어요. 다른 말은 한 번도 없었죠.'] } }
+  ];
+
+  var SOLVE_LINES = [
+    ['han', '국장님을 부조정실로 다시 불러 주세요. 열쇠 맡기기 전에 드릴 게 있다고요.'],
+    ['bg', 'booth'],
+    ['jang', '결재 서류 두고 갔다고? …아, 거기 있군.'],
+    ['han', '서류 말고 다른 것도 두고 가셨어요.']
+  ];
+  var FINALE = [
+    ['bg', 'booth'],
+    ['han', '30년 동안 온 엽서 천오백 장, 우표가 전부 거꾸로 붙어 있었어요. 그리고 오늘 콘솔 위 결재 서류엔 도장이 전부 거꾸로 찍혀 있었죠.'],
+    ['han', '국장님 서랍엔 빈 엽서 한 묶음. 맨 위 한 장엔 우표가 벌써 거꾸로 붙어 있었어요.'],
+    ['bg', 'station'],
+    ['han', '엽서 소인은 늘 월요일 아침, 정문 앞 우체통이에요. 그리고 경비 일지엔 10년 동안 일요일마다 국장실 불이 방송 끝날 때까지 켜져 있었어요.'],
+    ['han', '30년 동안 딱 한 주 엽서가 빠진 2003년 5월. 그 주에 영업부 장만수 차장은 신혼여행 중이셨고요.'],
+    ['bg', 'booth'],
+    ['jang', '……'],
+    ['jang', '…1995년에 영업부 막내였소. 야간 당직을 서는데, 당직실 라디오에서 그 프로가 나오더군.'],
+    ['jang', '첫 주는 못 들었어. 둘째 주부터 들었지. 사연 읽는 목소리가… 밤새 혼자 있는 사람한테 하는 말 같았소.'],
+    ['jang', '처음엔 이름 쓰기가 쑥스러웠고. 국장이 된 뒤엔 더 못 썼소. 국장이 DJ를 감싼다는 소리, 문 DJ가 들어선 안 되니까.'],
+    ['lee', '그래서 회의 때 그렇게 깐깐하셨던 거예요?'],
+    ['jang', '…남들이 보는 데선 미워해야 지켜 줄 수 있는 것도 있소.'],
+    ['jang', '폐지는 내가 막지 못했어. 대신 마지막 엽서는 직접 주지.'],
+    ['', '국장이 서랍에서 엽서 한 장을 꺼내, 그 자리에서 한 줄을 썼다. 우표는 거꾸로.'],
+    ['moon', '「오늘도 잘 들었습니다.」'],
+    ['moon', '…저도요, 국장님. 30년 동안 잘 들었어요. 매주 월요일마다요.'],
+    ['', '도토리가 콘솔 위로 올라가 엽서 묶음 맨 위에 앉았다. 천오백한 번째 엽서 위에.'],
+    ['han', '사진은 거짓말을 안 해요. 그런데 오늘은 우표 천오백 장이 30년 동안 한 사람을 가리키고 있었네요.'],
+    ['cat', '냐아.']
+  ];
+  /* ── 저장 ── */
+  var st;
+  function fresh() { return { scene: 'title', clues: [], seen: {}, asked: {}, step: 0, miss: 0, solved: false, t0: Date.now() }; }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+  function loadSave() { try { var s = JSON.parse(localStorage.getItem(KEY) || 'null'); return s && s.clues ? s : null; } catch (e) { return null; } }
+
+  /* ── 화면 전환 ── */
+  var LAYERS = ['title', 'talk', 'hub', 'ded', 'toon', 'end'];
+  function show(which) {
+    LAYERS.forEach(function (l) { $('L-' + l).hidden = l !== which; });
+    var inGame = which !== 'title';
+    $('b-note').hidden = !inGame; $('b-hint').hidden = !(which === 'hub' || which === 'ded');
+  }
+  function setBg(k) { $('bg').style.backgroundImage = 'url(' + (BG[k] || BG[HOME_BG]) + ')'; }
+
+  /* ── 대화 진행 ── */
+  var queue = [], onDone = null, typing = null, full = '';
+  function play(lines, done) { queue = lines.slice(); onDone = done; show('talk'); $('t-choices').hidden = true; $('t-box').hidden = false; step(); }
+  function step() {
+    if (typing) { clearInterval(typing); typing = null; $('t-line').textContent = full; return; }
+    if (!queue.length) { var f = onDone; onDone = null; if (f) f(); return; }
+    var l = queue.shift(), who = l[0], p = P[who];
+    if (who === 'bg') { setBg(l[1]); step(); return; }
+    var cg = $('t-cg');
+    if (who === 'cg') { cg.src = l[1]; cg.hidden = false; cg.style.animation = 'none'; void cg.offsetWidth; cg.style.animation = ''; l = ['', l[2] || '']; who = ''; p = null; }
+    else cg.hidden = true;
+    $('t-name').textContent = p ? p.name : '';
+    var line = $('t-line'); line.className = 'line' + (who ? '' : ' narr');
+    var pic = $('t-pic');
+    if (p) { pic.src = p.img; pic.alt = p.name; pic.hidden = false; pic.classList.toggle('cat', who === 'cat'); } else pic.hidden = true;
+    full = l[1];
+    if (RM) { line.textContent = full; return; }
+    var i = 0; line.textContent = '';
+    typing = setInterval(function () { i += 2; line.textContent = full.slice(0, i); if (i >= full.length) { clearInterval(typing); typing = null; } }, 24);
+  }
+  $('t-box').addEventListener('click', step);
+  document.addEventListener('keydown', function (e) {
+    if (!$('L-talk').hidden && !$('t-box').hidden && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); step(); }
+    if (e.key === 'Escape') $('sheet').hidden = true;
+  });
+
+  /* ── 단서 얻기 ── */
+  var toastT;
+  function toast(msg) { var t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 2200); }
+  function gain(ids) {
+    var got = [];
+    (ids || []).forEach(function (id) { if (st.clues.indexOf(id) < 0) { st.clues.push(id); got.push(CLUES[id][0]); } });
+    if (got.length) toast('수첩에 적었다 — ' + got.join(' · '));
+    $('nb-n').textContent = st.clues.length;
+    save();
+  }
+
+  /* ── 조사 지도 ── */
+  function hub() {
+    st.scene = 'hub'; save(); setBg(HOME_BG); show('hub');
+    var pl = $('places'); pl.innerHTML = '';
+    PLACES.forEach(function (x) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'tile' + (st.seen[x[0]] ? ' clear' : '');
+      b.innerHTML = '<i class="dot"></i><b></b><span></span>';
+      b.querySelector('b').textContent = x[1]; b.querySelector('span').textContent = st.seen[x[0]] ? '살펴봤다' : x[2];
+      b.addEventListener('click', function () {
+        var sc = S[x[0]]; setBg(sc.bg);
+        play(sc.lines, function () { st.seen[x[0]] = 1; gain(sc.clues); hub(); });
+      });
+      pl.appendChild(b);
+    });
+    var pe = $('people'); pe.innerHTML = '';
+    SUSPECTS.forEach(function (k) {
+      var all = Q[k].every(function (_, i) { return st.asked[k + i]; });
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'tile person' + (all ? ' clear' : '');
+      b.innerHTML = '<i class="dot"></i><img alt=""><b></b><span></span>';
+      b.querySelector('img').src = P[k].img; b.querySelector('b').textContent = P[k].name; b.querySelector('span').textContent = P[k].role;
+      b.addEventListener('click', function () { ask(k); });
+      pe.appendChild(b);
+    });
+    var ready = KEYS.every(function (k) { return st.clues.indexOf(k) >= 0; });
+    $('b-solve').disabled = !ready;
+    $('hub-hint').textContent = ready ? '핵심 단서가 다 모였어요. 추리를 시작할 수 있습니다.' : '장소를 살피고 사람들에게 물어 단서를 모으세요. (핵심 단서 ' + KEYS.filter(function (k) { return st.clues.indexOf(k) >= 0; }).length + '/' + KEYS.length + ')';
+  }
+  function ask(k) {
+    show('talk'); setBg(P[k].bg || HOME_BG); $('t-cg').hidden = true;
+    var p = P[k], pic = $('t-pic'); pic.src = p.img; pic.alt = p.name; pic.hidden = false;
+    $('t-name').textContent = p.name; $('t-line').className = 'line'; $('t-line').textContent = '무엇을 물어볼까요?';
+    $('t-next').hidden = true;
+    var box = $('t-choices'); box.innerHTML = ''; box.hidden = false;
+    Q[k].forEach(function (it, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = it.q;
+      if (st.asked[k + i]) b.className = 'done';
+      b.addEventListener('click', function () {
+        $('t-next').hidden = false;
+        play(it.lines, function () { st.asked[k + i] = 1; gain(it.clue ? [it.clue] : []); ask(k); });
+      });
+      box.appendChild(b);
+    });
+    var back = document.createElement('button'); back.type = 'button'; back.textContent = '← 다른 곳을 본다';
+    back.addEventListener('click', function () { $('t-next').hidden = false; hub(); });
+    box.appendChild(back);
+  }
+
+  /* ── 수첩 ── */
+  var pickCb = null;
+  function openNote(title, cb) {
+    pickCb = cb || null;
+    $('sheet-t').textContent = title || '수첩';
+    var list = $('sheet-list'); list.innerHTML = '';
+    if (!st.clues.length) list.innerHTML = '<p class="empty">아직 적은 것이 없어요.</p>';
+    st.clues.forEach(function (id) {
+      var d = document.createElement('div'); d.className = 'clue' + (cb ? ' pick' : '');
+      d.innerHTML = '<b></b><p></p>'; d.querySelector('b').textContent = CLUES[id][0]; d.querySelector('p').textContent = CLUES[id][1];
+      if (cb) { d.tabIndex = 0; d.addEventListener('click', function () { $('sheet').hidden = true; cb(id); }); }
+      list.appendChild(d);
+    });
+    $('sheet').hidden = false;
+  }
+  $('b-note').addEventListener('click', function () { openNote('수첩'); });
+  $('sheet-x').addEventListener('click', function () { $('sheet').hidden = true; });
+  $('sheet').addEventListener('click', function (e) { if (e.target === $('sheet')) $('sheet').hidden = true; });
+
+  /* ── 도토리 힌트 ── */
+  $('b-hint').addEventListener('click', function () {
+    var msg;
+    if (!$('L-ded').hidden) msg = STEPS[st.step].tip || '수첩을 다시 읽어 보세요. 서로 부딪히는 두 줄이 있어요.';
+    else {
+      var miss = KEYS.filter(function (k) { return st.clues.indexOf(k) < 0; });
+      msg = miss.length ? WHERE[miss[0]] : '단서는 다 모였어요. 「추리 시작」을 눌러 보세요.';
+    }
+    toast('🐈 냐아 — ' + msg);
+  });
+
+  /* ── 추리 ── */
+  function lives() { $('d-lives').textContent = '실수 ' + st.miss + '번'; }
+  function deduce() {
+    st.scene = 'ded'; save(); setBg(DED_BG); show('ded'); lives();
+    var s = STEPS[st.step];
+    $('d-q').textContent = (st.step + 1) + ' / ' + STEPS.length + ' · ' + s.q; $('d-sub').textContent = s.sub;
+    $('d-say').hidden = true;
+    var box = $('d-opts'); box.innerHTML = ''; box.className = 'opts';
+    function wrong(btn, why) { st.miss++; save(); lives(); if (btn) btn.classList.add('no'); var say = $('d-say'); say.textContent = why; say.hidden = false; }
+    function right() { st.step++; save(); if (st.step >= STEPS.length) finale(); else deduce(); }
+    if (s.type === 'who') {
+      box.className = 'opts pics';
+      SUSPECTS.forEach(function (k) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'opt pic';
+        b.innerHTML = '<img alt=""><b></b><small></small>';
+        b.querySelector('img').src = P[k].img; b.querySelector('b').textContent = P[k].name; b.querySelector('small').textContent = P[k].role;
+        b.addEventListener('click', function () { if (k === s.answer) right(); else wrong(b, s.wrong[k]); });
+        box.appendChild(b);
+      });
+    } else if (s.type === 'clue') {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = '수첩을 펼쳐 단서 고르기';
+      b.addEventListener('click', function () {
+        openNote('어느 단서일까요?', function (id) {
+          if (s.answer.indexOf(id) >= 0) right();
+          else wrong(null, '「' + CLUES[id][0] + '」… 그것만으로는 범인을 몰아붙일 수 없어요. ' + s.tip);
+        });
+      });
+      box.appendChild(b);
+    } else {
+      Object.keys(s.opts).forEach(function (k) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'opt';
+        b.innerHTML = '<b></b>'; b.querySelector('b').textContent = s.opts[k][0];
+        b.addEventListener('click', function () { if (k === s.answer) right(); else wrong(b, s.opts[k][1]); });
+        box.appendChild(b);
+      });
+    }
+  }
+  $('b-solve').addEventListener('click', function () {
+    play(SOLVE_LINES, function () { st.step = 0; deduce(); });
+  });
+
+  /* ── 엔딩 — 웹툰처럼 세로로 늘어놓고, 스크롤하면 한 칸씩 떠오른다 ── */
+  function webtoon(lines, done) {
+    show('toon'); window.scrollTo(0, 0);
+    var box = $('toon-strip'); box.innerHTML = '';
+    var hint = document.createElement('p'); hint.className = 'toon-hint'; hint.textContent = '▼ 아래로 내려 보세요'; box.appendChild(hint);
+    if (lines[0][0] !== 'bg' && lines[0][0] !== 'cg') lines = [['bg', HOME_BG]].concat(lines);
+    lines.forEach(function (l) {
+      var who = l[0], el, p = P[who];
+      if (who === 'bg' || who === 'cg') {
+        el = document.createElement('figure'); el.className = 'tp' + (who === 'bg' ? ' scene' : '');
+        var im = document.createElement('img'); im.alt = ''; im.src = who === 'bg' ? BG[l[1]] : l[1]; el.appendChild(im);
+        if (who === 'cg' && l[2]) { var fc = document.createElement('figcaption'); fc.textContent = l[2]; el.appendChild(fc); }
+      } else if (!p) {
+        el = document.createElement('p'); el.className = 'tn'; el.textContent = l[1];
+      } else {
+        el = document.createElement('div'); el.className = 'tb' + (who === 'han' ? ' me' : '') + (who === 'cat' ? ' cat' : '');
+        el.innerHTML = '<img alt=""><div><b></b><p></p></div>';
+        el.querySelector('img').src = p.img; el.querySelector('b').textContent = p.name; el.querySelector('p').textContent = l[1];
+      }
+      box.appendChild(el);
+    });
+    var go = document.createElement('button'); go.type = 'button'; go.className = 'btn toon-go'; go.textContent = '사건 해결 — 결과 보기';
+    go.addEventListener('click', function () { done(); });
+    box.appendChild(go);
+    if (!RM && 'IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: 0.12 });
+      box.querySelectorAll('.tp, .tn, .tb').forEach(function (x) { x.classList.add('fx'); io.observe(x); });
+    }
+  }
+
+  function finale() {
+    webtoon(FINALE, function () { st.solved = true; st.scene = 'end'; save(); showEnd(); count('rest-side4-solved', '쉬어가기: 추리 번외편 4 해결'); });
+  }
+  function showEnd() {
+      setBg(HOME_BG); show('end');
+      var stars = Math.max(1, 5 - st.miss);
+      $('e-stars').textContent = '★★★★★'.slice(0, stars) + '☆☆☆☆☆'.slice(0, 5 - stars);
+      $('e-rank').textContent = ['', '탐정 조수 — 실수 N번. 도토리가 많이 도와줬네요.', '견습 탐정 — 실수 N번.', '탐정 — 실수 N번, 제법이에요.', '일류 탐정 — 실수 한 번, 거의 완벽해요.', '명탐정 — 한 번도 틀리지 않았어요.'][stars].replace('N', st.miss);
+  }
+
+  /* ── 시작 · 이어하기 · 다시 ── */
+  function begin() { st = fresh(); save(); $('nb-n').textContent = 0; count('rest-side4-start', '쉬어가기: 추리 번외편 4 시작'); setBg(S.intro.bg); play(S.intro.lines, hub); }
+  function resume() {
+    $('nb-n').textContent = st.clues.length;
+    if (st.scene === 'end') showEnd(); else if (st.scene === 'ded') deduce(); else hub();
+  }
+  $('b-new').addEventListener('click', function () {
+    if (loadSave() && !confirm('처음부터 다시 할까요? 지금까지 모은 단서는 지워져요.')) return;
+    begin();
+  });
+  $('b-cont').addEventListener('click', resume);
+  $('b-again').addEventListener('click', function () { begin(); });
+  $('b-share').addEventListener('click', function () {
+    var url = 'https://swbins.github.io/rest/case/4/', text = '번외편은 본편을 별 다섯 개로 풀어야 열려. 도전해 봐. 나는 ' + $('e-stars').textContent;
+    if (navigator.share) { navigator.share({ title: '한겨울 사진관 사건 수첩 제4화 번외편', text: text, url: url }).catch(function () {}); return; }
+    var t = $('e-toast');
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text + ' ' + url).then(function () { t.textContent = '주소를 복사했어요.'; t.hidden = false; }, function () { window.prompt('이 주소를 복사하세요', url); });
+    else window.prompt('이 주소를 복사하세요', url);
+  });
+
+  $('nb-t').textContent = Object.keys(CLUES).length;
+  st = loadSave();
+  if (st && st.scene !== 'title') { $('b-cont').hidden = false; $('b-new').textContent = '처음부터'; $('b-new').className = 'btn ghost'; }
+  else st = fresh();
+  setBg(HOME_BG); show('title');
+})();
+</script>
+<!-- 방문 수만 셉니다 — GoatCounter(쿠키·개인 식별 없음). 대시보드 https://swbins.goatcounter.com -->
+<script data-goatcounter="https://swbins.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>
