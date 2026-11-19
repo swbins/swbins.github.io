@@ -675,9 +675,9 @@ a { color: var(--accent); }
   }
   function showEnd() {
       setBg(HOME_BG); show('end');
-      var stars = st.miss === 0 ? 3 : st.miss <= 2 ? 2 : 1;
-      $('e-stars').textContent = '★★★'.slice(0, stars) + '☆☆☆'.slice(0, 3 - stars);
-      $('e-rank').textContent = (stars === 3 ? '명탐정 — 한 번도 틀리지 않았어요.' : stars === 2 ? '탐정 — 실수 ' + st.miss + '번, 거의 완벽해요.' : '견습 탐정 — 실수 ' + st.miss + '번. 도토리가 많이 도와줬네요.');
+      var stars = Math.max(1, 5 - st.miss);
+      $('e-stars').textContent = '★★★★★'.slice(0, stars) + '☆☆☆☆☆'.slice(0, 5 - stars);
+      $('e-rank').textContent = ['', '탐정 조수 — 실수 N번. 도토리가 많이 도와줬네요.', '견습 탐정 — 실수 N번.', '탐정 — 실수 N번, 제법이에요.', '일류 탐정 — 실수 한 번, 거의 완벽해요.', '명탐정 — 한 번도 틀리지 않았어요.'][stars].replace('N', st.miss);
   }
 
   /* ── 시작 · 이어하기 · 다시 ── */
