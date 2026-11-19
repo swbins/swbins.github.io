@@ -139,6 +139,28 @@ a { color: var(--accent); }
 .end ol { margin: 0; padding-left: 20px; color: #d8cdbb; }
 .end .applink { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
 
+/* 엔딩 — 웹툰처럼 세로로 */
+.toon { background: rgba(18,16,15,.84); }
+.toon-strip { width: 100%; max-width: 620px; margin: 0 auto; padding: 28px 14px 64px; display: flex; flex-direction: column; gap: 22px; }
+.tp { margin: 0; background: #efe6d6; padding: 6px; border-radius: 3px; box-shadow: 0 10px 30px #000a; }
+.tp img { display: block; width: 100%; height: auto; }
+.tp.scene img { aspect-ratio: 16 / 9; object-fit: cover; }
+.tp figcaption { color: #2b2723; font-family: var(--head); font-size: 16px; line-height: 1.6; padding: 10px 8px 4px; }
+.tn { margin: 6px 0; padding: 14px 16px; border: 1px solid var(--line); background: #1c1916; font-family: var(--head); color: #d8cdbb; text-align: center; font-size: 16px; }
+.tb { display: flex; gap: 10px; align-items: flex-start; }
+.tb img { width: 56px; height: 56px; flex: none; border-radius: 50%; object-fit: cover; object-position: 50% 6%; background: #efe6d6; border: 2px solid #efe6d6; }
+.tb.cat img { object-position: 50% 30%; }
+.tb > div { background: #f4efe6; color: #2b2723; border-radius: 14px; padding: 10px 14px; max-width: 82%; }
+.tb b { display: block; font-size: 12px; color: #9a3f1d; }
+.tb p { margin: 2px 0 0; font-size: 16px; line-height: 1.6; }
+.tb.me { flex-direction: row-reverse; }
+.tb.me > div { background: #e0864f; color: #1a120c; }
+.tb.me b { color: #3a1d0c; }
+.fx { opacity: 0; transform: translateY(26px); transition: opacity .6s ease, transform .6s ease; }
+.fx.in { opacity: 1; transform: none; }
+.toon-go { align-self: center; margin-top: 12px; }
+.toon-hint { text-align: center; color: var(--muted); font-size: 13px; margin: 0; }
+
 /* 수첩 */
 .sheet { position: fixed; inset: 0; z-index: 20; background: #000a; display: flex; justify-content: center; align-items: flex-end; }
 .sheet[hidden] { display: none; }
@@ -222,6 +244,11 @@ a { color: var(--accent); }
       <p class="say" id="d-say" hidden></p>
     </section>
 
+    <!-- 엔딩 — 웹툰처럼 스크롤 -->
+    <section class="layer toon" id="L-toon" hidden>
+      <div class="toon-strip" id="toon-strip"></div>
+    </section>
+
     <!-- 끝 -->
     <section class="layer end" id="L-end" hidden>
       <span class="kicker" style="color:var(--accent);font-size:13px;letter-spacing:.12em">사건 해결 · 제3화</span>
@@ -299,7 +326,7 @@ a { color: var(--accent); }
       ['han', '도토리, 학교 냄새 좋지? 분필이랑 나무 바닥 냄새.'],
       ['cat', '냐아.'],
       ['bg', 'hall'],
-      ['', '밤 10시, 강당 불이 꺼지고 졸업생들의 옛 사진이 화면에 흘렀다. 20분 동안 모두 화면만 바라봤다.'],
+      ['cg', '../img/c3-hall.webp', '밤 10시, 강당 불이 꺼지고 졸업생들의 옛 사진이 화면에 흘렀다. 20분 동안 모두 화면만 바라봤다.'],
       ['bg', 'office'],
       ['', '10시 30분. 교무실에서 교장의 목소리가 떨렸다.'],
       ['jung', '계약서가… 내일 서명할 매각 계약서가 없어졌어요.'],
@@ -312,7 +339,7 @@ a { color: var(--accent); }
       ['', '교무실. 구석의 낡은 철제 금고 문이 열려 있다.'],
       ['han', '다이얼 금고네요. 긁힌 데도, 억지로 연 흔적도 없어요. 비밀번호를 아는 사람이에요.'],
       ['jung', '비밀번호는 개교 기념일, 0412예요. 저랑… 관리인 윤 선생님만 알아요.'],
-      ['han', '(금고 속 쪽지를 펼친다. 손으로 옮겨 적은 「졸업식 노래」 악보, 뒷면에 연필 글씨.)'],
+      ['cg', '../img/c3-sheet.webp', '금고 속 쪽지. 손으로 옮겨 적은 「졸업식 노래」 악보, 뒷면에 연필 글씨.'],
       ['han', '「이 학교를 부수지 마세요」… 악보 귀퉁이에 「1994. 음악실」이라고 적혀 있네요.']
     ], clues: ['safe', 'note'] },
 
@@ -327,6 +354,7 @@ a { color: var(--accent); }
     p_boiler: { bg: 'boiler', lines: [
       ['', '지하 보일러실. 낡은 보일러가 일정하게 웅웅거린다.'],
       ['han', '보일러 옆에 자동 기록계가 있네요. 종이에 온도가 줄로 그려지는 옛날 방식이에요.'],
+      ['cg', '../img/c3-boiler.webp', '기록지 위의 줄은 처음부터 끝까지 끊김 없이 이어져 있었다.'],
       ['han', '오늘 밤 줄이 한 번도 끊기지 않았어요. 멈춘 적도, 고친 흔적도 없어요.'],
       ['han', '그러고 보니 강당도 영상 내내 따뜻했죠.']
     ], clues: ['boiler'] }
@@ -342,6 +370,7 @@ a { color: var(--accent); }
       ], clue: 'jung' },
       { q: '음악실 피아노에 얽힌 이야기가 있나요?', lines: [
         ['jung', '…민호라는 아이가 있었어요. 피아노를 정말 좋아해서 쉬는 시간마다 음악실에서 쳤죠.'],
+        ['cg', '../img/c3-river.webp', '1994년 겨울, 얼어붙은 강.'],
         ['jung', '1994년 겨울, 언 강에 빠진 동생을 구하고… 돌아오지 못했어요. 6학년이었어요.'],
         ['jung', '그 뒤로 그 피아노는 아무도 안 쳤는데, 이상하게 늘 조율이 돼 있었어요.']
       ], clue: 'minho' }
@@ -402,6 +431,7 @@ a { color: var(--accent); }
   var SOLVE_LINES = [
     ['han', '모두 음악실로 모여 주세요. 이 사건은 거기서 시작됐어요.'],
     ['bg', 'music'],
+    ['cg', '../img/c3-gather.webp', '달빛 드는 음악실, 피아노 앞에 모두가 모였다.'],
     ['gu', '음악실? 계약서는 교무실에서 없어졌잖아.'],
     ['han', '네. 그런데 쪽지는 이 방의 악보로 썼어요.']
   ];
@@ -433,7 +463,7 @@ a { color: var(--accent); }
   function loadSave() { try { var s = JSON.parse(localStorage.getItem(KEY) || 'null'); return s && s.clues ? s : null; } catch (e) { return null; } }
 
   /* ── 화면 전환 ── */
-  var LAYERS = ['title', 'talk', 'hub', 'ded', 'end'];
+  var LAYERS = ['title', 'talk', 'hub', 'ded', 'toon', 'end'];
   function show(which) {
     LAYERS.forEach(function (l) { $('L-' + l).hidden = l !== which; });
     var inGame = which !== 'title';
@@ -596,8 +626,38 @@ a { color: var(--accent); }
     play(SOLVE_LINES, function () { st.step = 0; deduce(); });
   });
 
+  /* ── 엔딩 — 웹툰처럼 세로로 늘어놓고, 스크롤하면 한 칸씩 떠오른다 ── */
+  function webtoon(lines, done) {
+    show('toon'); window.scrollTo(0, 0);
+    var box = $('toon-strip'); box.innerHTML = '';
+    var hint = document.createElement('p'); hint.className = 'toon-hint'; hint.textContent = '▼ 아래로 내려 보세요'; box.appendChild(hint);
+    if (lines[0][0] !== 'bg' && lines[0][0] !== 'cg') lines = [['bg', HOME_BG]].concat(lines);
+    lines.forEach(function (l) {
+      var who = l[0], el, p = P[who];
+      if (who === 'bg' || who === 'cg') {
+        el = document.createElement('figure'); el.className = 'tp' + (who === 'bg' ? ' scene' : '');
+        var im = document.createElement('img'); im.alt = ''; im.src = who === 'bg' ? BG[l[1]] : l[1]; el.appendChild(im);
+        if (who === 'cg' && l[2]) { var fc = document.createElement('figcaption'); fc.textContent = l[2]; el.appendChild(fc); }
+      } else if (!p) {
+        el = document.createElement('p'); el.className = 'tn'; el.textContent = l[1];
+      } else {
+        el = document.createElement('div'); el.className = 'tb' + (who === 'han' ? ' me' : '') + (who === 'cat' ? ' cat' : '');
+        el.innerHTML = '<img alt=""><div><b></b><p></p></div>';
+        el.querySelector('img').src = p.img; el.querySelector('b').textContent = p.name; el.querySelector('p').textContent = l[1];
+      }
+      box.appendChild(el);
+    });
+    var go = document.createElement('button'); go.type = 'button'; go.className = 'btn toon-go'; go.textContent = '사건 해결 — 결과 보기';
+    go.addEventListener('click', function () { done(); });
+    box.appendChild(go);
+    if (!RM && 'IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: 0.12 });
+      box.querySelectorAll('.tp, .tn, .tb').forEach(function (x) { x.classList.add('fx'); io.observe(x); });
+    }
+  }
+
   function finale() {
-    play(FINALE, function () { st.solved = true; st.scene = 'end'; save(); showEnd(); count('rest-case3-solved', '쉬어가기: 추리 제3화 해결'); });
+    webtoon(FINALE, function () { st.solved = true; st.scene = 'end'; save(); showEnd(); count('rest-case3-solved', '쉬어가기: 추리 제3화 해결'); });
   }
   function showEnd() {
       setBg(HOME_BG); show('end');

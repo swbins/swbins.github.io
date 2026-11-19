@@ -75,6 +75,12 @@ a { color: var(--accent); }
 .who-pic { position: absolute; bottom: 168px; left: 50%; transform: translateX(-50%); height: min(62%, 560px); pointer-events: none; transition: opacity .2s; filter: drop-shadow(0 10px 18px #000a); }
 .who-pic[hidden] { display: block; opacity: 0; }
 .who-pic.cat { height: min(34%, 280px); }
+/* 장면 컷 — 웹툰 한 칸처럼 */
+.cg { position: absolute; z-index: 1; top: 16px; left: 50%; transform: translateX(-50%); width: min(94%, 860px); aspect-ratio: 1216 / 832; max-height: calc(100% - 200px); object-fit: cover; border: 4px solid #efe6d6; border-radius: 3px; box-shadow: 0 16px 40px #000c; animation: cgIn .5s ease; }
+.cg[hidden] { display: none; }
+@keyframes cgIn { from { opacity: 0; transform: translate(-50%, 10px); } }
+@media (prefers-reduced-motion: reduce) { .cg { animation: none; } }
+.box { z-index: 2; }
 .title h1 small, .title p, .end p, .end ol { text-shadow: 0 1px 8px #000, 0 0 2px #000; }
 .box { position: relative; margin: 0 12px 14px; background: rgba(28,25,22,.94); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px 30px; min-height: 140px; cursor: pointer; }
 .box .name { position: absolute; top: -15px; left: 14px; background: var(--accent); color: #1a120c; font-weight: 700; font-size: 14px; padding: 3px 12px; border-radius: 3px; }
@@ -133,6 +139,28 @@ a { color: var(--accent); }
 .end ol { margin: 0; padding-left: 20px; color: #d8cdbb; }
 .end .applink { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
 
+/* 엔딩 — 웹툰처럼 세로로 */
+.toon { background: rgba(18,16,15,.84); }
+.toon-strip { width: 100%; max-width: 620px; margin: 0 auto; padding: 28px 14px 64px; display: flex; flex-direction: column; gap: 22px; }
+.tp { margin: 0; background: #efe6d6; padding: 6px; border-radius: 3px; box-shadow: 0 10px 30px #000a; }
+.tp img { display: block; width: 100%; height: auto; }
+.tp.scene img { aspect-ratio: 16 / 9; object-fit: cover; }
+.tp figcaption { color: #2b2723; font-family: var(--head); font-size: 16px; line-height: 1.6; padding: 10px 8px 4px; }
+.tn { margin: 6px 0; padding: 14px 16px; border: 1px solid var(--line); background: #1c1916; font-family: var(--head); color: #d8cdbb; text-align: center; font-size: 16px; }
+.tb { display: flex; gap: 10px; align-items: flex-start; }
+.tb img { width: 56px; height: 56px; flex: none; border-radius: 50%; object-fit: cover; object-position: 50% 6%; background: #efe6d6; border: 2px solid #efe6d6; }
+.tb.cat img { object-position: 50% 30%; }
+.tb > div { background: #f4efe6; color: #2b2723; border-radius: 14px; padding: 10px 14px; max-width: 82%; }
+.tb b { display: block; font-size: 12px; color: #9a3f1d; }
+.tb p { margin: 2px 0 0; font-size: 16px; line-height: 1.6; }
+.tb.me { flex-direction: row-reverse; }
+.tb.me > div { background: #e0864f; color: #1a120c; }
+.tb.me b { color: #3a1d0c; }
+.fx { opacity: 0; transform: translateY(26px); transition: opacity .6s ease, transform .6s ease; }
+.fx.in { opacity: 1; transform: none; }
+.toon-go { align-self: center; margin-top: 12px; }
+.toon-hint { text-align: center; color: var(--muted); font-size: 13px; margin: 0; }
+
 /* 수첩 */
 .sheet { position: fixed; inset: 0; z-index: 20; background: #000a; display: flex; justify-content: center; align-items: flex-end; }
 .sheet[hidden] { display: none; }
@@ -188,6 +216,7 @@ a { color: var(--accent); }
     <!-- 대화 -->
     <section class="layer talk" id="L-talk" hidden>
       <img class="who-pic" id="t-pic" alt="" hidden>
+      <img class="cg" id="t-cg" alt="" hidden>
       <div class="box" id="t-box" role="button" tabindex="0" aria-live="polite">
         <span class="name" id="t-name"></span>
         <div class="line" id="t-line"></div>
@@ -213,6 +242,11 @@ a { color: var(--accent); }
       <p class="sub" id="d-sub"></p>
       <div class="opts" id="d-opts"></div>
       <p class="say" id="d-say" hidden></p>
+    </section>
+
+    <!-- 엔딩 — 웹툰처럼 스크롤 -->
+    <section class="layer toon" id="L-toon" hidden>
+      <div class="toon-strip" id="toon-strip"></div>
     </section>
 
     <!-- 끝 -->
@@ -291,7 +325,7 @@ a { color: var(--accent); }
       ['', '정월 대보름, 바닷가 마을 「등대골」. 한겨울은 불꽃 축제 사진을 찍어 달라는 부탁을 받고 사진관 문을 닫고 왔다.'],
       ['han', '도토리, 오늘 밤엔 불꽃이 터질 거야. 놀라서 숨지 마.'],
       ['cat', '냐.'],
-      ['', '밤 8시, 첫 불꽃이 바다 위로 터졌다. 20분 동안 마을 사람 모두가 하늘만 올려다봤다.'],
+      ['cg', '../img/c2-fire.webp', '밤 8시, 첫 불꽃이 바다 위로 터졌다. 20분 동안 마을 사람 모두가 하늘만 올려다봤다.'],
       ['', '그리고 8시 30분. 방파제 옆 등대 박물관에서 관장이 뛰어나왔다.'],
       ['baek', '시계가… 1910년 등대 시계가 없어졌어요! 이 마을의 보물인데!'],
       ['han', '관장님, 진열장은 부서져 있었나요?'],
@@ -311,6 +345,7 @@ a { color: var(--accent); }
       ['', '관장실. 벽 열쇠걸이에 오래된 열쇠가 줄지어 걸려 있다.'],
       ['baek', '진열장 예비 열쇠는 저기 걸어 둬요. 오늘 오후엔 신문사 차 기자님이 인터뷰하러 이 방에 왔었고요.'],
       ['cat', '(도토리가 열쇠걸이 아래 바닥 냄새를 맡더니 재채기를 한다.)'],
+      ['cg', '../img/c2-keys.webp', '열쇠걸이의 진열장 예비 열쇠. 홈에서 무언가 반짝였다.'],
       ['han', '바닥에 모래가 조금 흘러 있네요. 그리고 이 예비 열쇠… 홈에 젖은 모래 알갱이가 꼈어요.'],
       ['han', '이 마을에서 모래가 있는 곳은 방파제 아래 백사장뿐이죠.']
     ], clues: ['spare'] },
@@ -341,7 +376,8 @@ a { color: var(--accent); }
       { q: '불꽃놀이 때 어디 계셨어요?', lines: [
         ['cha', '방파제 백사장이요. 불꽃 사진은 거기가 명당이거든요.'],
         ['cha', '증거요? 여기 있죠. 20시 10분에 데스크한테 보낸 셀카. 뒤로 불꽃 터지는 거 보이시죠?'],
-        ['han', '(사진을 받아 확대한다. 구석에 마을 회관 시계탑이 작게 찍혀 있다.)'],
+        ['cg', '../img/c2-selfie.webp', '「20시 10분」에 보냈다는 셀카. 구석에 마을 회관 시계탑이 작게 찍혀 있다.'],
+        ['cg', '../img/c2-zoom.webp', '한겨울은 사진을 끝까지 확대했다.'],
         ['han', '…바늘이 7시 40분이네요.']
       ], clue: 'photo' },
       { q: '카메라 가방 좀 볼 수 있을까요?', lines: [
@@ -393,6 +429,7 @@ a { color: var(--accent); }
 
   var SOLVE_LINES = [
     ['han', '모두 회관 앞으로 모여 주세요. 시계를 가져간 사람이 이 안에 있어요.'],
+    ['cg', '../img/c2-gather.webp', '회관 시계탑 아래, 한겨울이 사람들 앞에 섰다.'],
     ['cha', '또 사진 이야기예요? 제 사진엔 시각까지 찍혀 있는데.'],
     ['han', '네, 시각이 찍혀 있죠. 그래서 문제예요.']
   ];
@@ -405,10 +442,10 @@ a { color: var(--accent); }
     ['han', '오후 인터뷰 때 열쇠걸이를 찍어 두셨죠. 어느 열쇠가 진열장 것인지 알아 두려고.'],
     ['nam', '그래, 그 털모자였어. 불꽃 시작하자마자 박물관 뒤로 뛰어가던.'],
     ['cat', '(도토리가 카메라 가방에 머리를 들이밀고 망원 렌즈 통을 앞발로 툭 친다.)'],
-    ['', '렌즈 통 뚜껑을 열자, 렌즈 대신 1910년 등대 시계가 째깍째깍 돌고 있었다.'],
+    ['cg', '../img/cg2-watch.webp', '렌즈 통 뚜껑을 열자, 렌즈 대신 1910년 등대 시계가 째깍째깍 돌고 있었다.'],
     ['cha', '…특종이 필요했어요. 「100년 된 보물 도난」 기사 하나면 서울 신문사로 갈 수 있었는데.'],
     ['baek', '그 시계는 100년 동안 이 마을 배들을 집으로 데려다줬어요. 기사 한 줄과 바꿀 물건이 아니에요.'],
-    ['', '9시 반, 해경이 도착했다. 늦게 남은 불꽃 하나가 바다 위로 터졌고, 도토리는 이번엔 숨지 않았다.']
+    ['cg', '../img/cg2-fire.webp', '9시 반, 해경이 도착했다. 늦게 남은 불꽃 하나가 바다 위로 터졌고, 도토리는 이번엔 숨지 않았다.']
   ];
 
   /* ── 저장 ── */
@@ -418,7 +455,7 @@ a { color: var(--accent); }
   function loadSave() { try { var s = JSON.parse(localStorage.getItem(KEY) || 'null'); return s && s.clues ? s : null; } catch (e) { return null; } }
 
   /* ── 화면 전환 ── */
-  var LAYERS = ['title', 'talk', 'hub', 'ded', 'end'];
+  var LAYERS = ['title', 'talk', 'hub', 'ded', 'toon', 'end'];
   function show(which) {
     LAYERS.forEach(function (l) { $('L-' + l).hidden = l !== which; });
     var inGame = which !== 'title';
@@ -433,6 +470,10 @@ a { color: var(--accent); }
     if (typing) { clearInterval(typing); typing = null; $('t-line').textContent = full; return; }
     if (!queue.length) { var f = onDone; onDone = null; if (f) f(); return; }
     var l = queue.shift(), who = l[0], p = P[who];
+    if (who === 'bg') { setBg(l[1]); step(); return; }
+    var cg = $('t-cg');
+    if (who === 'cg') { cg.src = l[1]; cg.hidden = false; cg.style.animation = 'none'; void cg.offsetWidth; cg.style.animation = ''; l = ['', l[2] || '']; who = ''; p = null; }
+    else cg.hidden = true;
     $('t-name').textContent = p ? p.name : '';
     var line = $('t-line'); line.className = 'line' + (who ? '' : ' narr');
     var pic = $('t-pic');
@@ -487,7 +528,7 @@ a { color: var(--accent); }
     $('hub-hint').textContent = ready ? '핵심 단서가 다 모였어요. 추리를 시작할 수 있습니다.' : '장소를 살피고 사람들에게 물어 단서를 모으세요. (핵심 단서 ' + KEYS.filter(function (k) { return st.clues.indexOf(k) >= 0; }).length + '/' + KEYS.length + ')';
   }
   function ask(k) {
-    show('talk'); setBg(HOME_BG);
+    show('talk'); setBg(P[k].bg || HOME_BG); $('t-cg').hidden = true;
     var p = P[k], pic = $('t-pic'); pic.src = p.img; pic.alt = p.name; pic.hidden = false;
     $('t-name').textContent = p.name; $('t-line').className = 'line'; $('t-line').textContent = '무엇을 물어볼까요?';
     $('t-next').hidden = true;
@@ -577,8 +618,38 @@ a { color: var(--accent); }
     play(SOLVE_LINES, function () { st.step = 0; deduce(); });
   });
 
+  /* ── 엔딩 — 웹툰처럼 세로로 늘어놓고, 스크롤하면 한 칸씩 떠오른다 ── */
+  function webtoon(lines, done) {
+    show('toon'); window.scrollTo(0, 0);
+    var box = $('toon-strip'); box.innerHTML = '';
+    var hint = document.createElement('p'); hint.className = 'toon-hint'; hint.textContent = '▼ 아래로 내려 보세요'; box.appendChild(hint);
+    if (lines[0][0] !== 'bg' && lines[0][0] !== 'cg') lines = [['bg', HOME_BG]].concat(lines);
+    lines.forEach(function (l) {
+      var who = l[0], el, p = P[who];
+      if (who === 'bg' || who === 'cg') {
+        el = document.createElement('figure'); el.className = 'tp' + (who === 'bg' ? ' scene' : '');
+        var im = document.createElement('img'); im.alt = ''; im.src = who === 'bg' ? BG[l[1]] : l[1]; el.appendChild(im);
+        if (who === 'cg' && l[2]) { var fc = document.createElement('figcaption'); fc.textContent = l[2]; el.appendChild(fc); }
+      } else if (!p) {
+        el = document.createElement('p'); el.className = 'tn'; el.textContent = l[1];
+      } else {
+        el = document.createElement('div'); el.className = 'tb' + (who === 'han' ? ' me' : '') + (who === 'cat' ? ' cat' : '');
+        el.innerHTML = '<img alt=""><div><b></b><p></p></div>';
+        el.querySelector('img').src = p.img; el.querySelector('b').textContent = p.name; el.querySelector('p').textContent = l[1];
+      }
+      box.appendChild(el);
+    });
+    var go = document.createElement('button'); go.type = 'button'; go.className = 'btn toon-go'; go.textContent = '사건 해결 — 결과 보기';
+    go.addEventListener('click', function () { done(); });
+    box.appendChild(go);
+    if (!RM && 'IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: 0.12 });
+      box.querySelectorAll('.tp, .tn, .tb').forEach(function (x) { x.classList.add('fx'); io.observe(x); });
+    }
+  }
+
   function finale() {
-    play(FINALE, function () { st.solved = true; st.scene = 'end'; save(); showEnd(); count('rest-case2-solved', '쉬어가기: 추리 제2화 해결'); });
+    webtoon(FINALE, function () { st.solved = true; st.scene = 'end'; save(); showEnd(); count('rest-case2-solved', '쉬어가기: 추리 제2화 해결'); });
   }
   function showEnd() {
       setBg(HOME_BG); show('end');
