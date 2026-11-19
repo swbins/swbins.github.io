@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>쉬어가기 — 일 유형 테스트 · 야근 범인 추리 · 30초 숨 고르기</title>
-<meta name="description" content="일하다 잠깐 쉬어 가는 곳. 질문 9개로 보는 「나는 어떤 일 유형?」, 남의 업무 PC 를 들여다보는 1분 추리 「야근 범인을 찾아라」, 30초 숨 고르기.">
+<title>쉬어가기 — 일 유형 테스트 · 추리 게임 · 오늘의 운세 · 타로 한 장</title>
+<meta name="description" content="일하다 잠깐 쉬어 가는 곳. 질문 9개로 보는 「나는 어떤 일 유형?」, 폭설에 갇힌 산장에서 사라진 그림을 쫓는 추리 게임 「한겨울 사진관 사건 수첩」, 날마다 바뀌는 오늘의 운세, 타로 한 장.">
 <link rel="canonical" href="https://swbins.github.io/rest/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="swbins">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:url" content="https://swbins.github.io/rest/">
 <meta property="og:title" content="쉬어가기 — 나는 어떤 일 유형?">
-<meta property="og:description" content="질문 9개로 보는 일 유형 테스트, 1분 추리 「야근 범인을 찾아라」, 30초 숨 고르기.">
+<meta property="og:description" content="일 유형 테스트, 추리 게임 「눈 내린 산장, 사라진 그림」, 날마다 바뀌는 오늘의 운세, 타로 한 장.">
 <meta property="og:image" content="https://swbins.github.io/rest/assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,51 +29,85 @@
   :root:not([data-theme="light"]) { --bg: #1f1c19; --ink: #ece4d6; --muted: #a59b8d; --line: #3a342e; --accent: #d7774f; --card: #262220; --soft: #2e2925; --btn: #ece4d6; --btnInk: #1f1c19; --btnHover: #d7774f; --ok: #8fbf86; }
 }
 :root[data-theme="dark"] { --bg: #1f1c19; --ink: #ece4d6; --muted: #a59b8d; --line: #3a342e; --accent: #d7774f; --card: #262220; --soft: #2e2925; --btn: #ece4d6; --btnInk: #1f1c19; --btnHover: #d7774f; --ok: #8fbf86; }
+/* 추리 놀이 중에는 밤 사무실 — 사이트 종이 결에서 벗어난다 */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--ink); font-family: var(--body); line-height: 1.65; min-height: 100vh; }
+html { -webkit-text-size-adjust: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); line-height: 1.65; min-height: 100vh; transition: background-color .4s; }
 a { color: inherit; }
+img { display: block; max-width: 100%; }
 b, strong { font-weight: 700; }
-button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
-button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+button, input { font: inherit; color: inherit; }
+button { background: none; border: 0; cursor: pointer; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 [hidden] { display: none !important; }
 
 .wrap { max-width: 1180px; margin: 0 auto; padding: 0 var(--gutter); }
 header.top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 28px 0 0; }
 .brand { font-family: var(--head); font-weight: 700; font-size: 20px; letter-spacing: -0.01em; text-decoration: none; }
-.top nav { display: flex; gap: 24px; font-size: 14px; color: var(--muted); }
+.top nav { display: flex; gap: 22px; font-size: 14px; color: var(--muted); }
 .top nav a { text-decoration: none; }
 .top nav a:hover { color: var(--ink); }
 
-/* 첫 화면: 제목 | 놀이 목차 */
-.hero { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(32px, 5vw, 64px); align-items: end;
-        padding: clamp(48px, 8vw, 96px) 0 clamp(40px, 6vw, 64px); }
+/* ── 첫 화면: 제목 | 그림 콜라주 ── */
+.hero { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 5vw, 64px); align-items: center;
+        padding: clamp(32px, 6vw, 72px) 0 clamp(40px, 6vw, 72px); }
 .kicker { font-size: 13px; font-weight: 500; letter-spacing: 0.02em; color: var(--accent); margin-bottom: 16px; }
-h1 { font-family: var(--head); font-weight: 700; font-size: clamp(36px, 5.6vw, 64px); line-height: 1.16; letter-spacing: -0.02em; word-break: keep-all; }
+h1 { font-family: var(--head); font-weight: 700; font-size: clamp(40px, 6.4vw, 76px); line-height: 1.1; letter-spacing: -0.02em; word-break: keep-all; }
 h1 em { font-style: normal; color: var(--accent); }
-.sub { margin-top: 20px; color: var(--muted); font-size: 16px; max-width: 30em; word-break: keep-all; }
+.sub { margin-top: 20px; color: var(--muted); font-size: 16px; max-width: 26em; word-break: keep-all; }
+.hero .go { margin-top: 28px; }
+.collage { position: relative; padding: 0 0 8% 8%; }
+.collage .main { width: 100%; height: auto; aspect-ratio: 1040 / 712; object-fit: cover; border: 1px solid var(--ink); border-radius: var(--radius); box-shadow: 8px 8px 0 var(--ink); background: var(--soft); }
+.collage .pol { position: absolute; width: 30%; background: var(--card); border: 1px solid var(--ink); padding: 6px 6px 22px; box-shadow: 4px 4px 0 rgba(0,0,0,.18); }
+.collage .pol img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.collage .pol span { position: absolute; left: 0; right: 0; bottom: 3px; text-align: center; font-family: var(--head); font-weight: 700; font-size: 12px; }
+.collage .p1 { left: 0; bottom: 0; transform: rotate(-4deg); }
+.collage .p2 { right: -2%; bottom: -4%; width: 18%; padding-bottom: 6px; transform: rotate(6deg); }
+.collage .p2 img { aspect-ratio: 832 / 1216; }
 
-.index { border-top: 2px solid var(--ink); }
-.index h2 { font-size: 13px; font-weight: 500; letter-spacing: 0.02em; color: var(--muted); padding: 12px 0 4px; }
-.index a { display: grid; grid-template-columns: 2.2em minmax(0, 1fr) auto; gap: 0 16px; align-items: baseline;
-           padding: 13px 0; border-top: 1px solid var(--line); text-decoration: none; }
-.index .n { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.index .chore { font-family: var(--head); font-weight: 700; font-size: 17px; word-break: keep-all; }
-.index .who { font-size: 13px; color: var(--muted); white-space: nowrap; }
-.index .who::after { content: " ↓"; }
-.index a:hover .chore { color: var(--accent); }
+/* ── 놀이 카드 네 장 ── */
+.games-h { border-top: 2px solid var(--ink); display: flex; justify-content: space-between; align-items: baseline; padding: 12px 0 18px; }
+.games-h h2 { font-size: 13px; font-weight: 500; letter-spacing: 0.02em; color: var(--muted); }
+.games-h span { font-size: 13px; color: var(--muted); }
+.games { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(14px, 2vw, 24px); margin-bottom: clamp(56px, 8vw, 96px); }
+.game { display: flex; flex-direction: column; text-decoration: none; background: var(--card); border: 1px solid var(--ink); border-radius: var(--radius); overflow: hidden;
+        transition: transform .18s, box-shadow .18s; box-shadow: 0 0 0 var(--ink); }
+.game:hover { transform: translate(-3px, -3px); box-shadow: 6px 6px 0 var(--ink); }
+.game:active { transform: translate(0, 0); box-shadow: 0 0 0 var(--ink); }
+.game figure { position: relative; margin: 0; border-bottom: 1px solid var(--ink); }
+.game figure img { width: 100%; aspect-ratio: 4 / 3.4; object-fit: cover; background: var(--soft); }
+.game .time { position: absolute; top: 12px; left: 12px; font-family: var(--mono); font-size: 11.5px; font-weight: 600; background: var(--bg); color: var(--ink); border: 1px solid var(--ink); padding: 2px 8px; border-radius: 99px; }
+.game .txt { padding: 14px 16px 16px; display: flex; flex-direction: column; flex: 1; }
+.game .no { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.game h3 { font-family: var(--head); font-size: clamp(21px, 2vw, 25px); line-height: 1.25; margin: 4px 0 6px; word-break: keep-all; }
+.game p { font-size: 14px; color: var(--muted); word-break: keep-all; flex: 1; }
+.game .start { align-self: flex-start; margin-top: 14px; background: var(--btn); color: var(--btnInk); font-weight: 700; font-size: 14px; padding: 8px 16px; border-radius: var(--radius); }
+.game:hover .start { background: var(--btnHover); }
+/* 추리 카드만 밤 표지 */
+.game.night { background: #0b0d12; color: #e7e9ef; border-color: #0b0d12; }
+.game.night:hover { box-shadow: 6px 6px 0 #e0a24a; }
+.game.night figure { border-bottom-color: #252a35; }
+.game.night figure::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(11,13,18,.92)); }
+.game.night .copy { position: absolute; left: 14px; right: 14px; bottom: 12px; z-index: 1; font-family: var(--head); font-weight: 700; font-size: 17px; line-height: 1.4; color: #fff; word-break: keep-all; }
+.game.night .time { background: #e0a24a; color: #0b0d12; border-color: #e0a24a; }
+.game.night .no, .game.night p { color: #8b93a3; }
+.game.night .start { background: #e0a24a; color: #0b0d12; }
+.game.night:hover .start { background: #f1bd6a; }
 
-/* 놀이 한 칸 */
-.play { border-top: 2px solid var(--ink); margin-bottom: clamp(56px, 8vw, 88px); scroll-margin-top: 16px; }
-.play > header { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(28px, 4vw, 48px); padding: 20px 0 24px; }
-.play .no { font-family: var(--mono); font-size: 12px; color: var(--muted); }
-.play h2 { font-family: var(--head); font-size: clamp(26px, 3.4vw, 34px); line-height: 1.2; margin: 6px 0 0; letter-spacing: -0.01em; word-break: keep-all; }
-.play .lead { color: var(--muted); font-size: 15px; word-break: keep-all; align-self: end; max-width: 36em; }
-.stage { border: 1px solid var(--ink); border-radius: var(--radius); background: var(--card); padding: clamp(18px, 3.5vw, 40px); }
+/* ── 놀이 한 판(한 번에 하나) ── */
+.back { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); padding: 22px 0 4px; }
+.back:hover { color: var(--ink); }
+.play { padding-bottom: clamp(48px, 8vw, 88px); }
+.p-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: center; padding: 14px 0 22px; }
+.p-head img { width: 84px; height: 84px; object-fit: cover; border: 1px solid var(--ink); border-radius: 50%; }
+.p-head .no { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.p-head h2 { font-family: var(--head); font-size: clamp(26px, 3.6vw, 38px); line-height: 1.15; letter-spacing: -0.01em; word-break: keep-all; }
+.p-head p { color: var(--muted); font-size: 14.5px; word-break: keep-all; max-width: 40em; margin-top: 4px; }
 
-.btn { display: inline-block; background: var(--btn); color: var(--btnInk); font-weight: 700; font-size: 14.5px; padding: 10px 18px; border-radius: var(--radius); text-decoration: none; }
+.btn { display: inline-block; background: var(--btn); color: var(--btnInk); font-weight: 700; font-size: 15px; padding: 11px 20px; border-radius: var(--radius); text-decoration: none; transition: transform .1s; }
 .btn:hover { background: var(--btnHover); }
+.btn:active { transform: translateY(1px); }
 .link { font-weight: 700; font-size: 14.5px; border-bottom: 2px solid var(--accent); padding-bottom: 1px; text-decoration: none; }
 .link:hover { color: var(--accent); }
 .ghost { font-size: 14px; color: var(--muted); }
@@ -82,97 +116,149 @@ h1 em { font-style: normal; color: var(--accent); }
 .toast { font-size: 13px; color: var(--ok); min-height: 1.4em; margin-top: 10px; }
 .applink { margin-top: 22px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 13.5px; color: var(--muted); word-break: keep-all; }
 .applink a { color: var(--ink); text-underline-offset: 3px; }
+.fine { font-size: 12.5px; color: var(--muted); }
+@keyframes txtin { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 
-/* 1. 심리테스트 */
-.q-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
-.bar { height: 3px; background: var(--line); margin: 10px 0 22px; }
-.bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s; }
-.q-text { font-family: var(--head); font-weight: 700; font-size: clamp(20px, 2.6vw, 26px); line-height: 1.4; word-break: keep-all; margin-bottom: 18px; max-width: 30em; }
-.opts { display: grid; gap: 8px; max-width: 640px; }
-.opts button { text-align: left; padding: 12px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); font-size: 15px; word-break: keep-all; }
-.opts button:hover { border-color: var(--ink); }
-.opts button.on { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
-.result { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: clamp(20px, 4vw, 44px); align-items: start; }
-.res-img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border: 1px solid var(--ink); border-radius: var(--radius); background: var(--soft); }
-.case-art { display: block; width: 100%; height: auto; aspect-ratio: 1100 / 520; max-height: 300px; object-fit: cover; border: 1px solid var(--ink); border-radius: var(--radius); margin-bottom: 18px; background: var(--soft); }
+/* ── 1. 일 유형 테스트 ── */
+.quiz { max-width: 760px; margin: 0 auto; }
+.q-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.q-num { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--muted); }
+.q-num b { font-size: 22px; color: var(--ink); }
+.bar { height: 12px; border: 1px solid var(--ink); border-radius: 99px; margin: 10px 0 22px; overflow: hidden; background: var(--card); }
+.bar i { display: block; height: 100%; width: 0; border-radius: 99px; transition: width .45s cubic-bezier(.3,1.4,.5,1);
+         background: repeating-linear-gradient(-45deg, var(--accent) 0 8px, color-mix(in srgb, var(--accent) 82%, var(--bg)) 8px 16px); }
+.qcard { position: relative; background: var(--card); border: 1px solid var(--ink); border-radius: 6px; box-shadow: 8px 8px 0 var(--ink); padding: clamp(22px, 4vw, 40px); overflow: hidden;
+         transition: opacity .2s, transform .2s; }
+.qcard.out { opacity: 0; transform: translateX(-36px); }
+.qcard.in { opacity: 0; transform: translateX(36px); transition: none; }
+.qcard .qmark { position: absolute; right: 14px; top: -18px; font-family: var(--head); font-weight: 700; font-size: 128px; line-height: 1; color: var(--soft); pointer-events: none; }
+.q-text { position: relative; font-family: var(--head); font-weight: 700; font-size: clamp(22px, 3vw, 30px); line-height: 1.35; word-break: keep-all; margin-bottom: 22px; }
+.opts { position: relative; display: grid; gap: 10px; }
+.opts button { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 14px; align-items: center; text-align: left; padding: 12px 16px 12px 12px;
+               border: 1px solid var(--ink); border-radius: 6px; background: var(--bg); font-size: 16px; word-break: keep-all; box-shadow: 3px 3px 0 var(--ink);
+               transition: transform .08s, box-shadow .08s, background-color .15s; }
+.opts button:hover { background: var(--soft); }
+.opts button:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+.opts .k { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid var(--ink); border-radius: 50%; font-family: var(--mono); font-weight: 600; font-size: 14px; background: var(--card); }
+.opts button.on .k, .opts button.picked .k { background: var(--accent); color: #fff; border-color: var(--accent); }
+.opts button.picked { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); background: var(--soft); }
+.opts button.picked .k { animation: pickpop .26s ease-out; }
+@keyframes pickpop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+.q-foot { display: flex; justify-content: space-between; margin-top: 16px; min-height: 24px; }
+
+.reveal { max-width: 760px; margin: 0 auto; text-align: center; padding: 64px 0; }
+.reveal p { font-size: 14px; color: var(--muted); }
+.reveal .spin { font-family: var(--head); font-weight: 700; font-size: clamp(26px, 4vw, 40px); margin-top: 10px; min-height: 1.4em; color: var(--ink); }
+
+.result { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(22px, 4vw, 48px); align-items: center; }
+.result.pop .res-art { animation: artin .7s cubic-bezier(.2,1.3,.4,1) both; }
+.result.pop .res-txt { animation: txtin .5s .25s ease-out both; }
+@keyframes artin { from { opacity: 0; transform: scale(.9) rotate(-2deg); } to { opacity: 1; transform: none; } }
+.res-art { position: relative; }
+.res-img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border: 1px solid var(--ink); border-radius: 6px; box-shadow: 10px 10px 0 var(--ink); background: var(--soft); }
+.res-art .stamp { position: absolute; top: 16px; left: -10px; transform: rotate(-6deg); background: var(--accent); color: #fff; font-family: var(--head); font-weight: 700; font-size: 15px; padding: 4px 14px; box-shadow: 2px 2px 0 rgba(0,0,0,.25); }
 .res-from { font-size: 13px; color: var(--accent); font-weight: 500; }
-.res-name { font-family: var(--head); font-weight: 700; font-size: clamp(28px, 4.4vw, 44px); line-height: 1.2; letter-spacing: -0.02em; word-break: keep-all; margin: 6px 0 14px; }
-.res-desc { font-size: 16px; max-width: 34em; word-break: keep-all; }
-.res-tip { margin-top: 12px; font-size: 15px; color: var(--muted); max-width: 34em; word-break: keep-all; }
+.res-name { font-family: var(--head); font-weight: 700; font-size: clamp(30px, 4.6vw, 48px); line-height: 1.18; letter-spacing: -0.02em; word-break: keep-all; margin: 6px 0 14px; }
+.res-desc { font-size: 16.5px; word-break: keep-all; }
+.res-tip { margin-top: 14px; font-size: 15px; color: var(--muted); word-break: keep-all; background: var(--soft); padding: 10px 14px; border-radius: 4px; }
 .res-tip b { color: var(--ink); }
 
-/* 2. 추리 — 남의 PC 화면 */
-.case-intro { font-size: 15.5px; max-width: 38em; word-break: keep-all; margin-bottom: 18px; }
-.pc { border: 1px solid var(--ink); border-radius: var(--radius); overflow: hidden; background: var(--bg); }
-.pc-bar { display: flex; justify-content: space-between; gap: 12px; padding: 7px 12px; background: var(--ink); color: var(--bg); font-family: var(--mono); font-size: 12px; }
-.pc-body { display: grid; grid-template-columns: 180px minmax(0, 1fr); min-height: 300px; }
-.icons { display: flex; flex-direction: column; gap: 2px; padding: 10px; border-right: 1px solid var(--line); background: var(--soft); }
-.icons button { display: flex; align-items: center; gap: 10px; text-align: left; padding: 8px 10px; border-radius: var(--radius); font-size: 14px; }
-.icons button:hover { background: var(--card); }
-.icons button.on { background: var(--card); box-shadow: inset 0 0 0 1px var(--ink); }
-.icons .ico { flex: none; width: 26px; height: 26px; display: grid; place-items: center; border: 1px solid var(--ink); border-radius: 2px; font-family: var(--mono); font-size: 11px; font-weight: 600; background: var(--bg); }
-.icons .seen { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--muted); }
-.viewer { padding: 16px 18px; font-size: 14.5px; min-width: 0; }
-.viewer .ph { color: var(--muted); font-size: 14px; }
-.win-t { font-family: var(--mono); font-size: 12px; color: var(--muted); padding-bottom: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
-.chat { display: grid; gap: 8px; }
-.chat p { max-width: 85%; padding: 7px 11px; border-radius: 10px; background: var(--card); border: 1px solid var(--line); word-break: keep-all; }
-.chat p.me { justify-self: end; background: var(--soft); }
-.chat small { display: block; font-size: 11.5px; color: var(--muted); }
-.memo { font-family: var(--body); font-size: 13.5px; white-space: pre-wrap; word-break: keep-all; overflow-wrap: anywhere; line-height: 1.75; }
-.files { list-style: none; font-family: var(--mono); font-size: 12.5px; }
-.files li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 4px 0; border-bottom: 1px dotted var(--line); }
-.files li span:first-child { overflow-wrap: anywhere; }
-.files .t { color: var(--muted); }
-.cal { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; font-size: 12.5px; }
-.cal div { border: 1px solid var(--line); border-radius: 2px; min-height: 92px; padding: 6px; background: var(--card); }
-.cal b { display: block; font-family: var(--mono); font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
-.cal span { display: block; background: var(--soft); border-left: 2px solid var(--accent); padding: 2px 5px; margin-bottom: 4px; word-break: keep-all; }
-.note { margin-top: 12px; font-size: 13px; color: var(--muted); word-break: keep-all; }
-.who-q { margin-top: 24px; font-family: var(--head); font-weight: 700; font-size: 20px; }
-.suspects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; max-width: 760px; }
-.suspects button { text-align: left; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); font-size: 14.5px; word-break: keep-all; }
-.suspects button:hover { border-color: var(--ink); }
-.suspects button.no { opacity: .5; text-decoration: line-through; text-decoration-color: var(--accent); }
-.verdict { margin-top: 18px; padding: 16px 18px; border-left: 3px solid var(--accent); background: var(--soft); font-size: 15px; word-break: keep-all; max-width: 760px; }
-.verdict h3 { font-family: var(--head); font-size: 20px; margin-bottom: 6px; }
-.verdict.right { border-left-color: var(--ok); }
-.verdict ol { margin: 8px 0 0 1.2em; }
+/* ── 3. 오늘의 운세 ── */
+.fort { max-width: 820px; margin: 0 auto; }
+.slip { position: relative; background: var(--card); border: 1px solid var(--ink); border-radius: 6px; box-shadow: 8px 8px 0 var(--ink); padding: clamp(22px, 4vw, 40px); }
+.slip::before { content: ""; position: absolute; inset: 8px; border: 1px dashed var(--line); border-radius: 4px; pointer-events: none; }
+.slip > * { position: relative; }
+.f-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.f-date { font-family: var(--head); font-weight: 700; font-size: clamp(26px, 4vw, 38px); line-height: 1.2; }
+.f-who { font-size: 13px; font-weight: 500; color: var(--accent); border: 1px solid var(--accent); padding: 1px 10px; border-radius: 99px; }
+.f-sum { font-family: var(--head); font-weight: 700; font-size: clamp(19px, 2.6vw, 24px); line-height: 1.45; margin: 14px 0 20px; word-break: keep-all; }
+.f-rows { display: grid; gap: 0; border-top: 2px solid var(--ink); }
+.f-row { display: grid; grid-template-columns: 4.5em auto minmax(0, 1fr); gap: 6px 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.f-row b { font-family: var(--head); font-size: 17px; }
+.pips { display: flex; gap: 4px; }
+.pips i { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--ink); }
+.pips i.on { background: var(--accent); border-color: var(--accent); animation: pipin .35s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes pipin { from { transform: scale(0); } to { transform: none; } }
+.f-row p { font-size: 15px; word-break: keep-all; }
+.f-lucky { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+.f-lucky div { background: var(--soft); border-radius: 4px; padding: 10px 12px; }
+.f-lucky small { display: block; font-size: 12px; color: var(--muted); }
+.f-lucky span { font-weight: 700; font-size: 15.5px; display: flex; align-items: center; gap: 8px; word-break: keep-all; }
+.f-lucky .sw { width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--ink); flex: none; }
+.f-todo { margin-top: 14px; font-size: 15px; word-break: keep-all; }
+.f-todo b { color: var(--accent); }
+.f-me { margin-top: 22px; border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; background: var(--card); }
+.f-me h3 { font-family: var(--head); font-size: 18px; }
+.f-me .row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-top: 10px; }
+.f-me input[type=date] { border: 1px solid var(--ink); border-radius: var(--radius); background: var(--bg); padding: 8px 10px; font-size: 15px; max-width: 100%; }
+.f-me label.chk { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); }
+.f-me .fine { margin-top: 8px; }
+.slip.pop { animation: txtin .45s ease-out both; }
 
-/* 3. 숨 고르기 */
-.breath { display: grid; justify-items: center; text-align: center; gap: 18px; padding: 12px 0; }
-.ring { width: 220px; height: 220px; border-radius: 50%; border: 1px dashed var(--line); display: grid; place-items: center; position: relative; }
-.ball { position: absolute; inset: 20px; border-radius: 50%; background: var(--soft); border: 2px solid var(--accent); transform: scale(.55); transition-property: transform; transition-timing-function: ease-in-out; }
-.ring .say { position: relative; font-family: var(--head); font-weight: 700; font-size: 22px; line-height: 1.3; }
-.ring .say small { display: block; font-family: var(--mono); font-weight: 400; font-size: 13px; color: var(--muted); }
-.b-left { font-family: var(--mono); font-size: 12px; color: var(--muted); }
-.b-done { font-size: 15px; word-break: keep-all; }
+/* ── 4. 타로 한 장 ── */
+.tarot { max-width: 920px; margin: 0 auto; }
+.t-ask { font-family: var(--head); font-weight: 700; font-size: clamp(21px, 3vw, 27px); margin-bottom: 14px; }
+.t-cats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.t-cats button { text-align: left; padding: 16px; border: 1px solid var(--ink); border-radius: 6px; background: var(--card); box-shadow: 3px 3px 0 var(--ink); transition: transform .08s, box-shadow .08s; }
+.t-cats button:hover { background: var(--soft); }
+.t-cats button:active { transform: translate(3px, 3px); box-shadow: none; }
+.t-cats b { display: block; font-family: var(--head); font-size: 22px; }
+.t-cats span { font-size: 13px; color: var(--muted); }
+.t-pick { text-align: center; }
+.t-pick p { color: var(--muted); font-size: 14.5px; margin-bottom: 18px; }
+.spread { display: flex; justify-content: center; padding: 20px 0 30px; }
+.tc { width: clamp(70px, 15vw, 130px); aspect-ratio: 832 / 1216; margin: 0 -10px; perspective: 900px; transition: transform .2s, opacity .3s; position: relative; }
+.tc:hover { transform: translateY(-14px) rotate(var(--r)) !important; z-index: 2; }
+.tc .in { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .7s cubic-bezier(.3,.9,.4,1.1); }
+.tc .f, .tc .b { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 6px; overflow: hidden; border: 1px solid var(--ink); box-shadow: 3px 4px 10px rgba(0,0,0,.25); background: var(--card); }
+.tc .f { transform: rotateY(180deg); }
+.tc img { width: 100%; height: 100%; object-fit: cover; }
+.tc.rev .f img { transform: rotate(180deg); }
+.tc.flip .in { transform: rotateY(180deg); }
+.tc.flip { transform: translateY(-20px) scale(1.25) !important; z-index: 3; }
+.spread.done .tc:not(.flip) { opacity: .2; }
+.t-res { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(22px, 4vw, 48px); align-items: center; }
+.t-res.pop .t-card { animation: artin .6s cubic-bezier(.2,1.3,.4,1) both; }
+.t-res.pop .t-txt { animation: txtin .5s .2s ease-out both; }
+.t-card { max-width: 340px; width: 100%; justify-self: center; }
+.t-card img { width: 100%; aspect-ratio: 832 / 1216; object-fit: cover; border: 1px solid var(--ink); border-radius: 8px; box-shadow: 10px 10px 0 var(--ink); }
+.t-card.rev img { transform: rotate(180deg); box-shadow: -10px -10px 0 var(--ink); }
+.t-ori { display: inline-block; font-size: 13px; font-weight: 500; color: var(--accent); border: 1px solid var(--accent); padding: 1px 10px; border-radius: 99px; }
+.t-name { font-family: var(--head); font-weight: 700; font-size: clamp(30px, 4.6vw, 46px); line-height: 1.15; margin: 8px 0 2px; }
+.t-en { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+.t-mean { font-size: 16.5px; margin-top: 14px; word-break: keep-all; }
 
 footer { border-top: 1px solid var(--line); padding: 22px 0 40px; font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; }
 footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
 
-@media (max-width: 860px) {
-  .hero { grid-template-columns: minmax(0, 1fr); align-items: start; }
-  .top nav { display: none; }
-  .play > header { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+@media (max-width: 1100px) {
+  .games { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .game figure img { aspect-ratio: 16 / 10; }
+  .game.night figure img { aspect-ratio: 16 / 10; object-position: center 30%; }
+  .top nav { gap: 16px; }
 }
-@media (max-width: 640px) {
-  .pc-body { grid-template-columns: minmax(0, 1fr); }
-  .icons { flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid var(--line); }
-  .icons button { flex: 1 1 calc(50% - 2px); padding: 7px 8px; font-size: 13.5px; }
-  .suspects { grid-template-columns: minmax(0, 1fr); }
-  .cal { grid-template-columns: repeat(5, minmax(0, 1fr)); font-size: 11px; }
-  .cal div { padding: 4px; min-height: 80px; }
-  .cal span { padding: 2px 3px; }
-  .stage { padding: 16px; }
-  .result { grid-template-columns: minmax(0, 1fr); }
-  .res-img { max-width: 280px; }
-  .case-art { aspect-ratio: 16 / 9; }
+@media (max-width: 860px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .top nav { display: none; }
+  .result, .t-res { grid-template-columns: minmax(0, 1fr); }
+  .t-cats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .games { grid-template-columns: minmax(0, 1fr); }
+  .p-head img { width: 64px; height: 64px; }
+  .qcard, .slip { box-shadow: 5px 5px 0 var(--ink); }
+  .opts button { font-size: 15px; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; }
+  .opts .k { width: 32px; height: 32px; }
+  .res-img { box-shadow: 6px 6px 0 var(--ink); }
+  .f-row { grid-template-columns: auto minmax(0, 1fr); }
+  .f-row p { grid-column: 1 / -1; }
+  .f-lucky { grid-template-columns: minmax(0, 1fr); }
+  .tc { margin: 0 -14px; }
+  .t-card { max-width: 240px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .ball { transition: none !important; }
-  .bar i { transition: none; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .game:hover, .tc:hover { transform: none; }
 }
 </style>
 </head>
@@ -180,39 +266,69 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
 <div class="wrap">
   <header class="top">
     <a class="brand" href="../">swbins</a>
-    <nav aria-label="놀이"><a href="#test">일 유형 테스트</a><a href="#case">야근 범인</a><a href="#breath">숨 고르기</a><a href="../">앱</a></nav>
+    <nav aria-label="놀이"><a href="#test">일 유형 테스트</a><a href="case/">추리 게임</a><a href="#fortune">오늘의 운세</a><a href="#tarot">타로</a><a href="../">앱</a></nav>
   </header>
 
-  <section class="hero">
-    <div>
-      <p class="kicker">쉬어가기 · 가입·저장 없음</p>
-      <h1>일하다 잠깐,<br><em>쉬어가기</em></h1>
-      <p class="sub">하나에 1~3분이면 끝나는 놀이 세 개. 고른 답은 어디에도 남지 않고, 창을 닫으면 그걸로 끝입니다.</p>
-    </div>
-    <nav class="index" aria-labelledby="index-h">
-      <h2 id="index-h">오늘의 놀이</h2>
-      <a href="#test"><span class="n">01</span><span class="chore">나는 어떤 일 유형?</span><span class="who">질문 9개</span></a>
-      <a href="#case"><span class="n">02</span><span class="chore">야근 범인을 찾아라</span><span class="who">1분 추리</span></a>
-      <a href="#breath"><span class="n">03</span><span class="chore">숨 고르기 한 판</span><span class="who">30초</span></a>
-    </nav>
-  </section>
+  <main id="home">
+    <section class="hero">
+      <div>
+        <p class="kicker">쉬어가기 · 가입·저장 없음</p>
+        <h1>일하다 잠깐,<br><em>쉬어가기</em></h1>
+        <p class="sub">하나에 1~3분이면 끝나는 놀이 네 개. 고른 답은 어디에도 남지 않고, 창을 닫으면 그걸로 끝입니다.</p>
+        <a class="btn go" href="#test">테스트부터 해 보기</a>
+      </div>
+      <div class="collage" aria-hidden="true">
+        <img class="main" src="assets/hero.webp" alt="" width="1040" height="712" fetchpriority="high">
+        <figure class="pol p1"><img src="assets/cover-test.webp" alt="" width="640" height="640"><span>나는 어떤 일 유형?</span></figure>
+        <figure class="pol p2"><img src="assets/tarot-star.webp" alt="" width="360" height="526"></figure>
+      </div>
+    </section>
+
+    <div class="games-h"><h2>오늘의 놀이</h2><span>네 개 · 아무거나 먼저</span></div>
+    <section class="games" aria-label="놀이 네 개">
+      <a class="game" href="#test">
+        <figure><img src="assets/cover-test.webp" alt="돋보기 속 다른 내 모습" width="640" height="640" loading="lazy"><span class="time">2분 · 질문 9개</span></figure>
+        <div class="txt"><span class="no">01</span><h3>나는 어떤 일 유형?</h3><p>회사·집에서 흔히 겪는 장면 아홉 개. 제일 나 같은 걸 고르면 됩니다.</p><span class="start">시작</span></div>
+      </a>
+      <a class="game night" href="case/">
+        <figure><img src="case/img/lodge.webp" alt="눈 덮인 밤 산장, 불 켜진 창" width="1216" height="832" loading="lazy"><span class="time">10분 추리 게임</span><span class="copy">폭설에 갇힌 산장.<br>공개 전 그림이 사라졌다.</span></figure>
+        <div class="txt"><span class="no">02</span><h3>한겨울 사진관 사건 수첩</h3><p>사진관 탐정과 고양이 조수가 되어 단서를 모으고, 네 사람을 심문하고, 범인을 지목하세요. 진행은 저절로 저장돼요.</p><span class="start">사건 시작</span></div>
+      </a>
+      <a class="game" href="#fortune">
+        <figure><img src="assets/cover-fortune.webp" alt="책상 위 운세 쪽지와 달력" width="640" height="640" loading="lazy"><span class="time">30초 · 매일 바뀜</span></figure>
+        <div class="txt"><span class="no">03</span><h3>오늘의 운세</h3><p>일운·금전운·대인운에 행운의 물건까지. 내일 오면 또 바뀌어요.</p><span class="start">오늘 운세 보기</span></div>
+      </a>
+      <a class="game" href="#tarot">
+        <figure><img src="assets/cover-tarot.webp" alt="엎어 둔 타로 카드를 한 장 뒤집는 손" width="640" height="640" loading="lazy"><span class="time">1분 · 카드 한 장</span></figure>
+        <div class="txt"><span class="no">04</span><h3>타로 한 장</h3><p>고민 하나 고르고, 엎어 둔 카드 중 한 장을 뒤집어 보세요.</p><span class="start">카드 뽑기</span></div>
+      </a>
+    </section>
+  </main>
 
   <!-- 1. 심리테스트 -->
-  <section class="play" id="test" aria-labelledby="test-h">
-    <header>
-      <div><span class="no">01</span><h2 id="test-h">나는 어떤 일 유형?</h2></div>
-      <p class="lead">회사·집에서 흔히 겪는 장면 아홉 개. 제일 나 같은 걸 고르면 됩니다. 정답은 없고, 맞아도 틀려도 웃고 넘기면 돼요.</p>
-    </header>
-    <div class="stage">
-      <div id="quiz">
-        <div class="q-top"><span id="q-num">01 / 09</span><button type="button" class="ghost" id="q-back" hidden>← 이전 질문</button></div>
-        <div class="bar" aria-hidden="true"><i id="q-bar"></i></div>
+  <section class="play" id="test" aria-labelledby="test-h" hidden>
+    <a class="back" href="#" data-back>← 놀이 목록</a>
+    <div class="p-head">
+      <img src="assets/cover-test.webp" alt="" width="640" height="640">
+      <div><span class="no">01 · 질문 9개</span><h2 id="test-h">나는 어떤 일 유형?</h2><p>회사·집에서 흔히 겪는 장면 아홉 개. 제일 나 같은 걸 고르면 됩니다. 정답은 없고, 맞아도 틀려도 웃고 넘기면 돼요.</p></div>
+    </div>
+    <div id="quiz" class="quiz">
+      <div class="q-top"><span class="q-num" id="q-num"><b>01</b> / 09</span></div>
+      <div class="bar" aria-hidden="true"><i id="q-bar"></i></div>
+      <div class="qcard" id="qcard">
+        <span class="qmark" aria-hidden="true" id="q-mark">Q1</span>
         <p class="q-text" id="q-text"></p>
         <div class="opts" id="q-opts"></div>
       </div>
-      <div id="result" class="result" hidden>
-        <img class="res-img" id="r-img" alt="" width="480" height="480">
-        <div>
+      <div class="q-foot"><button type="button" class="ghost" id="q-back" hidden>← 이전 질문</button></div>
+    </div>
+    <div id="reveal" class="reveal" hidden aria-live="polite"><p>결과를 여는 중</p><p class="spin" id="spin"></p></div>
+    <div id="result" class="result" hidden>
+      <div class="res-art">
+        <img class="res-img" id="r-img" alt="" width="560" height="560">
+        <span class="stamp">결과</span>
+      </div>
+      <div class="res-txt">
         <p class="res-from" id="r-from">내 결과</p>
         <p class="res-name" id="r-name"></p>
         <p class="res-desc" id="r-desc"></p>
@@ -224,133 +340,91 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
         </div>
         <p class="toast" id="r-toast" role="status" aria-live="polite"></p>
         <p class="applink" id="r-app"></p>
-        </div>
       </div>
     </div>
   </section>
 
-  <!-- 2. 1분 추리 -->
-  <section class="play" id="case" aria-labelledby="case-h">
-    <header>
-      <div><span class="no">02</span><h2 id="case-h">야근 범인을 찾아라</h2></div>
-      <p class="lead">수요일 밤 9시 40분. 김대리는 이번 주 사흘째 야근 중입니다. 잠깐 자리를 비운 사이 켜 둔 PC 를 들여다보고, 야근을 만든 범인을 골라 보세요.</p>
-    </header>
-    <div class="stage">
-      <img class="case-art" src="assets/case.webp" alt="밤 사무실, 모니터만 켜진 빈 책상" width="1100" height="520" loading="lazy">
-      <div class="pc">
-        <div class="pc-bar"><span>김대리의 PC</span><span>수 21:40</span></div>
-        <div class="pc-body">
-          <div class="icons" role="tablist" aria-label="단서">
-            <button type="button" role="tab" data-clue="chat"><span class="ico">톡</span>메신저<span class="seen"></span></button>
-            <button type="button" role="tab" data-clue="memo"><span class="ico">txt</span>메모장<span class="seen"></span></button>
-            <button type="button" role="tab" data-clue="folder"><span class="ico">폴더</span>폴더<span class="seen"></span></button>
-            <button type="button" role="tab" data-clue="cal"><span class="ico">31</span>일정<span class="seen"></span></button>
-            <button type="button" role="tab" data-clue="web"><span class="ico">www</span>방문 기록<span class="seen"></span></button>
-          </div>
-          <div class="viewer" id="viewer" role="tabpanel" aria-live="polite">
-            <p class="ph">왼쪽 아이콘을 눌러 단서를 열어 보세요. 다섯 개 다 안 봐도 괜찮습니다.</p>
-
-            <div data-panel="chat" hidden>
-              <p class="win-t">메신저 — 오늘</p>
-              <div class="chat">
-                <p><small>팀장 · 18:05</small>김대리, 오늘 주문 현황 정리 9시 전에만 부탁해요.</p>
-                <p class="me"><small>나 · 18:06</small>네, 지금 사이트 세 군데 돌면서 보고 있어요.</p>
-                <p><small>박주임 · 18:30</small>그거 어제도 하지 않았어요?</p>
-                <p class="me"><small>나 · 18:31</small>매일 해요… 어제 것도 그제 것도 제가 했어요.</p>
-                <p><small>박주임 · 18:31</small>ㅠㅠ 힘내요. 저 먼저 갑니다</p>
-                <p class="me"><small>나 · 20:12</small>B 사이트 또 로그인 풀려서 처음부터 합니다</p>
-              </div>
-            </div>
-
-            <div data-panel="memo" hidden>
-              <p class="win-t">매일할일.txt — 메모장</p>
-              <pre class="memo">[매일 저녁 — 주문 현황]
-1. A 몰 관리자 로그인 → 새 주문 수 적기
-2. B 몰 관리자 로그인 → 새 주문 수 적기
-3. C 몰 관리자 로그인 → 새 주문 수 적기
-4. 반품·취소도 각각 다시 확인
-5. 엑셀 「주문현황」 열어서 붙여 넣기
-6. 파일 이름에 날짜 붙여 저장
-7. 팀장님께 보내기
-
-※ 중간에 로그인 풀리면 1번부터
-※ 월말엔 지난달 것도 한 번 더</pre>
-            </div>
-
-            <div data-panel="folder" hidden>
-              <p class="win-t">바탕화면\주문현황</p>
-              <ul class="files">
-                <li><span>주문현황_1118.xlsx</span><span class="t">작성 중</span></li>
-                <li><span>주문현황_1117.xlsx</span><span class="t">화 20:52</span></li>
-                <li><span>주문현황_1116.xlsx</span><span class="t">월 20:47</span></li>
-                <li><span>주문현황_1113.xlsx</span><span class="t">금 20:58</span></li>
-                <li><span>주문현황_1112.xlsx</span><span class="t">목 20:44</span></li>
-                <li><span>주문현황_1111.xlsx</span><span class="t">수 20:50</span></li>
-                <li><span>주문현황_최종_진짜최종.xlsx</span><span class="t">지난달</span></li>
-              </ul>
-              <p class="note">파일은 날마다 하나씩, 저장한 시각은 늘 저녁 9시 언저리.</p>
-            </div>
-
-            <div data-panel="cal" hidden>
-              <p class="win-t">일정 — 이번 주</p>
-              <div class="cal">
-                <div><b>월</b><span>주간 회의 10:00–10:30</span></div>
-                <div><b>화</b></div>
-                <div><b>수</b><span>거래처 통화 15:00–15:20</span></div>
-                <div><b>목</b></div>
-                <div><b>금</b><span>팀 점심</span></div>
-              </div>
-              <p class="note">이번 주 회의는 다 합쳐 50분. 오후는 대부분 비어 있다.</p>
-            </div>
-
-            <div data-panel="web" hidden>
-              <p class="win-t">방문 기록 — 오늘</p>
-              <ul class="files">
-                <li><span>A 몰 관리자 · 주문 목록</span><span class="t">20:31</span></li>
-                <li><span>B 몰 관리자 · 로그인</span><span class="t">20:12</span></li>
-                <li><span>B 몰 관리자 · 주문 목록</span><span class="t">19:48</span></li>
-                <li><span>B 몰 관리자 · 로그인</span><span class="t">19:40</span></li>
-                <li><span>C 몰 관리자 · 반품 목록</span><span class="t">19:22</span></li>
-                <li><span>A 몰 관리자 · 주문 목록</span><span class="t">18:10</span></li>
-                <li><span>회사 근처 국밥 맛집</span><span class="t">11:52</span></li>
-              </ul>
-              <p class="note">점심 검색은 딱 한 번. 저녁 내내 같은 관리자 화면을 오갔다.</p>
-            </div>
-          </div>
+  <!-- 3. 오늘의 운세 -->
+  <section class="play" id="fortune" aria-labelledby="fortune-h" hidden>
+    <a class="back" href="#" data-back>← 놀이 목록</a>
+    <div class="p-head">
+      <img src="assets/cover-fortune.webp" alt="" width="640" height="640">
+      <div><span class="no">03 · 매일 바뀜</span><h2 id="fortune-h">오늘의 운세</h2><p>날짜로 정해지는 운세라 같은 날엔 몇 번을 봐도 같습니다. 생년월일을 넣으면 나만의 운세로 바뀌어요.</p></div>
+    </div>
+    <div class="fort">
+      <div class="slip" id="f-slip">
+        <div class="f-head"><p class="f-date" id="f-date"></p><span class="f-who" id="f-who">모두의 운세</span></div>
+        <p class="f-sum" id="f-sum"></p>
+        <div class="f-rows" id="f-rows"></div>
+        <div class="f-lucky" id="f-lucky"></div>
+        <p class="f-todo" id="f-todo"></p>
+        <p class="applink" id="f-app" hidden></p>
+        <div class="acts">
+          <button type="button" class="btn" id="f-save">그림으로 저장</button>
+          <button type="button" class="link" id="f-share">운세 공유하기</button>
+          <button type="button" class="ghost" id="f-today" hidden>오늘 내 운세 보기</button>
         </div>
+        <p class="toast" id="f-toast" role="status" aria-live="polite"></p>
+        <p class="fine">재미로 보세요 · 내일 오면 또 바뀌어요.</p>
       </div>
-
-      <p class="who-q">야근을 만든 범인은?</p>
-      <div class="suspects" id="suspects">
-        <button type="button" data-s="meeting">끝없이 길어지는 회의</button>
-        <button type="button" data-s="boss">퇴근 무렵에야 오는 팀장 지시</button>
-        <button type="button" data-s="repeat">세 사이트를 돌며 숫자를 옮겨 적는 매일 같은 일</button>
-        <button type="button" data-s="lunch">점심때 맛집 찾느라 날린 시간</button>
-      </div>
-      <div class="verdict" id="verdict" hidden></div>
+      <form class="f-me" id="f-me">
+        <h3>나만의 운세 (선택)</h3>
+        <div class="row">
+          <input type="date" id="f-birth" aria-label="생년월일" min="1920-01-01" max="2030-12-31">
+          <label class="chk"><input type="checkbox" id="f-keep"> 이 기기에 기억하기</label>
+          <button type="submit" class="btn">내 운세 보기</button>
+          <button type="button" class="ghost" id="f-all" hidden>모두의 운세로</button>
+        </div>
+        <p class="fine">생년월일은 이 브라우저 안에서만 계산에 쓰고 어디로도 보내지 않습니다. 「기억하기」를 고를 때만 이 기기에 남겨요.</p>
+      </form>
     </div>
   </section>
 
-  <!-- 3. 숨 고르기 -->
-  <section class="play" id="breath" aria-labelledby="breath-h">
-    <header>
-      <div><span class="no">03</span><h2 id="breath-h">숨 고르기 한 판</h2></div>
-      <p class="lead">원이 커질 때 4초 들이쉬고, 작아질 때 6초 내쉽니다. 세 번이면 30초. 어깨에 힘이 들어가 있었다면 내쉴 때 같이 내려 보세요.</p>
-    </header>
-    <div class="stage">
-      <div class="breath">
-        <div class="ring" aria-hidden="true"><div class="ball" id="ball"></div><p class="say" id="b-say">준비되면<small>시작</small></p></div>
-        <p class="b-left" id="b-left">3번 · 30초</p>
-        <button type="button" class="btn" id="b-go">시작</button>
-        <p class="b-done" id="b-done" role="status" aria-live="polite"></p>
+  <!-- 4. 타로 한 장 -->
+  <section class="play" id="tarot" aria-labelledby="tarot-h" hidden>
+    <a class="back" href="#" data-back>← 놀이 목록</a>
+    <div class="p-head">
+      <img src="assets/cover-tarot.webp" alt="" width="640" height="640">
+      <div><span class="no">04 · 카드 한 장</span><h2 id="tarot-h">타로 한 장</h2><p>고민 하나를 고르고, 엎어 둔 카드 중 마음 가는 한 장을 뒤집어 보세요. 재미로 보세요.</p></div>
+    </div>
+    <div class="tarot">
+      <div id="t-step1">
+        <p class="t-ask">지금 제일 마음 쓰이는 건?</p>
+        <div class="t-cats">
+          <button type="button" data-cat="work"><b>일</b><span>회사·하는 일</span></button>
+          <button type="button" data-cat="money"><b>돈</b><span>쓰고 모으는 일</span></button>
+          <button type="button" data-cat="people"><b>사람</b><span>가족·친구·동료</span></button>
+          <button type="button" data-cat="today"><b>오늘</b><span>그냥 오늘 하루</span></button>
+        </div>
+      </div>
+      <div id="t-step2" class="t-pick" hidden>
+        <p class="t-ask" id="t-q"></p>
+        <p>마음 가는 카드 한 장을 누르세요.</p>
+        <div class="spread" id="spread"></div>
+      </div>
+      <div id="t-res" class="t-res" hidden>
+        <div class="t-card" id="t-card"><img id="t-img" alt="" width="360" height="526"></div>
+        <div class="t-txt">
+          <span class="t-ori" id="t-ori"></span>
+          <p class="t-name" id="t-name"></p>
+          <p class="t-en" id="t-en"></p>
+          <p class="t-mean" id="t-mean"></p>
+          <p class="res-tip" id="t-tip"></p>
+          <div class="acts">
+            <button type="button" class="btn" id="t-save">그림으로 저장</button>
+            <button type="button" class="link" id="t-share">카드 공유하기</button>
+            <button type="button" class="ghost" id="t-again">다시 뽑기</button>
+          </div>
+          <p class="toast" id="t-toast" role="status" aria-live="polite"></p>
+        </div>
       </div>
     </div>
   </section>
 
   <footer>
     <span>swbins · <a href="../">앱 소개</a> · <a href="https://github.com/swbins">GitHub</a></span>
-    <span>고른 답은 이 화면에서만 쓰이고 어디에도 보내지 않습니다.</span>
-    <p class="legal">놀이 속 회사·사람·사이트는 지어낸 것입니다. 방문 수와 「끝까지 했다」는 횟수만 쿠키 없는 <a href="https://www.goatcounter.com">GoatCounter</a> 로 셉니다.</p>
+    <span>고른 답·생년월일은 이 화면에서만 쓰이고 어디에도 보내지 않습니다.</span>
+    <p class="legal">놀이 속 회사·사람·사이트는 지어낸 것이고, 운세·타로는 재미로 만든 글입니다. 방문 수와 「끝까지 했다」는 횟수만 쿠키 없는 <a href="https://www.goatcounter.com">GoatCounter</a> 로 셉니다.</p>
   </footer>
 </div>
 
@@ -360,10 +434,151 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
 (function () {
   'use strict';
   var BASE = 'https://swbins.github.io/rest/';
+  var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   function $(id) { return document.getElementById(id); }
-  // 고른 답은 보내지 않는다 — 「끝까지 했다」 이벤트 이름만 GoatCounter 에
+  // 고른 값은 보내지 않는다 — 「끝까지 했다」 이벤트 이름만 GoatCounter 에
   function count(path, title) {
     try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: path, title: title, event: true }); } catch (e) {}
+  }
+  function store(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+  function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  /* ---------- 한 번에 놀이 하나 — 주소 해시로 ---------- */
+  var PLAYS = ['test', 'fortune', 'tarot'];
+  if (location.hash === '#case') { location.replace('case/'); return; }   // 옛 「야근 범인」 공유 주소 → 새 추리 게임
+  var cameFromHome = false;
+  function route() {
+    var h = location.hash.slice(1);
+    var on = PLAYS.indexOf(h) >= 0 ? h : '';
+    $('home').hidden = !!on;
+    PLAYS.forEach(function (k) { $(k).hidden = k !== on; });
+    document.body.setAttribute('data-play', on);
+    if (on === 'fortune') count('rest-fortune-open', '쉬어가기: 오늘의 운세 열기');
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', function (e) {
+    var prev = (e.oldURL.split('#')[1] || '');
+    cameFromHome = PLAYS.indexOf(prev) < 0;
+    route();
+  });
+  // 결과 주소(?r= 등)로 바꾼 뒤 뒤로 가면 hashchange 가 안 올 수 있다
+  window.addEventListener('popstate', route);
+  document.querySelectorAll('[data-back]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (cameFromHome) { history.back(); return; }
+      history.pushState(null, '', location.pathname);
+      route();
+    });
+  });
+
+  // 공유 — share 가 있으면 그것, 없으면 주소 복사
+  function share(title, text, url, toastEl) {
+    if (navigator.share) { navigator.share({ title: title, text: text, url: url }).catch(function () {}); return; }
+    var done = function () { toastEl.textContent = '주소를 복사했어요. 메신저에 붙여 넣으면 됩니다.'; };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text + ' ' + url).then(done, function () { window.prompt('이 주소를 복사하세요', url); });
+    } else { window.prompt('이 주소를 복사하세요', url); }
+  }
+
+  /* ---------- 결과 카드 — canvas 에 직접 그린다 ---------- */
+  function wrapText(ctx, text, maxW) {
+    var words = text.split(' '), lines = [], line = '';
+    words.forEach(function (w) {
+      var tryLine = line ? line + ' ' + w : w;
+      if (ctx.measureText(tryLine).width <= maxW) { line = tryLine; return; }
+      if (line) lines.push(line);
+      line = '';
+      var piece = '';
+      for (var i = 0; i < w.length; i++) {
+        if (ctx.measureText(piece + w[i]).width > maxW && piece) { lines.push(piece); piece = ''; }
+        piece += w[i];
+      }
+      line = piece;
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+  function drawCard(canvas, o) {
+    var W = canvas.width, H = canvas.height, ctx = canvas.getContext('2d');
+    var P = Math.round(W * 0.085), inner = W - P * 2, u = W / 1080;
+    var HEAD = '"Gowun Batang", Batang, serif', BODY = '"Noto Sans KR", "Malgun Gothic", sans-serif', MONO = '"JetBrains Mono", Consolas, monospace';
+    ctx.fillStyle = '#f4efe6'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = '#2b2723'; ctx.lineWidth = 2 * u; ctx.strokeRect(P / 2, P / 2, W - P, H - P);
+    ctx.textBaseline = 'alphabetic';
+    var y = P + 40 * u;
+    ctx.fillStyle = '#9a3f1d'; ctx.font = '500 ' + Math.round(30 * u) + 'px ' + BODY; ctx.fillText(o.kicker, P, y);
+    y += 30 * u;
+    ctx.fillStyle = '#2b2723'; ctx.fillRect(P, y, inner, 3 * u);
+    if (o.img) {
+      var ih = Math.round(o.imgH * u), iy = y + 28 * u, sw = o.img.naturalWidth, sh = o.img.naturalHeight;
+      if (o.imgW) {            // 세로 카드 한 장(타로) — 가운데, 역방향이면 뒤집어서
+        var iw = Math.round(o.imgW * u), ix = (W - iw) / 2;
+        ctx.save();
+        if (o.imgRot) { ctx.translate(ix + iw / 2, iy + ih / 2); ctx.rotate(Math.PI); ctx.translate(-(ix + iw / 2), -(iy + ih / 2)); }
+        ctx.drawImage(o.img, 0, 0, sw, sh, ix, iy, iw, ih);
+        ctx.restore();
+        ctx.lineWidth = 1.5 * u; ctx.strokeRect(ix, iy, iw, ih);
+      } else {
+        var r = inner / ih, cw = sw, ch = sw / r; if (ch > sh) { ch = sh; cw = sh * r; }
+        ctx.drawImage(o.img, (sw - cw) / 2, (sh - ch) / 2, cw, ch, P, iy, inner, ih);
+        ctx.lineWidth = 1.5 * u; ctx.strokeRect(P, iy, inner, ih);
+      }
+      y = iy + ih;
+    }
+    y += (o.img ? 80 : 90) * u;
+    ctx.fillStyle = '#2b2723'; ctx.font = '700 ' + Math.round(o.titleSize * u) + 'px ' + HEAD;
+    wrapText(ctx, o.title, inner).forEach(function (l) { ctx.fillText(l, P, y); y += o.titleSize * 1.28 * u; });
+    if (o.sub) { y -= 4 * u; ctx.fillStyle = '#9a3f1d'; ctx.font = '500 ' + Math.round(30 * u) + 'px ' + BODY; ctx.fillText(o.sub, P, y); y += 50 * u; }
+    y += 14 * u;
+    ctx.fillStyle = '#2b2723'; ctx.font = '400 ' + Math.round(o.bodySize * u) + 'px ' + BODY;
+    wrapText(ctx, o.body, inner).forEach(function (l) { ctx.fillText(l, P, y); y += o.bodySize * 1.7 * u; });
+    if (o.rows) {
+      y += 6 * u;
+      o.rows.forEach(function (row) {
+        ctx.fillStyle = '#d9d0c2'; ctx.fillRect(P, y - 34 * u, inner, 1.5 * u);
+        y += 20 * u;
+        ctx.fillStyle = '#2b2723'; ctx.font = '700 ' + Math.round(34 * u) + 'px ' + HEAD; ctx.fillText(row.label, P, y);
+        for (var i = 0; i < 5; i++) {
+          ctx.beginPath(); ctx.arc(P + 190 * u + i * 40 * u, y - 11 * u, 13 * u, 0, Math.PI * 2);
+          if (i < row.score) { ctx.fillStyle = '#9a3f1d'; ctx.fill(); } else { ctx.strokeStyle = '#2b2723'; ctx.lineWidth = 2 * u; ctx.stroke(); }
+        }
+        y += 50 * u;
+        ctx.fillStyle = '#4a443d'; ctx.font = '400 ' + Math.round(30 * u) + 'px ' + BODY;
+        wrapText(ctx, row.text, inner).forEach(function (l) { ctx.fillText(l, P, y); y += 48 * u; });
+        y += 26 * u;
+      });
+    }
+    if (o.tip) {
+      y += 24 * u;
+      ctx.fillStyle = '#d9d0c2'; ctx.fillRect(P, y - 30 * u, inner, 1.5 * u);
+      y += 26 * u;
+      ctx.fillStyle = '#6d655c'; ctx.font = '400 ' + Math.round(o.bodySize * 0.88 * u) + 'px ' + BODY;
+      wrapText(ctx, o.tip, inner).forEach(function (l) { ctx.fillText(l, P, y); y += o.bodySize * 0.88 * 1.7 * u; });
+    }
+    ctx.fillStyle = '#6d655c'; ctx.font = '400 ' + Math.round(26 * u) + 'px ' + MONO;
+    ctx.fillText(o.foot, P, H - P - 10 * u);
+    ctx.fillStyle = '#9a3f1d'; ctx.font = '700 ' + Math.round(30 * u) + 'px ' + HEAD;
+    var mark = 'swbins'; ctx.fillText(mark, W - P - ctx.measureText(mark).width, H - P - 10 * u);
+  }
+  function saveCard(opts, name, toastEl, ev) {
+    var c = $('card');
+    var ready = (document.fonts && document.fonts.load) ? Promise.all([
+      document.fonts.load('700 84px "Gowun Batang"'), document.fonts.load('400 40px "Noto Sans KR"'), document.fonts.load('500 30px "Noto Sans KR"'), document.fonts.load('400 26px "JetBrains Mono"')
+    ]).catch(function () {}) : Promise.resolve();
+    ready.then(function () {
+      drawCard(c, opts);
+      c.toBlob(function (blob) {
+        if (!blob) { toastEl.textContent = '그림을 만들지 못했어요. 화면을 캡처해 주세요.'; return; }
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url; a.download = name;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+        toastEl.textContent = '그림을 저장했어요.';
+        count(ev[0], ev[1]);
+      }, 'image/png');
+    });
   }
 
   /* ---------- 1. 일 유형 테스트 ---------- */
@@ -438,14 +653,15 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
       ['한도 안 넘기고 하루 작업을 끝냈을 때', 'ai'],
       ['정시에 컴퓨터를 끌 때', 'calm'] ] }
   ];
-  var answers = [];
-  var cur = 0;
+  var KEYS = 'ABCDE';
+  var answers = [], cur = 0, busy = false;
 
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function showQ() {
     var item = QS[cur];
-    $('q-num').textContent = pad(cur + 1) + ' / ' + pad(QS.length);
-    $('q-bar').style.width = (cur / QS.length * 100) + '%';
+    $('q-num').innerHTML = '<b>' + pad(cur + 1) + '</b> / ' + pad(QS.length);
+    $('q-bar').style.width = ((cur + 1) / QS.length * 100) + '%';
+    $('q-mark').textContent = 'Q' + (cur + 1);
     $('q-text').textContent = item.q;
     $('q-back').hidden = cur === 0;
     var box = $('q-opts');
@@ -453,15 +669,36 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     item.a.forEach(function (opt, i) {
       var b = document.createElement('button');
       b.type = 'button';
-      b.textContent = opt[0];
+      var k = document.createElement('span'); k.className = 'k'; k.textContent = KEYS[i];
+      var t = document.createElement('span'); t.textContent = opt[0];
+      b.appendChild(k); b.appendChild(t);
       if (answers[cur] === i) b.className = 'on';
-      b.addEventListener('click', function () { pick(i); });
+      b.addEventListener('click', function () { pick(i, b); });
       box.appendChild(b);
     });
   }
-  function pick(i) {
+  // 고른 단추가 눌린 채 잠깐 → 카드가 왼쪽으로 빠지고 다음 질문이 오른쪽에서
+  function turn(fn) {
+    var card = $('qcard');
+    if (RM) { fn(); return; }
+    setTimeout(function () {
+      card.classList.add('out');
+      setTimeout(function () {
+        fn();
+        card.classList.remove('out'); card.classList.add('in');
+        requestAnimationFrame(function () { requestAnimationFrame(function () { card.classList.remove('in'); }); });
+      }, 200);
+    }, 220);
+  }
+  function pick(i, btn) {
+    if (busy) return;
+    busy = true;
     answers[cur] = i;
-    if (cur < QS.length - 1) { cur++; showQ(); var f = $('q-opts').querySelector('button'); if (f) f.focus({ preventScroll: true }); return; }
+    btn.classList.add('picked');
+    if (cur < QS.length - 1) {
+      turn(function () { cur++; showQ(); busy = false; var f = $('q-opts').querySelector('button'); if (f) f.focus({ preventScroll: true }); });
+      return;
+    }
     var score = {};
     ORDER.forEach(function (k) { score[k] = 0; });
     answers.forEach(function (ai, qi) { score[QS[qi].a[ai][1]]++; });
@@ -471,18 +708,31 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
       if (score[k] > score[acc] || (score[k] === score[acc] && k === last)) return k;
       return acc;
     }, ORDER[0]);
-    showResult(best, false);
     count('rest-test-done', '쉬어가기: 일 유형 테스트 완료');
+    setTimeout(function () { busy = false; reveal(best); }, RM ? 0 : 240);
   }
-  $('q-back').addEventListener('click', function () { if (cur > 0) { cur--; showQ(); } });
+  $('q-back').addEventListener('click', function () { if (cur > 0 && !busy) { cur--; showQ(); } });
+
+  // 결과 공개 — 유형 이름이 잠깐 돌다가 멈춘다
+  function reveal(key) {
+    new Image().src = 'assets/type-' + key + '.webp';
+    if (RM) { showResult(key, false); return; }
+    $('quiz').hidden = true; $('reveal').hidden = false;
+    var n = 0, spin = $('spin');
+    var t = setInterval(function () { spin.textContent = TYPES[ORDER[n++ % ORDER.length]].name; }, 110);
+    setTimeout(function () { clearInterval(t); $('reveal').hidden = true; showResult(key, false); }, 1100);
+  }
 
   var shownKey = null;
   function showResult(key, shared) {
     var t = TYPES[key];
     shownKey = key;
     $('r-img').src = 'assets/type-' + key + '.webp';
-    $('quiz').hidden = true;
-    $('result').hidden = false;
+    $('r-img').alt = t.name + ' 그림';
+    $('quiz').hidden = true; $('reveal').hidden = true;
+    var res = $('result');
+    res.hidden = false;
+    res.classList.remove('pop'); void res.offsetWidth; res.classList.add('pop');
     $('r-from').textContent = shared ? '누군가 받은 결과 — 나는 뭐가 나올까?' : '내 결과';
     $('r-name').textContent = t.name;
     $('r-desc').textContent = t.desc;
@@ -502,204 +752,280 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
       app.appendChild(a);
       app.appendChild(document.createTextNode(' (무료)'));
     } else {
-      app.appendChild(document.createTextNode('앱이 딱히 필요 없는 분. 아래 숨 고르기나 한 판 하고 가세요.'));
+      app.appendChild(document.createTextNode('앱이 딱히 필요 없는 분. 타로나 한 장 뽑고 가세요.'));
     }
     if (!shared) {
       try { history.replaceState(null, '', '?r=' + key + '#test'); } catch (e) {}
-      $('result').scrollIntoView({ block: 'nearest' });
+      window.scrollTo(0, 0);
     }
   }
   $('r-again').addEventListener('click', function () {
     answers = []; cur = 0;
     try { history.replaceState(null, '', location.pathname + '#test'); } catch (e) {}
     $('result').hidden = true; $('quiz').hidden = false; showQ();
-    $('test').scrollIntoView();
+    window.scrollTo(0, 0);
   });
-
-  // 결과 카드 — canvas 에 직접 그린다
-  function wrapText(ctx, text, maxW) {
-    var words = text.split(' '), lines = [], line = '';
-    words.forEach(function (w) {
-      var tryLine = line ? line + ' ' + w : w;
-      if (ctx.measureText(tryLine).width <= maxW) { line = tryLine; return; }
-      if (line) lines.push(line);
-      line = '';
-      // 한 단어가 너무 길면 글자로 자른다
-      var piece = '';
-      for (var i = 0; i < w.length; i++) {
-        if (ctx.measureText(piece + w[i]).width > maxW && piece) { lines.push(piece); piece = ''; }
-        piece += w[i];
-      }
-      line = piece;
-    });
-    if (line) lines.push(line);
-    return lines;
-  }
-  function drawCard(canvas, o) {
-    var W = canvas.width, H = canvas.height, ctx = canvas.getContext('2d');
-    var P = Math.round(W * 0.085), inner = W - P * 2, u = W / 1080;
-    var HEAD = '"Gowun Batang", Batang, serif', BODY = '"Noto Sans KR", "Malgun Gothic", sans-serif', MONO = '"JetBrains Mono", Consolas, monospace';
-    ctx.fillStyle = '#f4efe6'; ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = '#2b2723'; ctx.lineWidth = 2 * u; ctx.strokeRect(P / 2, P / 2, W - P, H - P);
-    ctx.textBaseline = 'alphabetic';
-    var y = P + 40 * u;
-    ctx.fillStyle = '#9a3f1d'; ctx.font = '500 ' + Math.round(30 * u) + 'px ' + BODY; ctx.fillText(o.kicker, P, y);
-    y += 30 * u;
-    ctx.fillStyle = '#2b2723'; ctx.fillRect(P, y, inner, 3 * u);
-    if (o.img) {
-      var ih = Math.round(o.imgH * u), iy = y + 28 * u;
-      var sw = o.img.naturalWidth, sh = o.img.naturalHeight, r = inner / ih;
-      var cw = sw, ch = sw / r; if (ch > sh) { ch = sh; cw = sh * r; }
-      ctx.drawImage(o.img, (sw - cw) / 2, (sh - ch) / 2, cw, ch, P, iy, inner, ih);
-      ctx.lineWidth = 1.5 * u; ctx.strokeRect(P, iy, inner, ih);
-      y = iy + ih;
-    }
-    y += 90 * u;
-    ctx.font = '700 ' + Math.round(o.titleSize * u) + 'px ' + HEAD;
-    wrapText(ctx, o.title, inner).forEach(function (l) { ctx.fillText(l, P, y); y += o.titleSize * 1.28 * u; });
-    y += 20 * u;
-    ctx.fillStyle = '#2b2723'; ctx.font = '400 ' + Math.round(o.bodySize * u) + 'px ' + BODY;
-    wrapText(ctx, o.body, inner).forEach(function (l) { ctx.fillText(l, P, y); y += o.bodySize * 1.7 * u; });
-    if (o.tip) {
-      y += 24 * u;
-      ctx.fillStyle = '#d9d0c2'; ctx.fillRect(P, y - 30 * u, inner, 1.5 * u);
-      y += 26 * u;
-      ctx.fillStyle = '#6d655c'; ctx.font = '400 ' + Math.round(o.bodySize * 0.88 * u) + 'px ' + BODY;
-      wrapText(ctx, o.tip, inner).forEach(function (l) { ctx.fillText(l, P, y); y += o.bodySize * 0.88 * 1.7 * u; });
-    }
-    ctx.fillStyle = '#6d655c'; ctx.font = '400 ' + Math.round(26 * u) + 'px ' + MONO;
-    ctx.fillText(o.foot, P, H - P - 10 * u);
-    ctx.fillStyle = '#9a3f1d'; ctx.font = '700 ' + Math.round(30 * u) + 'px ' + HEAD;
-    var mark = 'swbins'; ctx.fillText(mark, W - P - ctx.measureText(mark).width, H - P - 10 * u);
-  }
-  window.drawRestCard = drawCard;
-
-  function cardFor(key) {
-    var t = TYPES[key];
-    var img = $('r-img');
-    if (img.complete && img.naturalWidth) return { kicker: '쉬어가기 · 나는 어떤 일 유형?', img: img, imgH: 500, title: t.name, titleSize: 72, body: t.desc, bodySize: 36, tip: t.tip, foot: 'swbins.github.io/rest' };
-    return { kicker: '쉬어가기 · 나는 어떤 일 유형?', title: t.name, titleSize: 84, body: t.desc, bodySize: 40, tip: t.tip, foot: 'swbins.github.io/rest' };
-  }
-  function toast(msg) { $('r-toast').textContent = msg; }
   $('r-save').addEventListener('click', function () {
     var key = shownKey; if (!key) return;
-    var c = $('card');
-    var ready = (document.fonts && document.fonts.load) ? Promise.all([
-      document.fonts.load('700 84px "Gowun Batang"'), document.fonts.load('400 40px "Noto Sans KR"'), document.fonts.load('500 30px "Noto Sans KR"'), document.fonts.load('400 26px "JetBrains Mono"')
-    ]).catch(function () {}) : Promise.resolve();
-    ready.then(function () {
-      drawCard(c, cardFor(key));
-      c.toBlob(function (blob) {
-        if (!blob) { toast('그림을 만들지 못했어요. 화면을 캡처해 주세요.'); return; }
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url; a.download = '쉬어가기-일유형-' + key + '.png';
-        document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-        toast('그림을 저장했어요.');
-        count('rest-test-save', '쉬어가기: 결과 그림 저장');
-      }, 'image/png');
-    });
+    var t = TYPES[key], img = $('r-img');
+    var o = { kicker: '쉬어가기 · 나는 어떤 일 유형?', title: t.name, titleSize: 84, body: t.desc, bodySize: 40, tip: t.tip, foot: 'swbins.github.io/rest' };
+    if (img.complete && img.naturalWidth) { o.img = img; o.imgH = 500; o.titleSize = 72; o.bodySize = 36; }
+    saveCard(o, '쉬어가기-일유형-' + key + '.png', $('r-toast'), ['rest-test-save', '쉬어가기: 결과 그림 저장']);
   });
   $('r-share').addEventListener('click', function () {
     var key = shownKey; if (!key) return;
-    var url = BASE + '?r=' + key;
-    var text = '나는 「' + TYPES[key].name + '」 래요. 당신은?';
     count('rest-test-share', '쉬어가기: 결과 공유');
-    if (navigator.share) {
-      navigator.share({ title: '나는 어떤 일 유형?', text: text, url: url }).catch(function () {});
-      return;
-    }
-    var done = function () { toast('주소를 복사했어요. 메신저에 붙여 넣으면 됩니다.'); };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text + ' ' + url).then(done, function () { window.prompt('이 주소를 복사하세요', url); });
-    } else { window.prompt('이 주소를 복사하세요', url); }
+    share('나는 어떤 일 유형?', '나는 「' + TYPES[key].name + '」 래요. 당신은?', BASE + '?r=' + key, $('r-toast'));
   });
 
-  var r = new URLSearchParams(location.search).get('r');
+  /* ---------- 3. 오늘의 운세 — 날짜(+생년월일)로 정해지는 씨앗 ---------- */
+  function hashStr(s) {
+    var h = 1779033703 ^ s.length;
+    for (var i = 0; i < s.length; i++) { h = Math.imul(h ^ s.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; }
+    h = Math.imul(h ^ h >>> 16, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909);
+    return (h ^ h >>> 16) >>> 0;
+  }
+  function seeded(seed) {
+    return function () {
+      seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function pickOf(R, arr) { return arr[Math.floor(R() * arr.length)]; }
+  var DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+  function today() { var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function dateLabel(s) {
+    var p = s.split('-'), d = new Date(+p[0], +p[1] - 1, +p[2]);
+    return (+p[1]) + '월 ' + (+p[2]) + '일 ' + '일월화수목금토'[d.getDay()] + '요일';
+  }
+  var LINES = {
+    work: [
+      ['같은 일을 두 번 하게 되기 쉬운 날. 저장부터 하고 시작하세요.', '메일은 보내기 전에 한 번 더. 첨부 파일이 빠지기 쉬운 날이에요.', '급한 부탁이 몰리는 날. 다 받지 말고 하나는 내일로.'],
+      ['평범하게 흘러가는 날. 미뤄 둔 작은 일 하나 끝내기 좋아요.', '회의는 짧게, 메모는 길게.', '오전에 집중이 잘 돼요. 어려운 일은 점심 전에.'],
+      ['막혔던 일이 풀리는 날. 오늘 끝낸 건 오래 갑니다.', '말을 꺼내면 잘 받아들여지는 날. 제안할 게 있으면 오늘.', '손이 빠른 날. 쌓아 둔 일을 몰아서 치워도 괜찮아요.'] ],
+    money: [
+      ['충동 장바구니 주의. 결제는 하룻밤 자고 나서.', '작은 구독료가 새는 날. 안 쓰는 거 하나 끊어 보세요.', '점심값이 생각보다 나가는 날.'],
+      ['들어오는 것도 나가는 것도 고만고만.', '영수증을 정리하면 잊었던 돈이 보여요.', '큰 지출은 다음으로, 작은 저축은 오늘.'],
+      ['뜻밖의 적립금이나 환급이 보일 수 있는 날.', '아껴 둔 쿠폰을 쓰기 좋은 날.', '돈 이야기를 꺼내기 좋은 날. 정산은 오늘 하세요.'] ],
+    people: [
+      ['말끝이 날카롭게 들리기 쉬운 날. 메신저엔 한 문장 더 붙이기.', '답장이 늦어도 너무 마음 쓰지 마세요. 다들 바빠요.', '오해가 생기면 글보다 말로 푸는 게 빨라요.'],
+      ['조용히 지나가는 날. 먼저 안부 한 줄이면 충분.', '옆자리 사람과 커피 한 잔이 하루를 바꿔요.', '듣는 쪽이 이기는 날.'],
+      ['오래 연락 못 한 사람에게서 소식이 올 수 있어요.', '칭찬 한마디가 두 배로 돌아오는 날.', '부탁하면 기꺼이 도와줄 사람이 있는 날.'] ],
+    sum: [
+      ['오늘은 힘을 아끼는 날. 잘한 것 하나만 세어 보고 일찍 쉬세요.', '무리하지 않는 게 이기는 날.'],
+      ['무난한 하루. 작은 것 하나를 끝내면 기분이 좋아져요.', '평소대로가 제일 좋은 날.'],
+      ['일도 사람도 잘 풀리는 날. 미뤄 둔 걸 꺼내 보세요.', '운이 따라 주는 날. 망설이던 걸 시작해도 좋아요.'] ]
+  };
+  var ITEMS = ['파란 볼펜', '포스트잇', '따뜻한 보리차', '이어폰', '작은 화분', '손수건', '텀블러', '연필', '동전 하나', '우산', '초콜릿 한 조각', '메모장'];
+  var COLORS = [['먹색', '#2b2723'], ['벽돌색', '#9a3f1d'], ['쑥색', '#6b7a4a'], ['하늘색', '#8fb3e8'], ['겨자색', '#d9a63a'], ['연보라', '#a99ac9'], ['베이지', '#d9c7a5'], ['남색', '#2d3a66']];
+  var TODOS = ['책상 위 하나만 치우기', '물 한 컵 더 마시기', '미뤄 둔 답장 하나 보내기', '점심 뒤 10분 걷기', '오늘 한 일 세 줄 적기', '안 쓰는 탭 다 닫기', '퇴근 시간 정해 두고 지키기', '고마운 사람에게 한마디'];
+  var SCORE = [1, 2, 3, 3, 4, 4, 5];
+  function bucket(s) { return s <= 2 ? 0 : s === 3 ? 1 : 2; }
+  function fortuneOf(date, birth) {
+    var R = seeded(hashStr('fortune|' + date + '|' + (birth || '')));
+    var f = { date: date, personal: !!birth, rows: [] };
+    var total = 0;
+    [['work', '일운'], ['money', '금전운'], ['people', '대인운']].forEach(function (k) {
+      var s = pickOf(R, SCORE); total += s;
+      f.rows.push({ key: k[0], label: k[1], score: s, text: pickOf(R, LINES[k[0]][bucket(s)]) });
+    });
+    f.sum = pickOf(R, LINES.sum[total <= 7 ? 0 : total <= 10 ? 1 : 2]);
+    f.item = pickOf(R, ITEMS);
+    f.color = pickOf(R, COLORS);
+    var hr = 9 + Math.floor(R() * 12), mm = R() < 0.5 ? '00' : '30';
+    f.time = (hr < 12 ? '오전 ' + hr : '오후 ' + (hr === 12 ? 12 : hr - 12)) + ':' + mm;
+    f.todo = pickOf(R, TODOS);
+    return f;
+  }
+  var fNow = null, fBirth = null, fShared = false;
+  function renderFortune() {
+    var date = fShared || today();
+    var f = fortuneOf(date, fShared ? null : fBirth);
+    fNow = f;
+    $('f-date').textContent = dateLabel(date);
+    $('f-who').textContent = fShared ? '공유받은 운세' : (f.personal ? '나만의 운세' : '모두의 운세');
+    $('f-sum').textContent = f.sum;
+    var rows = $('f-rows'); rows.innerHTML = '';
+    f.rows.forEach(function (r, ri) {
+      var d = document.createElement('div'); d.className = 'f-row';
+      var b = document.createElement('b'); b.textContent = r.label;
+      var pips = document.createElement('span'); pips.className = 'pips'; pips.setAttribute('aria-label', '5점 중 ' + r.score + '점');
+      for (var i = 0; i < 5; i++) { var p = document.createElement('i'); if (i < r.score) { p.className = 'on'; p.style.animationDelay = (ri * 0.15 + i * 0.07) + 's'; } pips.appendChild(p); }
+      var t = document.createElement('p'); t.textContent = r.text;
+      d.appendChild(b); d.appendChild(pips); d.appendChild(t); rows.appendChild(d);
+    });
+    var lucky = $('f-lucky'); lucky.innerHTML = '';
+    [['행운의 물건', f.item], ['행운의 색', f.color[0], f.color[1]], ['행운의 시간', f.time]].forEach(function (x) {
+      var d = document.createElement('div'), s = document.createElement('small'), v = document.createElement('span');
+      s.textContent = x[0];
+      if (x[2]) { var sw = document.createElement('i'); sw.className = 'sw'; sw.style.background = x[2]; v.appendChild(sw); }
+      v.appendChild(document.createTextNode(x[1]));
+      d.appendChild(s); d.appendChild(v); lucky.appendChild(d);
+    });
+    $('f-todo').innerHTML = '<b>오늘 할 일:</b> ';
+    $('f-todo').appendChild(document.createTextNode(f.todo));
+    var app = $('f-app');
+    if (f.rows[0].score <= 2) {
+      app.hidden = false;
+      app.innerHTML = '일운이 낮은 날엔 반복하는 일부터 덜어 보세요 — 매일 같은 확인 작업은 <a href="../taskhand/">Taskhand</a> 에게 맡겨 둬도 돼요.';
+    } else { app.hidden = true; }
+    $('f-today').hidden = !fShared;
+    $('f-all').hidden = !fBirth || !!fShared;
+    $('f-toast').textContent = '';
+    var slip = $('f-slip'); slip.classList.remove('pop'); void slip.offsetWidth; slip.classList.add('pop');
+  }
+  (function initFortune() {
+    var d = new URLSearchParams(location.search).get('d');
+    if (d && DATE_RE.test(d)) fShared = d;
+    var saved = load('rest-birth');
+    if (saved && DATE_RE.test(saved)) { fBirth = saved; $('f-birth').value = saved; $('f-keep').checked = true; }
+    renderFortune();
+  })();
+  $('f-me').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = $('f-birth').value;
+    if (!DATE_RE.test(v)) { $('f-birth').focus(); return; }
+    fBirth = v; fShared = false;
+    store('rest-birth', $('f-keep').checked ? v : null);
+    try { history.replaceState(null, '', location.pathname + '#fortune'); } catch (err) {}
+    renderFortune();
+    count('rest-fortune-personal', '쉬어가기: 나만의 운세');
+    window.scrollTo(0, 0);
+  });
+  $('f-keep').addEventListener('change', function () {
+    if (!$('f-keep').checked) store('rest-birth', null);
+    else if (fBirth) store('rest-birth', fBirth);
+  });
+  $('f-all').addEventListener('click', function () { fBirth = null; $('f-birth').value = ''; $('f-keep').checked = false; store('rest-birth', null); renderFortune(); });
+  $('f-today').addEventListener('click', function () {
+    fShared = false;
+    try { history.replaceState(null, '', location.pathname + '#fortune'); } catch (err) {}
+    renderFortune();
+  });
+  $('f-save').addEventListener('click', function () {
+    var f = fNow; if (!f) return;
+    saveCard({ kicker: '쉬어가기 · 오늘의 운세', title: dateLabel(f.date), titleSize: 76, sub: f.personal ? '나만의 운세' : '모두의 운세',
+      body: f.sum, bodySize: 36, rows: f.rows,
+      tip: '행운의 물건 ' + f.item + ' · 색 ' + f.color[0] + ' · 시간 ' + f.time + '   오늘 할 일: ' + f.todo, foot: 'swbins.github.io/rest · 재미로 보세요' },
+      '쉬어가기-운세-' + f.date + '.png', $('f-toast'), ['rest-fortune-save', '쉬어가기: 운세 그림 저장']);
+  });
+  $('f-share').addEventListener('click', function () {
+    var f = fNow; if (!f) return;
+    count('rest-fortune-share', '쉬어가기: 운세 공유');
+    // 생년월일은 주소에 넣지 않는다 — 날짜만(받는 사람은 그날의 「모두의 운세」를 본다)
+    share('오늘의 운세', dateLabel(f.date) + ' 운세 — ' + f.sum, BASE + '?d=' + f.date + '#fortune', $('f-toast'));
+  });
+
+  /* ---------- 4. 타로 한 장 ---------- */
+  var CATS = { work: '일', money: '돈', people: '사람', today: '오늘' };
+  var CATQ = { work: '일 고민 — 카드는 뭐라고 할까?', money: '돈 고민 — 카드는 뭐라고 할까?', people: '사람 고민 — 카드는 뭐라고 할까?', today: '오늘 하루 — 카드는 뭐라고 할까?' };
+  var TAROT = {
+    fool: { ko: '바보', en: '0 · The Fool', up: '새로 시작하기 좋은 때. 계획이 덜 됐어도 첫발이 중요해요.', rev: '성급함 주의. 뛰기 전에 발밑부터 보세요.',
+      work: '새 일은 작게 시작해 보세요. 완벽한 계획은 나중에.', money: '즉흥 결제만 조심하면 괜찮아요.', people: '처음 보는 사람에게 먼저 말 걸어 보기.', today: '안 가 본 길로 한 번 돌아가 보기.' },
+    magician: { ko: '마법사', en: 'I · The Magician', up: '가진 걸로 충분히 해낼 수 있는 때. 도구는 이미 손에 있어요.', rev: '재주를 엉뚱한 데 쓰고 있을 수도. 방향부터 다시.',
+      work: '이미 있는 도구를 다시 보세요. 답이 거기 있을 수 있어요.', money: '새는 돈을 막는 방법을 이미 알고 있어요.', people: '말 한마디로 분위기를 바꿀 수 있는 날.', today: '미뤄 둔 걸 오늘 시작하면 손이 잘 붙어요.' },
+    priestess: { ko: '여사제', en: 'II · The High Priestess', up: '말보다 직감. 조용히 지켜볼 때예요.', rev: '알면서 모른 척하는 게 있지 않나요.',
+      work: '서두르지 말고 자료부터 차분히 읽어 보기.', money: '느낌이 안 좋으면 오늘은 결제하지 않기.', people: '듣기만 해도 많은 걸 알게 되는 날.', today: '혼자 있는 시간 30분 만들기.' },
+    empress: { ko: '여황제', en: 'III · The Empress', up: '돌보면 자라는 때. 꾸준함이 열매가 됩니다.', rev: '남 챙기느라 나를 잊고 있어요.',
+      work: '키우고 있는 일에 물 주듯 조금씩 손대기.', money: '작게 모은 것이 쌓이는 때. 끊지 말고 이어 가기.', people: '먼저 챙겨 주면 돌아오는 날.', today: '맛있는 거 하나 나에게 사 주기.' },
+    lovers: { ko: '연인', en: 'VI · The Lovers', up: '마음이 맞는 쪽을 고르는 때. 선택이 중요해요.', rev: '둘 다 갖고 싶어서 아무것도 못 고르는 중.',
+      work: '같이 할 사람을 고르는 게 일의 절반.', money: '두 개 중 하나만. 둘 다는 다음에.', people: '솔직하게 말하면 가까워지는 날.', today: '오래 고민한 선택 하나 끝내기.' },
+    chariot: { ko: '전차', en: 'VII · The Chariot', up: '밀고 나가면 되는 때. 방향만 잃지 않으면 돼요.', rev: '속도는 나는데 방향이 흔들려요.',
+      work: '마감 하나를 정해 두고 끝까지 밀기.', money: '목표 금액을 숫자로 정해 두기.', people: '내 입장을 분명히 말해도 되는 날.', today: '할 일 목록 맨 위 하나만 끝내기.' },
+    strength: { ko: '힘', en: 'VIII · Strength', up: '부드럽게 버티는 힘. 화내지 않고 이기는 때.', rev: '참는 게 한계에 왔다는 신호예요.',
+      work: '어려운 사람도 차분하게 대하면 풀려요.', money: '조급해하지 않으면 손해 볼 일 없어요.', people: '먼저 웃어 주는 쪽이 이기는 날.', today: '무리했다면 오늘은 일찍 자기.' },
+    hermit: { ko: '은둔자', en: 'IX · The Hermit', up: '혼자 정리할 시간이 필요한 때. 등불 하나면 충분해요.', rev: '너무 오래 혼자 끌어안고 있어요.',
+      work: '알림 끄고 한 가지에만 집중하는 시간 갖기.', money: '가계부 한 번 펼쳐 보기.', people: '도움을 청하면 생각보다 쉽게 풀려요.', today: '산책하면서 생각 정리하기.' },
+    wheel: { ko: '운명의 수레바퀴', en: 'X · Wheel of Fortune', up: '흐름이 바뀌는 때. 좋은 쪽으로 굴러가요.', rev: '지금은 잠깐 내리막. 곧 다시 올라와요.',
+      work: '바뀌는 상황에 올라타 보기. 버티는 것보다 쉬워요.', money: '들쭉날쭉한 때. 큰 결정은 조금 미루기.', people: '뜻밖의 연락이 반가운 날.', today: '평소와 다른 메뉴 골라 보기.' },
+    star: { ko: '별', en: 'XVII · The Star', up: '희망이 보이는 때. 천천히 회복돼요.', rev: '기대가 너무 커서 지쳐 있어요.',
+      work: '멀리 있는 목표를 한 줄로 적어 두기.', money: '작은 목표부터 하나씩.', people: '좋은 말을 해 주는 사람 곁에 있기.', today: '밤하늘 한 번 올려다보기.' },
+    sun: { ko: '태양', en: 'XIX · The Sun', up: '다 잘 풀리는 밝은 때. 마음껏 웃어도 돼요.', rev: '좋은 일이 있는데 못 보고 지나치는 중.',
+      work: '잘한 걸 알려도 되는 날. 숨기지 마세요.', money: '기분 좋게 쓰되 영수증은 챙기기.', people: '먼저 밝게 인사하면 하루가 밝아져요.', today: '햇볕 10분 쬐기.' },
+    world: { ko: '세계', en: 'XXI · The World', up: '한 바퀴를 끝내는 때. 마무리가 곧 시작이에요.', rev: '거의 다 왔는데 마지막 한 걸음이 남았어요.',
+      work: '끝나 가는 일을 깔끔하게 닫기.', money: '정산·정리를 끝내기 좋은 때.', people: '고마웠던 사람에게 인사하기.', today: '하나 끝내고 스스로 칭찬하기.' }
+  };
+  var TKEYS = Object.keys(TAROT);
+  var tCat = null, tNow = null;
+  function tStep(n) { $('t-step1').hidden = n !== 1; $('t-step2').hidden = n !== 2; $('t-res').hidden = n !== 3; }
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  document.querySelectorAll('[data-cat]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      tCat = b.getAttribute('data-cat');
+      $('t-q').textContent = CATQ[tCat];
+      var deal = shuffle(TKEYS).slice(0, 5), sp = $('spread');
+      sp.innerHTML = ''; sp.classList.remove('done');
+      deal.forEach(function (k, i) {
+        var rev = Math.random() < 0.3;
+        var c = document.createElement('button');
+        c.type = 'button'; c.className = 'tc' + (rev ? ' rev' : '');
+        var r = (i - 2) * 5; c.style.setProperty('--r', r + 'deg'); c.style.transform = 'rotate(' + r + 'deg) translateY(' + Math.abs(i - 2) * 6 + 'px)';
+        c.setAttribute('aria-label', (i + 1) + '번째 카드');
+        c.innerHTML = '<span class="in"><span class="b"><img src="assets/tarot-back.webp" alt=""></span><span class="f"><img alt=""></span></span>';
+        c.querySelector('.f img').src = 'assets/tarot-' + k + '.webp';
+        c.addEventListener('click', function () {
+          if (sp.classList.contains('done')) return;
+          sp.classList.add('done'); c.classList.add('flip');
+          count('rest-tarot-draw', '쉬어가기: 타로 한 장 뽑기');
+          setTimeout(function () { showTarot(k, rev ? 'r' : 'u', tCat, false); }, RM ? 0 : 1100);
+        });
+        sp.appendChild(c);
+      });
+      tStep(2);
+    });
+  });
+  function showTarot(k, o, cat, shared) {
+    var t = TAROT[k]; tNow = { k: k, o: o, cat: cat };
+    $('t-img').src = 'assets/tarot-' + k + '.webp'; $('t-img').alt = t.ko + ' 카드';
+    $('t-card').classList.toggle('rev', o === 'r');
+    $('t-ori').textContent = (shared ? '공유받은 카드 · ' : '') + CATS[cat] + ' 고민 · ' + (o === 'r' ? '역방향' : '정방향');
+    $('t-name').textContent = t.ko;
+    $('t-en').textContent = t.en;
+    $('t-mean').textContent = o === 'r' ? t.rev : t.up;
+    $('t-tip').innerHTML = '<b>한 줄 조언:</b> ';
+    $('t-tip').appendChild(document.createTextNode(t[cat]));
+    $('t-again').textContent = shared ? '나도 뽑아 보기' : '다시 뽑기';
+    $('t-again').className = shared ? 'btn' : 'ghost';
+    $('t-save').className = shared ? 'link' : 'btn';
+    $('t-toast').textContent = '';
+    tStep(3);
+    var res = $('t-res'); res.classList.remove('pop'); void res.offsetWidth; res.classList.add('pop');
+    if (!shared) { try { history.replaceState(null, '', '?t=' + k + '&o=' + o + '&c=' + cat + '#tarot'); } catch (e) {} window.scrollTo(0, 0); }
+  }
+  $('t-again').addEventListener('click', function () {
+    try { history.replaceState(null, '', location.pathname + '#tarot'); } catch (e) {}
+    tStep(1); window.scrollTo(0, 0);
+  });
+  $('t-save').addEventListener('click', function () {
+    var n = tNow; if (!n) return;
+    var t = TAROT[n.k], img = $('t-img');
+    var o = { kicker: '쉬어가기 · 타로 한 장 · ' + CATS[n.cat] + ' 고민', title: t.ko, titleSize: 68, sub: t.en + ' · ' + (n.o === 'r' ? '역방향' : '정방향'),
+      body: n.o === 'r' ? t.rev : t.up, bodySize: 34, tip: '한 줄 조언: ' + t[n.cat], foot: 'swbins.github.io/rest · 재미로 보세요' };
+    if (img.complete && img.naturalWidth) { o.img = img; o.imgW = 336; o.imgH = 491; o.imgRot = n.o === 'r'; }
+    saveCard(o, '쉬어가기-타로-' + n.k + '.png', $('t-toast'), ['rest-tarot-save', '쉬어가기: 타로 그림 저장']);
+  });
+  $('t-share').addEventListener('click', function () {
+    var n = tNow; if (!n) return;
+    count('rest-tarot-share', '쉬어가기: 타로 공유');
+    share('타로 한 장', CATS[n.cat] + ' 고민에 「' + TAROT[n.k].ko + '」 카드가 나왔어요.', BASE + '?t=' + n.k + '&o=' + n.o + '&c=' + n.cat + '#tarot', $('t-toast'));
+  });
+
+  /* ---------- 시작 ---------- */
+  showQ();
+  var qs = new URLSearchParams(location.search);
+  var r = qs.get('r'), tk = qs.get('t');
   if (r && TYPES[r]) {
     showResult(r, true);
-    if (!location.hash) setTimeout(function () { $('test').scrollIntoView(); }, 0);
-  } else { showQ(); }
-
-  /* ---------- 2. 야근 범인 ---------- */
-  var seen = {};
-  document.querySelectorAll('.icons button').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var k = btn.getAttribute('data-clue');
-      document.querySelectorAll('.icons button').forEach(function (x) { x.classList.toggle('on', x === btn); x.setAttribute('aria-selected', x === btn ? 'true' : 'false'); });
-      document.querySelectorAll('#viewer > *').forEach(function (p) { p.hidden = p.getAttribute('data-panel') !== k; });
-      seen[k] = true; btn.querySelector('.seen').textContent = '봄';
-    });
-  });
-  var WRONG = {
-    meeting: '일정을 보세요. 이번 주 회의는 다 합쳐 50분, 오후는 거의 비어 있어요. 회의는 억울합니다.',
-    boss: '지시가 늦게 오긴 했죠. 그런데 메신저를 다시 보면 매일 똑같은 부탁이에요. 늦게 와도 미리 알 수 있는 일이었습니다. 진짜 범인은 따로 있어요.',
-    lunch: '방문 기록에 맛집 검색은 11:52 딱 한 번. 국밥은 죄가 없습니다.'
-  };
-  var solved = false;
-  document.querySelectorAll('#suspects button').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      if (solved) return;
-      var s = btn.getAttribute('data-s'), v = $('verdict');
-      v.hidden = false;
-      if (s !== 'repeat') {
-        btn.classList.add('no');
-        v.className = 'verdict';
-        v.innerHTML = '<h3>아쉽지만 아니에요</h3><p></p><p class="note">단서를 하나 더 열어 보고 다시 골라 보세요.</p>';
-        v.querySelector('p').textContent = WRONG[s];
-        return;
-      }
-      solved = true;
-      v.className = 'verdict right';
-      v.innerHTML = '<h3>정답. 범인은 매일 같은 일입니다</h3>' +
-        '<p>단서를 맞춰 보면 이렇습니다.</p><ol>' +
-        '<li>메모장 「매일할일.txt」의 순서가 날마다 똑같다 — 사이트 세 곳을 돌며 숫자를 적고, 엑셀에 붙이고, 보낸다.</li>' +
-        '<li>폴더에는 그 결과 파일이 매일 하나씩, 저장 시각은 늘 저녁 9시 무렵.</li>' +
-        '<li>방문 기록엔 같은 관리자 화면이 저녁 내내, 로그인이 풀려 처음부터 다시 한 흔적까지.</li></ol>' +
-        '<p style="margin-top:8px">일이 많아서가 아니라, 똑같은 일을 매일 손으로 다시 해서 늦은 겁니다. 김대리, 오늘은 그 순서를 남한테 넘길 방법부터 찾아봐요.</p>' +
-        '<p class="applink">이런 분에게 맞는 앱 — 매일 같은 사이트를 열어 확인하는 일은 <a href="../taskhand/">Taskhand</a> 에게 한 번 보여 주면 다음부터 혼자 합니다 (무료).</p>' +
-        '<div class="acts"><button type="button" class="ghost" id="case-again">처음부터 다시</button></div>';
-      document.querySelectorAll('#suspects button').forEach(function (x) { x.disabled = x !== btn; });
-      count('rest-case-solved', '쉬어가기: 야근 범인 정답');
-      $('case-again').addEventListener('click', function () {
-        solved = false; seen = {};
-        v.hidden = true;
-        document.querySelectorAll('#suspects button').forEach(function (x) { x.disabled = false; x.classList.remove('no'); });
-        document.querySelectorAll('.icons button').forEach(function (x) { x.classList.remove('on'); x.querySelector('.seen').textContent = ''; });
-        document.querySelectorAll('#viewer > *').forEach(function (p) { p.hidden = !p.classList.contains('ph'); });
-        $('case').scrollIntoView();
-      });
-    });
-  });
-
-  /* ---------- 3. 숨 고르기 ---------- */
-  var IN = 4, OUT = 6, ROUNDS = 3, timer = null, running = false;
-  var ball = $('ball'), say = $('b-say');
-  function setSay(main, small) { say.innerHTML = ''; say.appendChild(document.createTextNode(main)); var s = document.createElement('small'); s.textContent = small; say.appendChild(s); }
-  function stopBreath(msg) {
-    clearInterval(timer); timer = null; running = false;
-    ball.style.transitionDuration = '1.2s'; ball.style.transform = 'scale(.55)';
-    $('b-go').textContent = '한 번 더';
-    $('b-left').textContent = '3번 · 30초';
-    if (msg) { setSay('끝', ''); $('b-done').textContent = msg; } else { setSay('준비되면', '시작'); $('b-done').textContent = ''; }
+    if (location.hash !== '#test') history.replaceState(null, '', location.pathname + location.search + '#test');
+  } else if (tk && TAROT[tk]) {
+    showTarot(tk, qs.get('o') === 'r' ? 'r' : 'u', CATS[qs.get('c')] ? qs.get('c') : 'today', true);
+    if (location.hash !== '#tarot') history.replaceState(null, '', location.pathname + location.search + '#tarot');
+  } else if (fShared && location.hash !== '#fortune') {
+    history.replaceState(null, '', location.pathname + location.search + '#fortune');
   }
-  $('b-go').addEventListener('click', function () {
-    if (running) { stopBreath(''); return; }
-    running = true; $('b-go').textContent = '멈추기'; $('b-done').textContent = '';
-    var total = (IN + OUT) * ROUNDS, t = 0;
-    function tick() {
-      if (t >= total) { stopBreath('됐습니다. 물 한 모금 마시고 돌아가세요.'); count('rest-breath-done', '쉬어가기: 숨 고르기 끝'); return; }
-      var inCycle = t % (IN + OUT), round = Math.floor(t / (IN + OUT)) + 1;
-      if (inCycle === 0) { ball.style.transitionDuration = IN + 's'; ball.style.transform = 'scale(1)'; }
-      if (inCycle === IN) { ball.style.transitionDuration = OUT + 's'; ball.style.transform = 'scale(.55)'; }
-      if (inCycle < IN) setSay('들이쉬기', String(IN - inCycle));
-      else setSay('내쉬기', String(IN + OUT - inCycle));
-      $('b-left').textContent = round + ' / ' + ROUNDS + '번 · ' + (total - t) + '초 남음';
-      t++;
-    }
-    tick(); timer = setInterval(tick, 1000);
-  });
+  route();
 })();
 </script>
 <!-- 방문 수만 셉니다 — GoatCounter(쿠키·개인 식별 없음). 대시보드 https://swbins.goatcounter.com -->
