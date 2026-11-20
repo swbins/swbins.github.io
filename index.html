@@ -15,125 +15,107 @@
 <meta property="og:description" content="매일 하는 귀찮은 일을 PC 가 대신하게 — Taskhand(사이트 확인·백업 자동화), 둥이로그(체험단 글 여러 곳 한 번에), Usage Tray(Claude Code 한도). 개인이 만든 무료 Windows 앱, 내 PC 안에서만 돕니다.">
 <meta property="og:image" content="https://swbins.github.io/taskhand/assets/poster.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="spine.css">
 <style>
-:root {
-  --bg: #f4efe6; --ink: #2b2723; --muted: #6d655c; --line: #d9d0c2; --accent: #9a3f1d; --card: #fbf8f2;
-  --btn: #2b2723; --btnInk: #f4efe6; --btnHover: #9a3f1d;
-  --head: "Gowun Batang", Batang, serif; --body: "Noto Sans KR", "Malgun Gothic", sans-serif;
-  --mono: "JetBrains Mono", Consolas, "Noto Sans KR", "Malgun Gothic", monospace;
-  --gutter: clamp(16px, 5vw, 64px); --radius: 3px;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --bg: #1f1c19; --ink: #ece4d6; --muted: #a59b8d; --line: #3a342e; --accent: #d7774f; --card: #262220; --btn: #ece4d6; --btnInk: #1f1c19; --btnHover: #d7774f; }
-}
-:root[data-theme="dark"] { --bg: #1f1c19; --ink: #ece4d6; --muted: #a59b8d; --line: #3a342e; --accent: #d7774f; --card: #262220; --btn: #ece4d6; --btnInk: #1f1c19; --btnHover: #d7774f; }
+/* 첫 화면: 제목(왼쪽) | 책장(오른쪽) — 앱이 높이 다른 책으로 꽂혀 있다 */
+.hero { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(28px, 5vw, 64px); align-items: end;
+        padding: clamp(40px, 7vw, 88px) 0 clamp(36px, 5vw, 56px); }
+h1 { font-size: clamp(34px, 5.4vw, 60px); line-height: 1.16; }
+.sub { margin-top: 18px; color: var(--sub); font-size: 16px; max-width: 30em; word-break: keep-all; }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--ink); font-family: var(--body); line-height: 1.65; min-height: 100vh; }
-a { color: inherit; }
-img { display: block; max-width: 100%; }
-b, strong { font-weight: 700; }
+.index > h2 { font-size: 13px; color: var(--sub); letter-spacing: 0; margin-bottom: 10px; }
+.shelf { display: flex; align-items: flex-end; gap: 5px; height: 290px; padding: 0 12px; border-bottom: 6px solid var(--ink); }
+.book { display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 14px 0 10px; text-decoration: none;
+        font-weight: 700; color: var(--ink); transition: transform .15s; }
+.book .v { writing-mode: vertical-rl; text-orientation: upright; letter-spacing: .12em; font-size: 18px; }
+.book small { writing-mode: vertical-rl; text-orientation: upright; font-size: 11px; font-weight: 400; letter-spacing: .04em; }
+.book small.lat { text-orientation: mixed; letter-spacing: .06em; }
+.book:active, .book:focus-visible { transform: translateY(-22px); }
+@media (hover: hover) { .book:hover { transform: translateY(-22px); } }
+.b1 { width: 60px; height: 268px; background: var(--spine); color: var(--on-spine); }
+.b2 { width: 72px; height: 236px; background: var(--face); }
+.b3 { width: 50px; height: 252px; background: var(--b3); }
+.b4 { width: 54px; height: 204px; background: var(--ink); color: var(--bg); }
+.chores { list-style: none; margin-top: 2px; }
+.chores a { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 14px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line);
+            text-decoration: none; font-size: 15px; word-break: keep-all; }
+.chores .who { font-weight: 700; white-space: nowrap; }
+.chores a:hover .chore { text-decoration: underline; text-underline-offset: 4px; }
 
-.wrap { max-width: 1180px; margin: 0 auto; padding: 0 var(--gutter); }
-header.top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 28px 0 0; }
-.brand { font-family: var(--head); font-weight: 700; font-size: 20px; letter-spacing: -0.01em; text-decoration: none; }
-.top nav { display: flex; gap: 24px; font-size: 14px; color: var(--muted); }
-.top nav a { text-decoration: none; }
-.top nav a:hover { color: var(--ink); }
+/* 세 앱 모두 지키는 것 — 쑥색 통판 한 줄 */
+.promise { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--face); margin-bottom: clamp(48px, 7vw, 80px); }
+.promise div { padding: 14px 18px 16px; }
+.promise div + div { border-left: 1px solid var(--line); }
+.promise dt { font-weight: 700; font-size: 16px; }
+.promise dd { font-size: 13px; color: var(--sub); margin-top: 2px; word-break: keep-all; }
 
-/* 첫 화면: 제목(왼쪽 7) | 대신하는 일 목차(오른쪽 5) */
-.hero { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(32px, 5vw, 64px); align-items: end;
-        padding: clamp(48px, 8vw, 96px) 0 clamp(40px, 6vw, 64px); }
-.kicker { font-size: 13px; font-weight: 500; letter-spacing: 0.02em; color: var(--accent); margin-bottom: 16px; }
-h1 { font-family: var(--head); font-weight: 700; font-size: clamp(36px, 5.6vw, 64px); line-height: 1.16; letter-spacing: -0.02em; word-break: keep-all; }
-h1 em { font-style: normal; color: var(--accent); }
-h1 .keep { white-space: nowrap; }
-.sub { margin-top: 20px; color: var(--muted); font-size: 16px; max-width: 30em; word-break: keep-all; }
-
-.index { border-top: 2px solid var(--ink); }
-.index h2 { font-size: 13px; font-weight: 500; letter-spacing: 0.02em; color: var(--muted); padding: 12px 0 4px; }
-.index a { display: grid; grid-template-columns: 2.2em minmax(0, 1fr) auto; gap: 0 16px; align-items: baseline;
-           padding: 13px 0; border-top: 1px solid var(--line); text-decoration: none; }
-.index .n { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.index .chore { font-size: 15.5px; word-break: keep-all; }
-.index .who { font-family: var(--head); font-weight: 700; font-size: 16px; color: var(--accent); white-space: nowrap; }
-.index .who::after { content: " ↓"; font-family: var(--body); font-weight: 400; font-size: 13px; }
-.index a:hover .chore { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--line); }
-.index a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-
-/* 세 앱 모두 지키는 것 — 표 한 줄 */
-.promise { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: clamp(56px, 8vw, 88px); }
-.promise div { padding: 16px 20px 18px 0; }
-.promise div + div { padding-left: 20px; border-left: 1px solid var(--line); }
-.promise dt { font-family: var(--head); font-weight: 700; font-size: 17px; }
-.promise dd { font-size: 13.5px; color: var(--muted); margin-top: 2px; word-break: keep-all; }
-
-/* 앱마다 한 줄: 글(왼쪽 4) | 실제 화면(오른쪽 8) */
-.apps { border-top: 2px solid var(--ink); margin-bottom: 72px; }
-.apps > h2 { font-size: 13px; font-weight: 500; letter-spacing: 0.02em; color: var(--muted); padding: 14px 0 6px; }
-.app { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(28px, 4vw, 48px); align-items: start;
-       padding: 32px 0 40px; border-top: 1px solid var(--line); scroll-margin-top: 16px; }
-.app .no { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.app h3 { font-family: var(--head); font-size: 34px; line-height: 1.2; margin: 6px 0 4px; letter-spacing: -0.01em; }
+/* 앱마다 한 줄: 글(왼쪽) | 실제 화면(오른쪽) */
+.apps { border-top: 3px solid var(--ink); margin-bottom: 64px; }
+.apps > h2 { font-size: 13px; color: var(--sub); letter-spacing: 0; padding: 12px 0 4px; }
+.app { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(24px, 4vw, 44px); align-items: start;
+       padding: 28px 0 36px; border-top: 1px solid var(--line); scroll-margin-top: 16px; }
+.app h3 { font-size: 32px; line-height: 1.2; margin-bottom: 4px; }
 .app h3 a { text-decoration: none; }
-.app h3 a:hover { color: var(--accent); }
-.app .tag { font-size: 13.5px; font-weight: 500; color: var(--accent); word-break: keep-all; }
-.app p { color: var(--muted); font-size: 15px; margin-top: 14px; word-break: keep-all; }
-.app .meta { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--line); word-break: keep-all; }
-.app .acts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 20px; }
-.app .get { text-decoration: none; background: var(--btn); color: var(--btnInk); font-weight: 700; font-size: 14.5px; padding: 9px 18px; border-radius: var(--radius); }
-.app .get:hover { background: var(--btnHover); }
-.app .more { font-weight: 700; font-size: 14.5px; text-decoration: none; border-bottom: 2px solid var(--accent); padding-bottom: 1px; }
-.app .more:hover { color: var(--accent); }
-.app .get:focus-visible, .app .more:focus-visible, .app .shot:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.app h3 a:hover { text-decoration: underline; text-underline-offset: 6px; }
+.app .tag { font-size: 14px; font-weight: 700; word-break: keep-all; }
+.app p { color: var(--sub); font-size: 15px; margin-top: 12px; word-break: keep-all; }
+.app .meta { font-size: 13px; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); }
+.app .acts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
 .app .shot { display: block; }
-.app img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: top left; border: 1px solid var(--ink); border-radius: var(--radius); background: var(--card); }
+.app img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: top left; border: 1px solid var(--ink); background: var(--face); }
 
 /* 쉬어가기 — 앱 아래 한 줄 */
-.rest { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 8px clamp(28px, 4vw, 48px); align-items: baseline;
-        border-top: 2px solid var(--ink); padding: 18px 0 22px; margin: -32px 0 72px; text-decoration: none; }
-.rest h2 { font-family: var(--head); font-weight: 700; font-size: 24px; }
-.rest h2::after { content: " →"; font-family: var(--body); font-weight: 400; font-size: 18px; color: var(--accent); }
-.rest p { font-size: 15px; color: var(--muted); word-break: keep-all; }
-.rest:hover h2 { color: var(--accent); }
-.rest:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
-
-footer { border-top: 1px solid var(--line); padding: 22px 0 40px; font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; }
-footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
+.rest { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 6px clamp(24px, 4vw, 44px); align-items: baseline;
+        background: var(--face2); box-shadow: inset -4px 0 0 var(--edge); padding: 18px 22px 20px; margin: -24px 0 64px; text-decoration: none;
+        transition: transform .15s, box-shadow .15s; }
+.rest h2 { font-size: 24px; }
+.rest p { font-size: 15px; color: var(--sub); word-break: keep-all; }
+.rest:active { transform: translateX(-6px); box-shadow: inset -10px 0 0 var(--edge); }
+@media (hover: hover) { .rest:hover { transform: translateX(-6px); box-shadow: inset -10px 0 0 var(--edge); } }
 
 @media (max-width: 960px) {
   .promise { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .promise div:nth-child(3) { padding-left: 0; border-left: 0; }
+  .promise div:nth-child(3) { border-left: 0; }
   .promise div:nth-child(n+3) { border-top: 1px solid var(--line); }
 }
 @media (max-width: 860px) {
   .hero { grid-template-columns: minmax(0, 1fr); align-items: start; }
-  .top nav { display: none; }
 }
 @media (max-width: 760px) {
-  .app { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 24px 0 32px; }
+  .app { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 22px 0 30px; }
   .app .shot { grid-row: 1; }
-  .app h3 { font-size: 30px; }
-  .rest { grid-template-columns: minmax(0, 1fr); margin-top: -16px; }
+  .app h3 { font-size: 28px; }
+  .rest { grid-template-columns: minmax(0, 1fr); margin-top: -12px; }
 }
-@media (max-width: 420px) {
-  .promise div { padding-right: 12px; }
-  .promise div + div { padding-left: 12px; }
-  .promise div:nth-child(3) { padding-left: 0; }
+@media (max-width: 600px) {
+  .shelf { height: 250px; gap: 4px; padding: 0 6px; }
+  .b1 { width: 54px; height: 236px; } .b2 { width: 62px; height: 206px; } .b3 { width: 46px; height: 222px; } .b4 { width: 48px; height: 180px; }
+  .book .v { font-size: 16px; }
+  .promise div { padding: 12px 12px 14px; }
 }
+@media (prefers-reduced-motion: reduce) { .book:hover, .book:active, .book:focus-visible, .rest:hover, .rest:active { transform: none !important; } }
 </style>
 </head>
 <body>
+<div class="spine" aria-hidden="true"><span class="v">만든 것들</span><small>swbins</small></div>
 <div class="wrap">
   <header class="top">
     <a class="brand" href="./">swbins</a>
-    <nav aria-label="앱"><a href="#taskhand">Taskhand</a><a href="#dungilog">둥이로그</a><a href="#usage-tray">Usage Tray</a><a href="rest/">쉬어가기</a><a href="https://github.com/swbins">GitHub</a></nav>
+    <div class="right">
+      <nav aria-label="앱"><a href="#taskhand">Taskhand</a><a href="#dungilog">둥이로그</a><a href="#usage-tray">Usage Tray</a><a href="rest/">쉬어가기</a><a href="https://github.com/swbins">GitHub</a></nav>
+      <div class="theme" role="group" aria-label="화면 밝기"><button type="button" data-theme-btn="auto">자동</button><button type="button" data-theme-btn="light">밝게</button><button type="button" data-theme-btn="dark">어둡게</button></div>
+    </div>
   </header>
-
+<script>
+(function(){var KEY='swbins-theme',mode='auto';try{mode=localStorage.getItem(KEY)||'auto'}catch(e){}
+var mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
+function apply(){var d;if(mode==='auto'){var h=new Date().getHours();d=(h>=19||h<7)||(mq&&mq.matches);}else d=(mode==='dark');
+document.documentElement.setAttribute('data-theme',d?'dark':'light');
+document.querySelectorAll('[data-theme-btn]').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-theme-btn')===mode));});}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-theme-btn]');if(!b)return;mode=b.getAttribute('data-theme-btn');try{localStorage.setItem(KEY,mode)}catch(x){}apply();});
+apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener('change',apply);})();
+</script>
+  <div class="page">
   <section class="hero">
     <div>
       <p class="kicker">Windows 10/11 · 무료 · 내 PC 안에서만</p>
@@ -142,9 +124,17 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     </div>
     <nav class="index" aria-labelledby="index-h">
       <h2 id="index-h">이런 일을 대신합니다</h2>
-      <a href="#taskhand"><span class="n">01</span><span class="chore">아침마다 사이트 열어 새 주문 확인</span><span class="who">Taskhand</span></a>
-      <a href="#dungilog"><span class="n">02</span><span class="chore">체험단 글을 6곳에 따로 쓰기</span><span class="who">둥이로그</span></a>
-      <a href="#usage-tray"><span class="n">03</span><span class="chore">Claude Code 한도 살피기</span><span class="who">Usage Tray</span></a>
+      <div class="shelf" aria-hidden="true">
+        <a class="book b1" href="#taskhand" tabindex="-1"><span class="v">태스크핸드</span><small class="lat">Taskhand</small></a>
+        <a class="book b2" href="#dungilog" tabindex="-1"><span class="v">둥이로그</span><small>6곳 글</small></a>
+        <a class="book b3" href="#usage-tray" tabindex="-1"><span class="v">한도 살피기</span><small class="lat">Usage Tray</small></a>
+        <a class="book b4" href="rest/" tabindex="-1"><span class="v">쉬어가기</span><small>놀이</small></a>
+      </div>
+      <ul class="chores">
+        <li><a href="#taskhand"><span class="chore">아침마다 사이트 열어 새 주문 확인</span><span class="who">Taskhand</span></a></li>
+        <li><a href="#dungilog"><span class="chore">체험단 글을 6곳에 따로 쓰기</span><span class="who">둥이로그</span></a></li>
+        <li><a href="#usage-tray"><span class="chore">Claude Code 한도 살피기</span><span class="who">Usage Tray</span></a></li>
+      </ul>
     </nav>
   </section>
 
@@ -160,14 +150,13 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
 
     <article class="app" id="taskhand">
       <div>
-        <span class="no">01</span>
         <h3><a href="taskhand/">Taskhand</a></h3>
         <span class="tag">매일 사이트 들어가 확인하는 일</span>
         <p>한 번 해 보이면 다음부터 혼자 합니다. 새 주문·공지가 생기면 알려 주고, 정한 시각에 백업도 해 둬요.</p>
         <p class="meta">업무 자동화 · 예약 · 사이트 감시 · AI 요금 없음</p>
         <div class="acts">
-          <a class="get" href="taskhand/#get">받기</a>
-          <a class="more" href="taskhand/">영상으로 보기 →</a>
+          <a class="btn main" href="taskhand/#get">받기</a>
+          <a class="btn" href="taskhand/">영상으로 보기</a>
         </div>
       </div>
       <a class="shot" href="taskhand/" tabindex="-1" aria-hidden="true"><img src="taskhand/assets/poster.png" alt="" loading="lazy"></a>
@@ -175,14 +164,13 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
 
     <article class="app" id="dungilog">
       <div>
-        <span class="no">02</span>
         <h3><a href="dungilog/">둥이로그</a></h3>
         <span class="tag">체험단 글을 여러 곳에 따로 쓰는 일</span>
         <p>메모 몇 줄과 사진으로 블로그·카페·인스타·스레드·틱톡·쇼츠 글 초안을 한 번에, 내 말투로. 협찬 마감과 받은 돈도 정리해요.</p>
         <p class="meta">체험단·협찬 블로거용 · 6곳 글 · 마감·장부</p>
         <div class="acts">
-          <a class="get" href="dungilog/#get">받기</a>
-          <a class="more" href="dungilog/">영상으로 보기 →</a>
+          <a class="btn main" href="dungilog/#get">받기</a>
+          <a class="btn" href="dungilog/">영상으로 보기</a>
         </div>
       </div>
       <a class="shot" href="dungilog/" tabindex="-1" aria-hidden="true"><img src="dungilog/assets/poster.png" alt="" loading="lazy"></a>
@@ -190,14 +178,13 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
 
     <article class="app" id="usage-tray">
       <div>
-        <span class="no">03</span>
         <h3><a href="usage-tray/">Usage Tray</a></h3>
         <span class="tag">Claude Code 한도가 언제 차는지 모르는 일</span>
         <p>5시간 구간을 몇 % 썼는지 트레이 아이콘에 숫자로. 한도가 가깝거나, 작업이 끝나거나 나를 기다리면 알려 줍니다. 로그인 토큰은 읽지 않아요.</p>
         <p class="meta">개발자용 · 트레이 아이콘 · 오픈소스(MIT)</p>
         <div class="acts">
-          <a class="get" href="usage-tray/#get">받기</a>
-          <a class="more" href="usage-tray/">자세히 →</a>
+          <a class="btn main" href="usage-tray/#get">받기</a>
+          <a class="btn" href="usage-tray/">자세히</a>
         </div>
       </div>
       <a class="shot" href="usage-tray/" tabindex="-1" aria-hidden="true"><img src="usage-tray/assets/poster.png" alt="" loading="lazy"></a>
@@ -214,6 +201,7 @@ footer .legal { flex-basis: 100%; font-size: 12px; word-break: keep-all; }
     <span>문의·버그: 각 앱 저장소의 Issues — <a href="https://github.com/swbins/taskhand/issues">Taskhand</a> · <a href="https://github.com/swbins/dungilog/issues">둥이로그</a> · <a href="https://github.com/swbins/usage-tray/issues">Usage Tray</a></span>
     <p class="legal">개인이 만든 독립 앱으로, 이름이 나오는 AI·플랫폼 회사들과 제휴·보증 관계가 없습니다. 방문 수는 쿠키 없는 <a href="https://www.goatcounter.com">GoatCounter</a> 로만 셉니다.</p>
   </footer>
+  </div>
 </div>
 <!-- 방문 수만 셉니다 — GoatCounter(쿠키·개인 식별 없음). 대시보드 https://swbins.goatcounter.com -->
 <script data-goatcounter="https://swbins.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
