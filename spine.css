@@ -7,13 +7,13 @@
   color-scheme: light;
 }
 :root[data-theme="dark"] {
-  --bg: #1B2018; --ink: #DEE5D3; --sub: #A4AE97; --spine: #3C4A48; --on-spine: #EEF2E8;
+  --bg: #1B2018; --ink: #DEE5D3; --sub: #A4AE97; --spine: #5A6D69; --on-spine: #EEF2E8;
   --face: #2C3527; --face2: #151A13; --line: #2F382A; --b3: #3A4433; --err: #C98A78;
   --edge: #A4AE97; color-scheme: dark;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    --bg: #1B2018; --ink: #DEE5D3; --sub: #A4AE97; --spine: #3C4A48; --on-spine: #EEF2E8;
+    --bg: #1B2018; --ink: #DEE5D3; --sub: #A4AE97; --spine: #5A6D69; --on-spine: #EEF2E8;
     --face: #2C3527; --face2: #151A13; --line: #2F382A; --b3: #3A4433; --err: #C98A78; --edge: #A4AE97;
   }
 }
