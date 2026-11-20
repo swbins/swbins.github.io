@@ -574,7 +574,7 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
   function drawCard(canvas, o) {
     var W = canvas.width, H = canvas.height, ctx = canvas.getContext('2d');
     var P = Math.round(W * 0.085), inner = W - P * 2, u = W / 1080;
-    ctx.fillStyle = '#F3F5EE'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#EEF3EA'; ctx.fillRect(0, 0, W, H);
     ctx.strokeStyle = '#2A3324'; ctx.lineWidth = 2 * u; ctx.strokeRect(P / 2, P / 2, W - P, H - P);
     ctx.textBaseline = 'alphabetic';
     var y = P + 40 * u;
