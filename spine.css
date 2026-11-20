@@ -1,6 +1,6 @@
 /* 책등 — swbins 공통 겉모습 (design-draft/identity/SPEC.md). 사이트·쉬어가기·제품 소개 페이지가 같이 쓴다. 추리 게임(rest/case/)은 따로. */
 :root {
-  --bg: #F3F5EE; --ink: #2A3324; --sub: #5A6650; --spine: #2F3A3A; --on-spine: #E9EEE2;
+  --bg: #EEF3EA; --ink: #2A3324; --sub: #5A6650; --spine: #2F3A3A; --on-spine: #E9EEE2;
   --face: #E2E8D8; --face2: #FAFBF7; --line: #D6DCCB; --b3: #CDD5C0; --err: #8A4A3A;
   --edge: #2F3A3A; --spine-w: 40px; --gutter: clamp(16px, 4.5vw, 56px);
   --font: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
