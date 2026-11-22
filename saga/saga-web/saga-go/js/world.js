@@ -1399,7 +1399,7 @@
     g = ctx.createRadialGradient(0, 0, 0, 0, 0, w * 0.52); g.addColorStop(0, 'rgba(15,12,8,0.45)'); g.addColorStop(1, 'rgba(15,12,8,0)');
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, w * 0.52, 0, Math.PI * 2); ctx.fill(); ctx.restore();
   }
-  function drawHouse2d(t, p) {
+  function drawHouse2d(t, p) { /* W-0782 사용자 11-22 「건물이랑 캐릭터 크기가 안맞아」 — 들판 집이 땅 칸 배율(폰 확대 0.5 면 사람 몸 배율의 절반)·마을 건물은 공용 표(사람 키 × 2.6)라 안 맞았다 → 자체 그림이면 공용 표 키(unitH × scaleOf house × 양식 k ÷ 평균 1.86 × go.house2dK 0.7 — 들판은 칸 사이가 좁아 마을 건물보다 조금 작게 × 몸 배율)로 drawSprite. 손잡이 go.house2dTable 0 = 옛 */ var M2 = global.DG.mode2d, sid = global.DG.sprite.selfBld ? global.DG.sprite.selfBld('house_' + t.id.slice(6)) : null, uH = ((global.DG.cfg && global.DG.cfg.mode2d) || {}).unitH; if (sid && uH && M2 && M2.spriteReady && M2.spriteReady(sid) && +global.DG.core.tuned('go.house2dTable', 1)) { M2.drawSprite(ctx, { id: sid, x: p.x, y: p.y, flip: t.flip, h: uH * M2.scaleOf('house', sid) * (t.k / 1.86) * +global.DG.core.tuned('go.house2dK', 0.7) * bodyK() * p.s }); return; }
     var im = global.DG.sprite.buildingImg('house_' + t.id.slice(6));
     if (!(im && im.complete && im.naturalWidth)) { return; }
     var w = t.k * 48 * scale() * p.s, h = w * im.naturalHeight / im.naturalWidth;

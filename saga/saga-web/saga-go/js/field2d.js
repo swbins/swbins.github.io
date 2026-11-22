@@ -78,7 +78,7 @@
     if (!best) { return false; }
     var vx = Math.floor(best.v.x / CELL), vy = Math.floor(best.v.y / CELL), ox = Math.floor(h01(best.rx * 7 + 1, best.ry * 11 + 3) * 3), oy = Math.floor(h01(best.rx * 13 + 5, best.ry * 3 + 7) * 3);
     if (((tx - vx + ox) % 3 + 3) % 3 !== 0 || ((ty - vy + oy + (Math.floor((tx - vx + ox) / 3) & 1)) % 3 + 3) % 3 !== 0) { return false; }   // 줄마다 어긋난 3칸 격자
-    if (Math.hypot(best.v.x - x, best.v.y - y) < 120 || Math.hypot(x, y) < 110) { return false; }   // 광장 · 시작 자리
+    var PZ = C && C.tuned ? +C.tuned('go.villagePlaza2d', 170) : 170; if (Math.hypot(best.v.x - x, best.v.y - y) < PZ || Math.hypot(x, y) < PZ - 10) { return false; }   // 광장 · 시작 자리 — W-0782 집을 사람 크기 표로 키워(go.house2dTable) 옛 120·110 이면 역참 주민 무리를 덮었다 → 170·160
     f = W.fortAt ? W.fortAt(best.rx, best.ry) : null; if (f && Math.hypot(f.x - x, f.y - y) < 150) { return false; }
     return h01(tx * 3 + 11, ty * 5 + 17) < 0.86;
   }

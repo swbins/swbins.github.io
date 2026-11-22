@@ -1194,7 +1194,7 @@
 
   global.DG = global.DG || {};
   global.DG.sprite = {
-    building: building, buildingImg: buildingImg,
+    building: building, buildingImg: buildingImg, selfBld: function (n) { return SELF_BLD[n] || null; }, selfBld: function (n) { return SELF_BLD[n] || null; },
     portraitCard: portraitCard,
     stamp: stamp, stampStats: stampStats, _bucketScale: bucketScale,
     lookOf: lookOf, idSeed: idSeed, beastFormOf: beastFormOf, beastColorOf: beastColorOf,

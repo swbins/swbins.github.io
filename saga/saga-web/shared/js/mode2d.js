@@ -796,7 +796,7 @@
     }
     var tr = townRole(role, eight, o.town), et = tr !== role ? getImg(o.pool, tr, true) : null;   // W-0138 마을 맨손 — 받는 중·없으면 전투 시트 그대로
     if (et && et.ok) { e = et; role = tr; }
-    if (tonly && !e.ok) { return false; } if (eight && !e.ok && selfOf(o.pool)) { return false; }   // W-0771 자체 몸 시트를 받는 중이면 옛 VRoid 3행 시트로 메우지 않는다(부른 쪽 기존 그림)   // W-0688 받는 중 — 3행 시트는 없다
+    if (tonly && !e.ok) { return false; } if (eight && !e.ok && selfOf(o.pool)) { var sb = bare(o.pool), sr = ['idle', 'idle_town', 'walk_town', 'walk'].filter(function (k) { var q = imgs[sb + '/' + k + '#8@self']; return q && q.ok; })[0]; if (!sr) { return false; } e = imgs[sb + '/' + sr + '#8@self']; role = sr; }   /* W-0782 사용자 11-22 「움직이면 꺼졌다가 작아졌다」 — 걷기 시트를 받는 동안 이미 받은 같은 사람 자체 시트로 잇는다(옛: false → 부른 쪽 작은 도장) */   // W-0771 자체 몸 시트를 받는 중이면 옛 VRoid 3행 시트로 메우지 않는다(부른 쪽 기존 그림)   // W-0688 받는 중 — 3행 시트는 없다
     if (eight && !e.ok) {
       /* 8방향이 아직 안 왔으면(받는 중·실패) 같은 사람의 3행 시트로 — 몸이 깜박이지 않게 */
       eight = false; s8 = null; role = roleOf(o.clip, false); e = getImg(o.pool, role, false);
@@ -1071,7 +1071,7 @@
     ctx.save();
     if (o.shadow !== false) { spriteShadowAt(ctx, o.x, o.y, w, h); }   // W-0389 ③-4 shadow:false = 그림자는 부른 쪽이 땅 조각에 미리 구웠다
     if (o.alpha !== undefined) { ctx.globalAlpha = o.alpha; }
-    if (heroBehind(ctx, o.x, o.y, w, h)) { ctx.globalAlpha *= tuneOf('mode2d.occludeA', 0.45); }   // W-0700 주인공을 가리는 앞 그림은 반투명
+    if (heroBehind(ctx, o.x, o.y, w, h)) { ctx.globalAlpha *= tuneOf('mode2d.occludeA', 0.45); }   /* W-0782 flip = 좌우 뒤집기(가림 판정 뒤에) */ if (o.flip) { ctx.translate(o.x, 0); ctx.scale(-1, 1); ctx.translate(-o.x, 0); }   // W-0700 주인공을 가리는 앞 그림은 반투명
     ctx.imageSmoothingEnabled = true; hq(ctx); applyTone(ctx);
     var sk = sinkOf(o.id);   // W-0775
     if (sk) { ctx.drawImage(e.img, b.sx, b.sy, b.sw, b.sh * (1 - sk), o.x - w / 2, o.y - h * (1 - sk), w, h * (1 - sk)); } else { ctx.drawImage(e.img, b.sx, b.sy, b.sw, b.sh, o.x - w / 2, o.y - h, w, h); }
