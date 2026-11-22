@@ -1041,9 +1041,11 @@
 
   /* ───── 건물·지물 스프라이트(K-0017 산출, `shared/assets/world2d/<id>.webp`) — 판 설정 `prop2d: { 종류: { id, h } }` ─────
      h = 그 종류가 화면에서 보일 키(px, 확대 k=1 기준). 못 받았거나 표에 없으면 false → 부른 쪽이 옛 그림(코드 도형)을 그린다. */
+  /* W-0778 사용자 11-22 「그것도 자체 에셋으로」 — bld_<이름>(판 폴더 남의 건물 그림) → 공용 자체 world2d. 표에 없는 이름만 옛 판 파일 */
+  var SELF_BLD = { house_eu: 'eu_house_01', house_hanok: 'hanok_01', house_silk: 'silkroad_house_01', house_cn: 'chinese_hall_01', house_cottage: 'forest_cottage_01', Inn: 'inn_01', tower_round: 'stone_tower_01', tower_ruin: 'stone_tower_01', well: 'well_01', home: 'forest_cottage_01', school: 'seodang_01', museum: 'chinese_hall_01', tailor: 'town_house_01' };
   var sprites = {};   // id → { img, ok, fail, box:{sx,sy,sw,sh} }
   function spriteOf(id) {
-    var A = global.DG && global.DG.assets3d, bm = /^bld_([A-Za-z0-9_]+)$/.exec(String(id)), u = bm ? 'assets/sprites2d/building_' + bm[1] + '.png' : (A && A.spriteUrl && A.spriteUrl(id)), e = sprites[id];   /* 11-03 bld_<이름> = 판 폴더 sprites2d/building_<이름>.png(정면 건물 — 1만리와 같은 그림) */
+    var A = global.DG && global.DG.assets3d, bm = /^bld_([A-Za-z0-9_]+)$/.exec(String(id)), sb = bm && SELF_BLD[bm[1]] && A && A.spriteUrl ? A.spriteUrl(SELF_BLD[bm[1]]) : null, u = sb || (bm ? 'assets/sprites2d/building_' + bm[1] + '.png' : (A && A.spriteUrl && A.spriteUrl(id))), e = sprites[id];   /* 11-03 bld_<이름> = 판 폴더 sprites2d/building_<이름>.png(정면 건물 — 1만리와 같은 그림) */
     if (!u) { return null; }
     if (!e) {
       e = sprites[id] = loadImg(u);

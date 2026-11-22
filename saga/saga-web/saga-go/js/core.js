@@ -525,7 +525,7 @@
     reg: { 'fort:t1': ['stone_tower_01'], 'fort:t2': ['dungeon_gate_01'], 'fort:t3': ['chinese_hall_01'], 'fort': ['stone_tower_01'], 'station': ['inn_01'],
       'landmark:plain': ['stone_tower_01'], 'landmark:bamboo': ['chinese_hall_01'], 'landmark:canyon': ['rock_outcrop_01'], 'landmark:marsh': ['forest_cottage_01'], 'landmark:ruins': ['rubble_pillar_01'],
       /* W-0322 — K-0126 짝(옛 빌린 기본 표 줄은 지웠다) */ 'gather:plant': ['grass_tuft_02'], 'gather:berry': ['bush_01'], 'domain:gate': ['stone_arch_01'], 'landmark': ['stone_tower_01'],
-      'lantern': ['stone_lantern_01'], 'cook:pot': ['kitchen_pot_01'], 'cook:fire': ['campfire_logs_01'], 'chest': ['chest_01'], 'gather:mushroom': ['mushroom_01'], 'gather:flower': ['flower_patch_01'], 'gather:rock': ['rock_small_01'], 'domain:altar': ['altar_base_01'], 'board': ['notice_board_01'] },   // board = 낚시터·파견 게시판(fishing·dispatch, 못 받으면 옛 말뚝 판)
+      'lantern': ['stone_lantern_01'], 'cook:pot': ['kitchen_pot_01'], 'cook:fire': ['campfire_logs_01'], 'domain:tree': ['tree_glow_01'], 'chest': ['chest_01'], 'gather:mushroom': ['mushroom_01'], 'gather:flower': ['flower_patch_01'], 'gather:rock': ['rock_small_01'], 'domain:altar': ['altar_base_01'], 'board': ['notice_board_01'] },   // board = 낚시터·파견 게시판(fishing·dispatch, 못 받으면 옛 말뚝 판)
     /* 빌린 몸(W-0074, shared/js/assets3d.js borrowRecipe) — 제 몸이 없는 사람(주민·이야기·세계 임무·절차 인물·땅 사람)은 시대 구분 없이
        옛 몸(VRoid 샘플·OGA·Quaternius·folk) 대신 도감과 안 겹치는 VRoid 통일 몸을 입는다(사용자 10-06 "인물은 모두 교체").
        named 는 서로 다른 몸, skip 은 사람이 아닌 것(드론·말 — pet 몸) */

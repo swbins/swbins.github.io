@@ -375,7 +375,10 @@
   /** 이 펫의 종 몸 2D 시트 풀('crea:<id>') — 표에 없거나 공용 에셋 주소를 아직 모르면 null(→ 그림) */
   function petCrea(pet) { var M = global.DG.mode2d, c = pet && (pet.crea || PET_CREA[pet.id]);   /* W-0702 적 전용 몸(pet.crea)이 먼저 */ return c && M && M.creaPool && petSheetOn() ? M.creaPool(c) : null; }
   var beastImgCache = {};
+  /* W-0781 자체로 증명 안 된 짐승 그림 8(남의 몸 렌더) — 지우고 자리표시(부른 쪽이 다른 그림·글로). 자체 2D 는 수신함 K */
+  var BEAST_GONE = { Alien: 1, Alien_2: 1, BlueDemon: 1, Demon: 1, Orc: 1, Wizard: 1, Yeti: 1, Zombie: 1 }, beastWait = {};
   function beastImgFile(name) {
+    if (BEAST_GONE[name]) { return beastWait[name] || (beastWait[name] = { complete: false, naturalWidth: 0, src: 'gone:assets/sprites2d/beast_' + name + '.png' }); }   // 자리표시(받지 않음 — src 는 진단이 짝만 본다)
     var src = 'assets/sprites2d/beast_' + name + '.png';
     var im = beastImgCache[src];
     if (!im) { im = new Image(); im.src = src; beastImgCache[src] = im; }
@@ -442,8 +445,11 @@
    *  — 그전엔 굽기가 멎어 옛 여관 모델 Inn.glb 그림을 썼다, `building_Inn.png` 은 되돌림 자리로 남김). `o.img`를
    *  안 넘기거나 아직 안 실렸으면 여기 그대로 절차적 그림으로 떨어진다. */
   var buildingImgCache = {};
+  /* W-0778 사용자 11-22 「그것도 자체 에셋으로 바꿔」 — 남의 건물 그림(Kenney·옛 굽기 building_*.png) 대신 공용 자체 2D(world2d) — 없는 이름만 옛 자리 */
+  var SELF_BLD = { house_eu: 'eu_house_01', house_hanok: 'hanok_01', house_silk: 'silkroad_house_01', house_cn: 'chinese_hall_01', house_cottage: 'forest_cottage_01', Inn: 'inn_01', tower_round: 'stone_tower_01', tower_ruin: 'stone_tower_01', Watchtower: 'stone_tower_01', Tower: 'beacon_tower_01', PointyTower: 'stone_tower_01' };
   function buildingImg(name) {
-    var src = 'assets/sprites2d/building_' + name + '.png';
+    var A = global.DG && global.DG.assets3d, su = SELF_BLD[name] && A && A.spriteUrl ? A.spriteUrl(SELF_BLD[name]) : null;
+    var src = su || 'assets/sprites2d/building_' + name + '.png';
     var im = buildingImgCache[src];
     if (!im) { im = new Image(); im.src = src; buildingImgCache[src] = im; }
     return im;
@@ -755,12 +761,19 @@
    *  말고 에셋으로") 방침 */
   var HUMAN_SPRITE_N = 14;
   var humanImgCache = {};
+  /* W-0779 사용자 11-22 「그것도 자체 에셋으로」 — Kenney 사람 열넷(human_*.png) 대신 자체 몸 2D 시트(characters2d8_self) 마을 서기 첫 칸(정면)을 오려 쓴다.
+     돌려주는 것 = 캔버스(complete·naturalWidth 를 달아 옛 그림과 같은 꼴) — 받기 전엔 complete false 라 부른 쪽이 자리표시 */
+  var HUMAN_SELF = ['villager_b', 'villager_c', 'traveler_m', 'chief_m', 'punk_m', 'punk_f', 'modern_f', 'ancient_f', 'knight_m', 'martial_m', 'hero_f', 'elf_001', 'pool_f_human_139', 'pool_g_human_147'];
   function humanImg(i) {
-    var n = ((i - 1) % HUMAN_SPRITE_N + HUMAN_SPRITE_N) % HUMAN_SPRITE_N + 1;
-    var src = 'assets/sprites2d/human_' + (n < 10 ? '0' + n : n) + '.png';
-    var im = humanImgCache[src];
-    if (!im) { im = new Image(); im.src = src; humanImgCache[src] = im; }
-    return im;
+    var n = ((i - 1) % HUMAN_SPRITE_N + HUMAN_SPRITE_N) % HUMAN_SPRITE_N, id = HUMAN_SELF[n], e = humanImgCache[id];
+    if (e) { return e.cv || e.wait; }
+    var A = global.DG.assets3d, T = global.DG.assets3dIds && global.DG.assets3dIds.self2d8, t = T && T[id], root = A && A.root && A.root();
+    e = humanImgCache[id] = { wait: { complete: false, naturalWidth: 0 }, cv: null };
+    if (!t || !root) { return e.wait; }
+    var im = new Image(), px = t[1] || 192;
+    im.onload = function () { var cv = document.createElement('canvas'); cv.width = px; cv.height = px; cv.getContext('2d').drawImage(im, 0, 0, px, px, 0, 0, px, px); cv.complete = true; cv.naturalWidth = px; cv.naturalHeight = px; e.cv = cv; };
+    im.src = root + 'characters2d8_self/' + t[0] + '/idle_town.webp';
+    return e.wait;
   }
   function humanIndexOf(ref) {
     var id = String((ref && (ref.id || ref.key || ref.name)) || 'anon');
