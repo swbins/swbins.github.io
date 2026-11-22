@@ -316,8 +316,10 @@
     return b ? { id: b, seed: seed } : null;
   }
   function borrowRecipe(ref) {
-    var p = borrowPick(ref), u = p && url('hero', p.id);
-    return u ? { key: 'uni:' + p.id, body: u, borrowedFor: p.seed } : null;
+    var p = borrowPick(ref), sb = p && heroSelfOf(p.id);   // W-0773 빌린 몸도 그 인물의 자체 몸(표 heroSelf) — 옛 characters3d(VRoid) 안 받음 · hid = 2D 가 쓰는 인물 id
+    if (sb) { return { key: sb.key, body: sb.body, anim: sb.anim, self: sb.self, hid: p.id, borrowedFor: p.seed }; }
+    var u = p && url('hero', p.id);
+    return u ? { key: 'uni:' + p.id, body: u, hid: p.id, borrowedFor: p.seed } : null;
   }
 
   global.DG.assets3d = {

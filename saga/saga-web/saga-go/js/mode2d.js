@@ -182,9 +182,9 @@
     if (id && A.has('hero', id)) { return VPRE + id; }
     var pp = peoplePick(kind, id, who, v); if (pp) { return pp; }   // W-0688 K-0265 — 대화 사람은 일러스트와 같은 몸(사람 19 마을 시트)
     var r = A.borrowRecipe && A.borrowRecipe(id || kind);
-    if (!(r && r.key && r.key.indexOf('uni:') === 0)) { return null; }
+    var hid = r && (r.hid || (r.key && r.key.indexOf('uni:') === 0 ? r.key.slice(4) : null)); if (!hid) { return null; }   // W-0773 자체 몸 레시피(self:)도 인물 id 로
     var Co = global.DG.core, k = Co && Co.tuned ? +Co.tuned('mode2d.borrowTint', 1) : 1;
-    return VPRE + r.key.slice(4) + (k > 0 ? TPRE + tintSlot(id || kind) : '');   // W-0121 — 빌린 몸은 사람마다 옷 색(풀 꼬리 '~칸')
+    return VPRE + hid + (k > 0 ? TPRE + tintSlot(id || kind) : '');   // W-0121 — 빌린 몸은 사람마다 옷 색(풀 꼬리 '~칸')
   }
   function isVroid(pool) { return typeof pool === 'string' && pool.indexOf(VPRE) === 0; }
   /* W-0688 K-0265 사람 19 2D 마을 시트(`characters2d8/<몸>/idle_town·walk_town` 둘뿐) — 제 시트 없는 사람(빌린 몸 길)을 대화 일러스트와 같은 몸으로.
