@@ -1,0 +1,370 @@
+{
+ "id": "kr_unify",
+ "chains": [
+  {
+   "id": "kr_unify.fire",
+   "name": "불타는 서고",
+   "ar": 3,
+   "reward": {
+    "gold": 300,
+    "party": 150
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "seolgi",
+     "text": "불타는 서고 — 서고지기 설기를 돕기",
+     "lines": [
+      "kr_unify.fire.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -120,
+      -90
+     ],
+     "text": "연기 속 안쪽 궤짝 꺼내기"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      40,
+      -130
+     ],
+     "text": "궤짝을 뒷문 수레까지 나르기"
+    },
+    {
+     "type": "talk",
+     "npc": "seolgi",
+     "text": "설기에게 수레가 찼다고 말하기",
+     "lines": [
+      "kr_unify.fire.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_unify.cart",
+   "name": "책 수레",
+   "ar": 3,
+   "reward": {
+    "gold": 400,
+    "party": 150
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "seolgi",
+     "text": "책 수레 — 설기와 피란 길에 오르기",
+     "lines": [
+      "kr_unify.cart.0"
+     ]
+    },
+    {
+     "type": "follow",
+     "npc": "seolgi",
+     "text": "수레를 미는 설기를 놓치지 않고 따라가기"
+    },
+    {
+     "type": "talk",
+     "npc": "seolgi",
+     "text": "길에서 만난 피란민",
+     "lines": [
+      "kr_unify.cart.1"
+     ]
+    },
+    {
+     "type": "defend",
+     "zone": "home",
+     "off": [
+      -60,
+      120
+     ],
+     "name": "나무다리",
+     "waves": [
+      [
+       "hawk",
+       "hawk"
+      ],
+      [
+       "raptor",
+       "hawk",
+       "hawk"
+      ],
+      [
+       "raptor",
+       "raptor",
+       "hawk"
+      ]
+     ],
+     "text": "수레가 건너는 동안 나무다리를 전쟁터 까마귀 떼에게서 지키기"
+    },
+    {
+     "type": "talk",
+     "npc": "seolgi",
+     "text": "다리를 건넌 설기와 말하기",
+     "lines": [
+      "kr_unify.cart.2"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_unify.north",
+   "name": "북쪽 성의 마지막 겨울",
+   "ar": 3,
+   "reward": {
+    "gold": 300,
+    "party": 150
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "bukseong",
+     "text": "북쪽 성 — 성 사람에게 남쪽 소식 전하기",
+     "lines": [
+      "kr_unify.north.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      150,
+      -70
+     ],
+     "text": "성 밖 창고에서 식량 받아 오기"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      90,
+      -150
+     ],
+     "text": "성 안 사람들에게 식량 나르기"
+    },
+    {
+     "type": "talk",
+     "npc": "seolgi",
+     "text": "설기와 이 성의 책 이야기",
+     "lines": [
+      "kr_unify.north.1"
+     ]
+    },
+    {
+     "type": "talk",
+     "npc": "bukseong",
+     "text": "북으로 떠나는 사람들 배웅하기",
+     "lines": [
+      "kr_unify.north.2"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_unify.maeso",
+   "name": "매소성",
+   "ar": 1,
+   "reward": {
+    "gold": 300
+   },
+   "steps": [
+    {
+     "type": "srpg",
+     "door": "saga-realm",
+     "text": "매소성 — 적 본진이 아니라 보급 길 셋을 끊기",
+     "lines": [
+      "kr_unify.maeso.0",
+      "kr_unify.maeso.1"
+     ],
+     "battle": {
+      "seed": "kr_unify.maeso",
+      "land": "plain",
+      "siege": false,
+      "goal": "cut",
+      "foeTroops": [
+       3600
+      ],
+      "myTroops": [
+       3000
+      ],
+      "where": "매소성 판"
+     }
+    }
+   ]
+  },
+  {
+   "id": "kr_unify.books",
+   "name": "책을 어디에 맡기나",
+   "ar": 3,
+   "reward": {
+    "gold": 300,
+    "party": 150
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "seolgi",
+     "text": "설기의 수레 — 책을 어디에 맡길까",
+     "lines": [
+      "kr_unify.books.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -150,
+      -60
+     ],
+     "text": "책 궤짝을 맡길 곳까지 나르기"
+    },
+    {
+     "type": "talk",
+     "npc": "seolgi",
+     "text": "설기에게 맡겼다고 말하기",
+     "lines": [
+      "kr_unify.books.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_unify.s_letters",
+   "name": "두 나라 사람들의 편지",
+   "ar": 3,
+   "side": true,
+   "reward": {
+    "gold": 200
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "pinan",
+     "text": "흩어진 사람들의 편지 셋",
+     "lines": [
+      "kr_unify.s_letters.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      110,
+      40
+     ],
+     "text": "강가 나루 — 첫 편지(남쪽에서 온 사람)"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -90,
+      -80
+     ],
+     "text": "산골 움막 — 둘째 편지(북쪽에서 온 사람)"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      40,
+      -120
+     ],
+     "text": "장터 — 셋째 편지(아직 길 위의 사람)"
+    },
+    {
+     "type": "talk",
+     "npc": "pinan",
+     "text": "답장",
+     "lines": [
+      "kr_unify.s_letters.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_unify.s_grave",
+   "name": "황산 들의 이름 없는 무덤",
+   "ar": 3,
+   "side": true,
+   "reward": {
+    "gold": 150
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "nongbu",
+     "text": "들판 가운데 이름 없는 돌무더기",
+     "lines": [
+      "kr_unify.s_grave.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -60,
+      90
+     ],
+     "text": "무너진 돌 모으기"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      20,
+      110
+     ],
+     "text": "무덤 둘레 풀 베기"
+    },
+    {
+     "type": "talk",
+     "npc": "nongbu",
+     "text": "돌에 새길 말",
+     "lines": [
+      "kr_unify.s_grave.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_unify.s_bat",
+   "name": "셋째 도깨비",
+   "ar": 3,
+   "side": true,
+   "reward": {
+    "gold": 200
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "dokkaebi3",
+     "text": "방망이 내기",
+     "lines": [
+      "kr_unify.s_bat.0"
+     ]
+    },
+    {
+     "type": "chase",
+     "npc": "dokkaebi3",
+     "text": "방망이 들고 달아나는 도깨비 잡기",
+     "flee": "도깨비가 방망이를 메고 달아난다. 달려라!",
+     "caught": "도깨비를 붙잡았다 — 방망이를 순순히 내민다"
+    },
+    {
+     "type": "talk",
+     "npc": "dokkaebi3",
+     "text": "진 도깨비의 약속",
+     "lines": [
+      "kr_unify.s_bat.1"
+     ]
+    }
+   ]
+  }
+ ]
+}

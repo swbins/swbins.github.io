@@ -1,0 +1,436 @@
+{
+ "id": "kr_open",
+ "chains": [
+  {
+   "id": "kr_open.pier",
+   "name": "부두",
+   "ar": 9,
+   "reward": {
+    "gold": 400,
+    "party": 150
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "saebom",
+     "text": "부두 — 통역 견습 새봄과 처음 보는 물건들",
+     "lines": [
+      "kr_open.pier.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -130,
+      50
+     ],
+     "text": "첫째 짐 — 불도 없는데 빛나는 유리"
+    },
+    {
+     "type": "talk",
+     "npc": "saebom",
+     "text": "빛나는 유리에 이름 짓기",
+     "lines": [
+      "kr_open.pier.lamp"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      40,
+      150
+     ],
+     "text": "둘째 짐 — 말 없이 구르는 쇠 수레"
+    },
+    {
+     "type": "talk",
+     "npc": "saebom",
+     "text": "구르는 쇠 수레에 이름 짓기",
+     "lines": [
+      "kr_open.pier.car"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      150,
+      -60
+     ],
+     "text": "셋째 짐 — 말소리가 건너가는 줄"
+    },
+    {
+     "type": "talk",
+     "npc": "saebom",
+     "text": "소리 나는 줄에 이름 짓기",
+     "lines": [
+      "kr_open.pier.wire"
+     ]
+    },
+    {
+     "type": "talk",
+     "npc": "saebom",
+     "text": "지은 이름을 새봄의 수첩에",
+     "lines": [
+      "kr_open.pier.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_open.paper",
+   "name": "신문",
+   "ar": 9,
+   "reward": {
+    "gold": 400,
+    "built": "press"
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "inswae",
+     "text": "신문 — 첫 신문 찍는 날의 인쇄소",
+     "lines": [
+      "kr_open.paper.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -90,
+      -100
+     ],
+     "text": "활자 상자 하나 — 닿소리"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      80,
+      -30
+     ],
+     "text": "활자 상자 둘 — 홀소리"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      20,
+      120
+     ],
+     "text": "활자 상자 셋 — 띄어 쓸 빈 칸"
+    },
+    {
+     "type": "talk",
+     "npc": "saebom",
+     "text": "갓 찍은 첫 장",
+     "lines": [
+      "kr_open.paper.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_open.field",
+   "name": "들의 편지",
+   "ar": 9,
+   "reward": {
+    "gold": 500
+   },
+   "steps": [
+    {
+     "type": "run",
+     "door": "saga-story",
+     "npc": "mese",
+     "text": "들의 편지 — 전령 메세의 글을 다음 마을까지",
+     "lines": [
+      "kr_open.field.0",
+      "kr_open.field.1"
+     ],
+     "run": {
+      "key": "kr_field",
+      "name": "남쪽 들 고갯길",
+      "base": "field",
+      "width": 3000,
+      "enemyLv": 9,
+      "spawn": 4,
+      "sky": [
+       "#3a4a5a",
+       "#d8b070"
+      ],
+      "mood": "sky",
+      "goal": {
+       "type": "reach",
+       "sec": 120,
+       "endName": "다음 마을",
+       "okText": "둥글게 쓴 글이 다음 마을에 닿았다"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "kr_open.choice",
+   "name": "무엇을 받아들이고 무엇을 지킬까",
+   "ar": 9,
+   "reward": {
+    "gold": 400,
+    "party": 200
+   },
+   "steps": [
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -60,
+      80
+     ],
+     "text": "개항장 거리 — 사람들에게 묻기"
+    },
+    {
+     "type": "talk",
+     "npc": "notin",
+     "text": "상투 튼 노인에게",
+     "lines": [
+      "kr_open.choice.0"
+     ]
+    },
+    {
+     "type": "talk",
+     "npc": "cheongnyeon",
+     "text": "양복 입은 청년에게",
+     "lines": [
+      "kr_open.choice.1"
+     ]
+    },
+    {
+     "type": "talk",
+     "npc": "saebom",
+     "text": "기록꾼도 답하기",
+     "lines": [
+      "kr_open.choice.2"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_open.lamp",
+   "name": "첫 전등",
+   "ar": 9,
+   "reward": {
+    "gold": 500,
+    "ally": "saebom"
+   },
+   "steps": [
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      110,
+      -110
+     ],
+     "text": "궁 담 밖 — 불이 켜지는 밤"
+    },
+    {
+     "type": "talk",
+     "npc": "saebom",
+     "text": "켜진다, 켜진다…",
+     "lines": [
+      "kr_open.lamp.0"
+     ]
+    },
+    {
+     "type": "talk",
+     "npc": "dokkaebi9",
+     "text": "골목에서 떠는 도깨비",
+     "lines": [
+      "kr_open.lamp.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_open.s_photo",
+   "name": "사진관",
+   "ar": 9,
+   "side": true,
+   "reward": {
+    "gold": 250
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "sajin",
+     "text": "새로 연 사진관",
+     "lines": [
+      "kr_open.s_photo.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -70,
+      50
+     ],
+     "text": "동료들 부르러 — 부두·장터·인쇄소"
+    },
+    {
+     "type": "talk",
+     "npc": "sajin",
+     "text": "찰칵",
+     "lines": [
+      "kr_open.s_photo.1",
+      {
+       "if": "kr_open.s_photo",
+       "is": 0,
+       "key": "kr_open.s_photo.a"
+      },
+      {
+       "if": "kr_open.s_photo",
+       "is": 1,
+       "key": "kr_open.s_photo.b"
+      },
+      {
+       "done": "kr_dawn.wake",
+       "key": "kr_open.s_photo.dolme"
+      },
+      {
+       "done": "kr_three.salt",
+       "key": "kr_open.s_photo.nari"
+      },
+      {
+       "done": "kr_unify.fire",
+       "key": "kr_open.s_photo.seolgi"
+      },
+      {
+       "done": "kr_ns.sea",
+       "key": "kr_open.s_photo.badasol"
+      },
+      {
+       "done": "kr_goryeo.six",
+       "key": "kr_open.s_photo.suri"
+      },
+      {
+       "done": "kr_mongol.wood",
+       "key": "kr_open.s_photo.ongyeol"
+      },
+      {
+       "done": "kr_joseon.cheat",
+       "key": "kr_open.s_photo.geulsaem"
+      },
+      {
+       "done": "kr_imjin.hill",
+       "key": "kr_open.s_photo.deulkkot"
+      },
+      {
+       "done": "kr_open.pier",
+       "key": "kr_open.s_photo.saebom"
+      },
+      "kr_open.s_photo.2"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_open.s_tram",
+   "name": "전차 첫 손님",
+   "ar": 9,
+   "side": true,
+   "reward": {
+    "gold": 300
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "chajang",
+     "text": "손님 없는 첫 전차",
+     "lines": [
+      "kr_open.s_tram.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      100,
+      -40
+     ],
+     "text": "첫째 정거장 — 장터 앞"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      140,
+      40
+     ],
+     "text": "둘째 정거장 — 부두 앞 — 누가 표 꾸러미를!"
+    },
+    {
+     "type": "chase",
+     "npc": "milsu",
+     "text": "전차 표 꾸러미를 훔쳐 달아나는 밀수꾼 두목 잡기",
+     "flee": "밀수꾼 두목이 표 꾸러미를 안고 골목으로 달아난다. 달려라!",
+     "caught": "밀수꾼 두목을 붙잡았다 — 표 꾸러미를 되찾았다"
+    },
+    {
+     "type": "talk",
+     "npc": "chajang",
+     "text": "첫 손님들",
+     "lines": [
+      "kr_open.s_tram.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_open.s_lamp9",
+   "name": "아홉째 도깨비",
+   "ar": 9,
+   "side": true,
+   "reward": {
+    "gold": 250
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "dokkaebi9",
+     "text": "아직도 전등이 무서운 도깨비",
+     "lines": [
+      "kr_open.s_lamp9.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      60,
+      80
+     ],
+     "text": "한지 — 등 갓 만들 종이"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -110,
+      -50
+     ],
+     "text": "동네 어귀 장승 — 그 뒤에 숨은 도깨비"
+    },
+    {
+     "type": "talk",
+     "npc": "dokkaebi9",
+     "text": "갓 씌운 전등",
+     "lines": [
+      "kr_open.s_lamp9.1"
+     ]
+    }
+   ]
+  }
+ ]
+}

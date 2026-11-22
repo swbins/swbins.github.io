@@ -1,0 +1,27 @@
+{
+ "id": "kr",
+ "v": 1,
+ "from": "2026-11-15",
+ "off": [],
+ "needs": [],
+ "files": [
+  "chapters.json",
+  "people.json",
+  "dex.json",
+  "sets.json",
+  "chains/kr_dawn.json",
+  "chains/kr_three.json",
+  "chains/kr_unify.json",
+  "chains/kr_ns.json",
+  "chains/kr_goryeo.json",
+  "chains/kr_mongol.json",
+  "chains/kr_joseon.json",
+  "chains/kr_imjin.json",
+  "chains/kr_open.json",
+  "chains/kr_dawn2.json",
+  "lines/ko.json"
+ ],
+ "start": "kr_dawn.wake",
+ "gate": "kr_dawn.altar",
+ "pet": "pt_haeo"
+}

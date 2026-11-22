@@ -1,0 +1,284 @@
+/* 사가 다섯 판 공용 창 틀 — W-0252 (정본 shared/css/ui-kit.css → tools/sync-shared.mjs 가 판마다 css/ui-kit.css 로 복사)
+ *
+ * 다섯 판은 창 마크업이 같다(#sheet·.sheet-head·#sheet-close·#encounter .enc-card·#detail .dt-card·#dock button·.btn).
+ * 이 파일이 그 **틀**(모서리·여백·글자·눌림)을 한 벌로 정하고, 판마다 다른 건 **색 옷**뿐이다 —
+ * 9-slice 그림 `assets/ui/*.png`(K-0040, 정본 shared/assets/ui/<판>/ — 같은 이름 다른 색, sync 가 판 폴더로 복사, 규격 ui_parts.json).
+ * 그래서 같은 이 파일이 판마다 제 색으로 입혀진다. 각 판 style.css **뒤**에 싣는다(같은 특이도면 뒤가 이긴다).
+ *
+ * 규칙: 레이아웃(자리·크기)은 안 바꾼다 — 겉옷만. border-image-width 를 border-width 보다 크게 줘서 그림이 안쪽 여백 위에 그려지게
+ * (테두리 두께가 그대로라 자리가 안 밀린다). 원래 배경은 남겨 두어 그림을 못 받아도 창이 비지 않는다.
+ * 8px 격자 · 글꼴 본문 하나 + 숫자 고정폭(tabular-nums).
+ */
+
+:root {
+  --ui-window:  url(../assets/ui/window.png);
+  --ui-popup:   url(../assets/ui/popup.png);
+  --ui-card:    url(../assets/ui/card.png);
+  --ui-btn:     url(../assets/ui/btn_normal.png);
+  --ui-btn-hv:  url(../assets/ui/btn_hover.png);
+  --ui-btn-dn:  url(../assets/ui/btn_pressed.png);
+  --ui-btn-off: url(../assets/ui/btn_disabled.png);
+  --ui-tab-on:  url(../assets/ui/tab_on.png);
+  --ui-tab-off: url(../assets/ui/tab_off.png);
+  /* 모서리 — 색 옷 그림의 모서리(192px 그림에 ~6px, 반 크기로 그린다)와 맞춘다. 판 안의 카드·줄도 같은 결로 */
+  --r-lg: 12px;
+  --r-md: 10px;
+  --r-sm: 8px;
+}
+
+body { font-variant-numeric: tabular-nums; }
+
+/* ── 시트(오른쪽에서 밀려 나오는 창) ── */
+#sheet {
+  border-radius: var(--r-sm);
+  border-image: var(--ui-window) 32 fill / 16px stretch;
+}
+.sheet-head {
+  padding: 16px 16px 8px 24px;
+  border-bottom: 0;
+  background: linear-gradient(90deg, transparent, var(--gold-soft) 18%, var(--gold-soft) 82%, transparent) bottom / 100% 1px no-repeat;
+}
+.sheet-head h3 { font-size: 16px; letter-spacing: 0; }
+#sheet-body { padding: 16px 24px 24px; }
+
+/* ── 모달 카드(조우·결과·안내) · 인물 상세 ── */
+.enc-card, .dt-card {
+  border-radius: var(--r-sm);
+  border-image: var(--ui-popup) 36 fill / 18px stretch;
+  padding: 24px;
+}
+
+/* ── 단추 ── */
+.btn {
+  border-radius: var(--r-sm);
+  border-image: var(--ui-btn) 24 fill / 12px stretch;
+  min-height: 40px;
+}
+.btn:hover:not(:disabled) { filter: none; border-image-source: var(--ui-btn-hv); }
+.btn:active:not(:disabled) { border-image-source: var(--ui-btn-dn); }
+.btn:disabled { opacity: 1; color: var(--ink-faint); border-image-source: var(--ui-btn-off); }
+.btn.primary { border-image: none; border-radius: var(--r-sm); }   /* 할 일 단추는 금빛 그대로 — 색 옷 위에서 한눈에 */
+.btn.primary:hover:not(:disabled) { filter: brightness(1.12); }
+.btn.ghost { border-image: none; }
+/* R-5: .btn:hover:not(:disabled)(0,3,0)가 위 none(0,2,0)을 이겨 금빛·빈 단추에 그림이 기본 slice·1px 로 끼어들었다 */
+.btn.primary:hover:not(:disabled), .btn.primary:active:not(:disabled), .btn.ghost:hover:not(:disabled), .btn.ghost:active:not(:disabled) { border-image-source: none; }
+.btn.tiny { min-height: 0; border-image-width: 8px; border-radius: 6px; }
+
+/* ── 아래 독(메뉴 단추) ── */
+#dock button {
+  border-radius: var(--r-md);
+  border-image: var(--ui-btn) 24 fill / 14px stretch;
+}
+#dock button:hover { border-image-source: var(--ui-btn-hv); }
+#dock button.on { border-image-source: var(--ui-btn-dn); background: var(--glass); box-shadow: var(--shadow), inset 0 0 0 2px var(--gold); }
+#dock button.on span, #dock button.on small { color: var(--gold); }
+
+/* ── 닫기 단추(시트·상세) ── */
+#sheet-close, .dt-x {
+  width: 40px; height: 40px; border-radius: 50%; font-size: 15px;
+}
+
+/* ── ☰ 메뉴 화면(W-0253, shared/js/menu-grid.js) — 독엔 cfg.menu.keep 만, 나머지는 여기 격자로 ── */
+#dock button[data-menu-only] { display: none; }
+#btn-menu { position: relative; }
+#btn-menu.mg-alert::after { content: ''; position: absolute; top: 6px; right: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--bad); box-shadow: 0 0 0 2px rgba(0, 0, 0, .5); }
+#menu-grid {
+  position: fixed; inset: 0; z-index: 38; display: none;
+  align-items: center; justify-content: center; padding: 24px;
+  background: rgba(6, 8, 12, .62);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+#menu-grid.show { display: flex; animation: fade .18s ease-out; }
+.mg-panel {
+  width: min(760px, 100%); max-height: calc(100vh - 48px); max-height: calc(100dvh - 48px); overflow-y: auto; padding: 24px;
+  background: rgba(24, 27, 34, .94); border: 1px solid var(--glass-br); border-radius: var(--r-sm);
+  border-image: var(--ui-popup) 36 fill / 18px stretch;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .6);
+}
+.mg-head { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.mg-head h3 { margin: 0; font-size: 18px; }
+.mg-head small { flex: 1; }
+.mg-x { width: 40px; height: 40px; border-radius: 50%; font-size: 15px; }
+.mg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; }
+/* W-0766 아래 작은 링크 한 줄 — 출처와 크레딧(saga-web/credits.html) */
+.mg-foot { margin-top: 14px; text-align: center; font-size: 13px; }
+.mg-foot a { color: inherit; opacity: .72; text-decoration: underline; }
+/* 세계 편 문 안(body.door)에선 세계 편 링크를 숨긴다 — 쪽지 없이 빠져나가지 않게(나가기는 「그만두고 책으로」) */
+body.door .mg-foot .mg-world, body.door .mg-foot .mg-sep { display: none; }
+/* 칸 — card 그림은 안쪽 초상 틀이 있어 칸엔 btn 그림(눌림·밝힘이 같은 결) */
+.mg-cell {
+  position: relative; min-height: 104px; padding: 16px 8px;
+  display: grid; place-items: center; align-content: center; gap: 8px;
+  color: var(--ink); font-family: inherit; cursor: pointer;
+  background: rgba(255, 255, 255, .05); border: 1px solid var(--glass-br); border-radius: var(--r-sm);
+  border-image: var(--ui-btn) 24 fill / 14px stretch;
+}
+.mg-cell span { font-size: 30px; line-height: 1; }
+.mg-cell span svg { width: 30px; height: 30px; }
+.mg-cell small { font-size: 13px; font-weight: 600; color: var(--ink); }
+.mg-cell:hover, .mg-cell:focus-visible { outline: none; border-image-source: var(--ui-btn-hv); box-shadow: inset 0 0 0 2px var(--gold); }
+.mg-cell.on { box-shadow: inset 0 0 0 2px var(--gold); }
+.mg-cell:disabled { opacity: .45; cursor: not-allowed; }
+.mg-cell.badge::after { content: attr(data-badge); position: absolute; top: 8px; right: 10px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: var(--bad); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+.mg-cell i.badge {
+  position: absolute; top: 8px; right: 10px; font-style: normal;
+  min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px;
+  background: var(--bad); color: #fff; font-size: 11px; font-weight: 700;
+  display: grid; place-items: center;
+}
+/* ── 끌어 놓기(W-0362, shared/js/dragdrop.js) — 끌 칸 [data-dd] · 받을 칸 [data-dd-drop] ── */
+[data-dd] { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }   /* iOS 길게 누르기 메뉴·글자 고르기 끔 — touch-action 은 기본(스크롤 그대로) */
+.dd-ghost { position: fixed; z-index: 9999; pointer-events: none; margin: 0; opacity: .88; transform: translate(-50%, -50%) scale(1.06); box-shadow: 0 10px 28px rgba(0, 0, 0, .55); }
+.dd-src { opacity: .4; }
+.dd-ghost.dd-sticky { opacity: .7; transform: translate(-50%, -110%) scale(.9); }   /* 들고 있는 채(터치) — 손가락 위에 작게, 받는 칸을 누르면 놓는다 */
+.dd-on [data-dd-drop].dd-ok { box-shadow: inset 0 0 0 2px var(--gold); }
+.dd-on [data-dd-drop].dd-no { box-shadow: inset 0 0 0 2px var(--bad); opacity: .7; }
+.dd-on [data-dd-drop].dd-ok.dd-hover { box-shadow: inset 0 0 0 3px var(--gold), 0 0 14px rgba(232, 193, 90, .55); }
+/* ── 「내 정보」 창(W-0361, shared/js/me-panel.js) — 메뉴 화면과 같은 덮개·틀(.mg-panel) ── */
+#me-panel {
+  position: fixed; inset: 0; z-index: 66;   /* 직접 연 창 — 자동 진행 ▶(45)·2나락 작은 지도(65) 위 */ display: none;
+  align-items: center; justify-content: center; padding: 24px;
+  background: rgba(6, 8, 12, .62);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+#me-panel.show { display: flex; animation: fade .18s ease-out; }
+.me-panel { display: grid; gap: 12px; }
+.mp-who { display: flex; align-items: center; gap: 12px; }
+.mp-who img, .mp-who canvas { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+.mp-who b { font-size: 17px; }
+.mp-who small { display: block; margin-top: 2px; }
+.mp-body { display: grid; grid-template-columns: 1.15fr 1fr; gap: 12px; align-items: start; }
+.mp-slots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.mp-slot {
+  display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 6px 8px; text-align: left;
+  color: var(--ink); font-family: inherit; cursor: pointer;
+  background: rgba(255, 255, 255, .05); border: 1px solid var(--glass-br); border-radius: var(--r-sm);
+}
+.mp-slot:disabled { cursor: default; }
+.mp-slot.empty { opacity: .7; }
+.mp-slot:not(:disabled):hover, .mp-slot:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--gold); }
+.mp-ico { flex: 0 0 36px; height: 36px; display: grid; place-items: center; font-size: 24px; }
+.mp-ico img { width: 36px; height: 36px; object-fit: contain; }
+.mp-txt { display: grid; min-width: 0; }
+.mp-txt small { font-size: 11px; color: var(--ink-2, #aab); }
+.mp-txt b, .mp-txt i { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mp-stats { display: grid; gap: 4px; }
+.mp-stat { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 0 8px; padding: 6px 10px; background: rgba(255, 255, 255, .04); border-radius: var(--r-sm); }
+.mp-stat b { font-size: 16px; color: var(--gold); }
+.mp-stat small { grid-column: 1 / -1; font-size: 11px; }
+.mp-note { margin: 0; font-size: 12px; }
+.mp-grow { justify-self: start; padding: 10px 16px; color: var(--ink); font-family: inherit; font-weight: 700; cursor: pointer; background: rgba(255, 255, 255, .06); border: 1px solid var(--gold); border-radius: var(--r-sm); }
+@media (max-width: 600px) {
+  #me-panel { padding: 12px; }
+  .mp-body { grid-template-columns: 1fr; }
+}
+/* ── 「오늘」 창(W-0380, shared/js/goals-panel.js) — 내 정보와 같은 덮개·틀 ── */
+#goals-panel {
+  position: fixed; inset: 0; z-index: 66; display: none;
+  align-items: center; justify-content: center; padding: 24px;
+  background: rgba(6, 8, 12, .62);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+#goals-panel.show { display: flex; animation: fade .18s ease-out; }
+.goals-panel { display: grid; gap: 12px; min-width: min(420px, 82vw); }
+.gp-reset { margin: 0; font-size: 12px; }
+.gp-sec { display: grid; gap: 6px; }
+.gp-sec h4 { margin: 0; font-size: 14px; }
+.gp-row {
+  display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 10px; text-align: left;
+  color: var(--ink); font-family: inherit; cursor: pointer;
+  background: rgba(255, 255, 255, .05); border: 1px solid var(--glass-br); border-radius: var(--r-sm);
+}
+.gp-row:disabled { cursor: default; }
+.gp-row.done { opacity: .62; }
+.gp-row:not(:disabled):hover, .gp-row:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--gold); }
+.gp-ico { flex: 0 0 28px; font-size: 20px; text-align: center; }
+.gp-txt { flex: 1; display: grid; gap: 4px; min-width: 0; }
+.gp-txt b { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gp-bar { height: 5px; border-radius: 3px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+.gp-bar i { display: block; height: 100%; background: var(--gold); }
+.gp-n { flex: 0 0 auto; font-size: 13px; font-weight: 700; color: var(--gold); }
+.gp-none { margin: 0; font-size: 12px; }
+.gp-claim { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; background: rgba(255, 255, 255, .04); border-radius: var(--r-sm); }
+.gp-claim small { display: block; font-size: 11px; }
+.gp-claim em { flex: 0 0 auto; font-style: normal; font-size: 13px; white-space: nowrap; color: var(--ink-2, #aab); }
+.gp-claim.paid em { color: var(--gold); }
+.gp-take { padding: 8px 14px; color: var(--ink); font-family: inherit; font-weight: 700; cursor: pointer; background: rgba(255, 255, 255, .06); border: 1px solid var(--gold); border-radius: var(--r-sm); }
+.gp-note { margin: 0; font-size: 12px; }
+@media (max-width: 600px) {
+  #goals-panel { padding: 12px; }
+  .goals-panel { min-width: 0; }
+}
+@media (max-width: 600px) {
+  #menu-grid { padding: 16px; }
+  .mg-panel { padding: 16px; }
+  .mg-grid { grid-template-columns: repeat(3, 1fr); }
+  .mg-cell { min-height: 96px; }
+}
+
+/* ── 첫 화면(W-0256, shared/js/account.js — 이어하기·다른 이름으로·설정) ──
+   account 가 문서에 넣는 <style> 이 뒤에 오고 border 단축 속성이 border-image 를 지우므로 #acc-host 로 특이도를 올린다 */
+#acc-host .acc-card { border-radius: var(--r-sm); border-image: var(--ui-popup) 36 fill / 18px stretch; }
+#acc-host .acc-btn { border-image: var(--ui-btn) 24 fill / 12px stretch; }
+#acc-host .acc-btn:hover { border-image-source: var(--ui-btn-hv); }
+#acc-host .acc-btn:active { border-image-source: var(--ui-btn-dn); }
+#acc-host .acc-btn.primary { border-image: none; }
+#acc-host .acc-btn:not(.primary) { color: #f6e9c8; text-shadow: 0 1px 1px #000; }   /* W-0586 ⑤ 어두운 단추 바탕에 어두운 초록 글자라 「바꾸기」가 안 읽혔다(11-10) */
+#acc-host .acc-btn.tiny { border-image-width: 8px; }
+
+/* ── HUD(W-0257) — 늘 떠 있는 프로필·지갑·근처 카드·도구 단추도 창들과 같은 결. 자리·크기는 그대로, 알약 → 모서리 둥근 판 ── */
+#profile, #wallet, .near-card {
+  border-radius: var(--r-md);
+  border-image: var(--ui-window) 32 fill / 12px stretch;
+}
+.icon-btn {
+  border-radius: var(--r-sm);
+  border-image: var(--ui-btn) 24 fill / 12px stretch;
+}
+.icon-btn:hover { border-image-source: var(--ui-btn-hv); }
+.icon-btn:active { border-image-source: var(--ui-btn-dn); }
+.icon-btn.on { border-image-source: var(--ui-btn-dn); box-shadow: var(--shadow), inset 0 0 0 2px var(--gold); color: var(--gold); }
+.icon-btn.sm { border-image-width: 8px; }
+/* 창 안 닫기 단추는 둥근 그대로(9-slice 를 둥근 칸에 입히면 네모가 비친다) */
+#sheet-close, .dt-x, .mg-x, #sheet-close:hover, .dt-x:hover, .mg-x:hover, #sheet-close:active, .dt-x:active, .mg-x:active { border-image: none; }   /* :hover 까지 — .icon-btn:hover 가 그림을 다시 끼우지 않게(R-5) */
+
+/* ── 폰 탭 목표 44px(W-0335 측정 → W-0340, 애플 HIG) — 판별 style.css 가 미디어 쿼리 안에서 width/height 를 40·36·34 로 주므로
+   특이도 싸움 대신 min-* 로 바닥만 깐다(그림·자리 규칙은 그대로, 작으면 44 로 자란다). 손가락 기기(pointer: coarse)의 좁은 변 ≤ 520 만 — PC 그대로 */
+@media (pointer: coarse) and (max-width: 520px), (pointer: coarse) and (max-height: 520px) {
+  /* !important — 판 안의 더 센 선택자(.focus-card .btn·#wallet .btn.primary·#rmapctl .icon-btn.sm …)가 40 을 다시 준다. 하한값이라 이 쿼리 안에서만 */
+  .icon-btn, #dock button, .hud-sk, #hud-dodge, .goal-hide, #sheet-close, .dt-x, .mg-x { min-width: 44px !important; min-height: 44px !important; }
+  .btn, #acc-host .acc-btn { min-height: 44px !important; }
+  /* W-0341 — <small> 의 브라우저 기본 "smaller"(부모 12px → 10px)는 px 규칙이 아니라 font-floor.js 가 못 올린다. 판 규칙이 있는 small 은 그쪽이 이긴다 */
+  small { font-size: max(12px, .85em); }
+}
+
+/* ── 폰 HUD 다이어트(W-0363 — 사용자 10-21 "화면을 엄청 가린다") — 폰 세로(≤520)에서 늘 떠 있는 판을 접는다. 판이 body 에 hud-diet 를 달아야 켜진다
+   (1만리 먼저, 네 판은 W-0364). 지우지 않고 접기만 — 접은 것은 한 번 누르면 .hud-open 으로 다 나온다(판 ui 가 단다). PC(넓은 화면) 그대로.
+   · 상태 카드 = 이름·레벨 한 줄  · 자원 줄 = 첫 칸 + .hud-keep(주 자원) 둘, 나머지 누르면  · 알림 = 맨 위 가장자리 한 줄(덮이는 건 이미 HUD 자리 — 판이 --toast-edge 로 윗 카드 높이에 맞춘다)
+   · 단추 = 크기 그대로, 투명도 .85 */
+@media (max-width: 520px) {
+  body.hud-diet #profile:not(.hud-open) .p-meta > :not(:first-child):not(.hud-keep) { display: none; }
+  body.hud-diet #profile:not(.hud-open) .p-meta > .hud-keep { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }   /* W-0364 판이 남기는 "지금 할 일" 한 줄 */
+  /* 조이스틱 받침 원은 누를 때만(.held — 판 조이스틱 코드가 단다, 잡는 자리 그대로) */
+  body.hud-diet :is(#gjoy, #vjoy, #dg-joy):not(.held) { background: transparent; border-color: transparent; box-shadow: none; }
+  body.hud-diet #wallet:not(.hud-open) > :not(:first-child):not(.hud-keep) { display: none; }
+  body.hud-diet #wallet:not(.hud-open)::after { content: '+'; align-self: center; padding: 0 4px 0 2px; font-size: 12px; font-weight: 700; opacity: .7; }
+  body.hud-diet #wallet { cursor: pointer; }
+  body.hud-diet #toast {
+    top: calc(var(--toast-edge, 4px) + var(--safe-t, 0px)); max-width: calc(100vw - 24px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    padding: 4px 12px; font-size: 12px; line-height: 18px; border-radius: 999px;
+  }
+  body.hud-diet .icon-btn { opacity: .85; }
+}
+
+/* ── 2D 카메라 ＋/－ 단추(W-0365 shared/js/cam2d.js cam.buttons) — 오른쪽 가운데 세로 둘. 판이 --cam2d-top·--cam2d-right 로 자리만 옮긴다 */
+.cam2d-btns { position: fixed; z-index: 24; right: calc(var(--cam2d-right, 8px) + var(--safe-r, 0px)); top: var(--cam2d-top, 40%); display: flex; flex-direction: column; gap: 6px; }
+.cam2d-btns .icon-btn { font-size: 18px; font-weight: 700; line-height: 1; opacity: .85; }
+body.sheet-open .cam2d-btns { visibility: hidden; }
+/* 터치 가로 폰(키 ≤500)은 ＋/－ 를 접는다 — 오른쪽 가운데 자리가 1만리 회피·공격, 4종횡 조작 단추, 2나락 무예 칸과 겹쳤다(844×390 실측). 두 손가락 핀치로 그대로 당긴다(cam2d.attach) */
+@media (pointer: coarse) and (max-height: 500px) and (min-width: 600px) { .cam2d-btns { display: none; } }
+
+/* W-0371 인물 일러스트(정사각 반신 512) — 초상 칸이 150×172 처럼 세로로 길어도 늘이지 않고 얼굴 쪽으로 자른다 */
+img[src*="assets/illust/"] { object-fit: cover; object-position: 50% 14%; }
+/* W-0389 ③-5 손잡이 ui.blur 0(폰 기본) — 유리 흐림 끔(device-mode.js syncBlur) */
+.no-blur *, .no-blur *::before, .no-blur *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }

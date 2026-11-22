@@ -1,0 +1,494 @@
+[
+ {
+  "id": "kr_dawn",
+  "no": 1,
+  "title": "첫 나라의 아침",
+  "era": "청동기",
+  "stage": "아사달 · 고인돌 들",
+  "open": null,
+  "fact": "청동기 시대 한반도와 만주에 첫 나라 고조선이 선다. 건국 신화는 하늘에서 온 이와 곰·범(쑥과 마늘, 굴 속 백 날)의 이야기다. 고인돌과 비파 모양 청동 검이 이 시대 유물이다.",
+  "play": "떠돌기",
+  "chains": [
+   {
+    "id": "kr_dawn.wake",
+    "name": "빈 책"
+   },
+   {
+    "id": "kr_dawn.cave",
+    "name": "굴의 백 날"
+   },
+   {
+    "id": "kr_dawn.stone",
+    "name": "덮개돌"
+   },
+   {
+    "id": "kr_dawn.tiger",
+    "name": "흰 범"
+   },
+   {
+    "id": "kr_dawn.altar",
+    "name": "한 제단"
+   }
+  ],
+  "sides": [
+   {
+    "id": "kr_dawn.s_chisel",
+    "name": "돌메의 끌"
+   },
+   {
+    "id": "kr_dawn.s_ssireum",
+    "name": "첫 도깨비"
+   },
+   {
+    "id": "kr_dawn.s_stars",
+    "name": "별자리 덮개돌"
+   }
+  ]
+ },
+ {
+  "id": "kr_three",
+  "no": 2,
+  "title": "세 나라, 쇠의 시대",
+  "era": "4~6세기",
+  "stage": "한강 유역 · 가야 쇠터",
+  "field": "gamagol",
+  "open": "kr_dawn",
+  "fact": "고구려·백제·신라 세 나라와 가야가 자리 잡는다. 가야는 쇠로 이름났고, 4~6세기에 세 나라가 한강 유역을 두고 차례로 다툰다.",
+  "play": "떠돌기 · 내려가기",
+  "chains": [
+   {
+    "id": "kr_three.salt",
+    "name": "소금 길"
+   },
+   {
+    "id": "kr_three.forge",
+    "name": "무너진 쇠터"
+   },
+   {
+    "id": "kr_three.eater",
+    "name": "쇠를 먹는 것"
+   },
+   {
+    "id": "kr_three.ferry",
+    "name": "세 번 바뀐 나루"
+   },
+   {
+    "id": "kr_three.iron",
+    "name": "가람의 쇠를 어느 장터에 넘기나"
+   }
+  ],
+  "sides": [
+   {
+    "id": "kr_three.s_mural",
+    "name": "벽화 무덤"
+   },
+   {
+    "id": "kr_three.s_goldthread",
+    "name": "금관 장인의 금실"
+   },
+   {
+    "id": "kr_three.s_gayageum",
+    "name": "가야금 줄"
+   },
+   {
+    "id": "kr_three.s_riddle",
+    "name": "둘째 도깨비"
+   }
+  ]
+ },
+ {
+  "id": "kr_unify",
+  "no": 3,
+  "title": "하나가 되는 전쟁",
+  "era": "7세기",
+  "stage": "사비 · 평양성 · 매소성",
+  "field": "gojeong",
+  "open": "kr_three",
+  "fact": "660년 백제, 668년 고구려가 무너진다. 신라는 함께 싸운 당과 다시 싸워 675년 매소성, 676년 기벌포 싸움 뒤 당 군대를 몰아낸다.",
+  "play": "겨루기",
+  "chains": [
+   {
+    "id": "kr_unify.fire",
+    "name": "불타는 서고"
+   },
+   {
+    "id": "kr_unify.cart",
+    "name": "책 수레"
+   },
+   {
+    "id": "kr_unify.north",
+    "name": "북쪽 성의 마지막 겨울"
+   },
+   {
+    "id": "kr_unify.maeso",
+    "name": "매소성"
+   },
+   {
+    "id": "kr_unify.books",
+    "name": "책을 어디에 맡기나(절·바다 건너·거점 서고)"
+   }
+  ],
+  "sides": [
+   {
+    "id": "kr_unify.s_letters",
+    "name": "두 나라 사람들의 편지"
+   },
+   {
+    "id": "kr_unify.s_grave",
+    "name": "황산 들의 이름 없는 무덤"
+   },
+   {
+    "id": "kr_unify.s_bat",
+    "name": "셋째 도깨비"
+   }
+  ]
+ },
+ {
+  "id": "kr_ns",
+  "no": 4,
+  "title": "남과 북의 나라",
+  "era": "8~9세기",
+  "stage": "서라벌 · 청해진 · 상경",
+  "field": "galdae",
+  "open": "kr_unify",
+  "fact": "698년 고구려 옛 땅에 발해가 선다. 남쪽 신라에서는 8세기에 불국사와 석굴암이 지어지고, 828년 완도에 청해진이 서 바닷길 무역을 지킨다.",
+  "play": "떠돌기 · 머물기",
+  "chains": [
+   {
+    "id": "kr_ns.sea",
+    "name": "바닷길 진"
+   },
+   {
+    "id": "kr_ns.pirate",
+    "name": "끌려간 사람들"
+   },
+   {
+    "id": "kr_ns.envoy",
+    "name": "북에서 온 사신"
+   },
+   {
+    "id": "kr_ns.grotto",
+    "name": "돌 속의 방"
+   },
+   {
+    "id": "kr_ns.market",
+    "name": "한 장터"
+   }
+  ],
+  "sides": [
+   {
+    "id": "kr_ns.s_bell",
+    "name": "종 만드는 사람의 쇳물"
+   },
+   {
+    "id": "kr_ns.s_trade",
+    "name": "무역품 열 가지"
+   },
+   {
+    "id": "kr_ns.s_tile",
+    "name": "북쪽 도읍의 기와 무늬"
+   },
+   {
+    "id": "kr_ns.s_song",
+    "name": "넷째 도깨비"
+   }
+  ]
+ },
+ {
+  "id": "kr_goryeo",
+  "no": 5,
+  "title": "새 나라와 북쪽 바람",
+  "era": "10~11세기",
+  "stage": "개경 · 압록강 가 · 귀주",
+  "field": "cheongpung",
+  "open": "kr_ns",
+  "fact": "918년 고려가 서고 936년 후삼국을 아우른다. 993년 거란의 침입은 담판으로 물리고 강동 6주를 얻는다. 1019년 귀주에서 크게 이긴다.",
+  "play": "겨루기 · 달리기",
+  "chains": [
+   {
+    "id": "kr_goryeo.map",
+    "name": "빈 지도"
+   },
+   {
+    "id": "kr_goryeo.talk",
+    "name": "붓과 지도"
+   },
+   {
+    "id": "kr_goryeo.six",
+    "name": "여섯 성"
+   },
+   {
+    "id": "kr_goryeo.beacon",
+    "name": "봉화"
+   },
+   {
+    "id": "kr_goryeo.gwiju",
+    "name": "귀주"
+   }
+  ],
+  "sides": [
+   {
+    "id": "kr_goryeo.s_kiln",
+    "name": "청자 가마의 불 색"
+   },
+   {
+    "id": "kr_goryeo.s_scholar",
+    "name": "과거 보러 가는 선비"
+   },
+   {
+    "id": "kr_goryeo.s_baduk",
+    "name": "다섯째 도깨비"
+   },
+   {
+    "id": "kr_goryeo.s_wolf",
+    "name": "북쪽 숲 늑대 왕"
+   }
+  ]
+ },
+ {
+  "id": "kr_mongol",
+  "no": 6,
+  "title": "섬으로 옮긴 도읍",
+  "era": "13세기",
+  "stage": "강화도 · 경판 새기는 절",
+  "field": "dalho",
+  "open": "kr_goryeo",
+  "fact": "1231년 몽골이 쳐들어오고 1232년 도읍을 강화도로 옮긴다. 1236~1251년 팔만대장경을 새긴다. 1270~1273년 삼별초가 진도·제주로 옮겨 가며 끝까지 싸운다.",
+  "play": "내려가기 · 떠돌기",
+  "chains": [
+   {
+    "id": "kr_mongol.move",
+    "name": "섬으로"
+   },
+   {
+    "id": "kr_mongol.wood",
+    "name": "나무와 바닷물"
+   },
+   {
+    "id": "kr_mongol.ash",
+    "name": "불탄 절"
+   },
+   {
+    "id": "kr_mongol.carve",
+    "name": "한 자 한 절"
+   },
+   {
+    "id": "kr_mongol.last",
+    "name": "끝까지 간 사람들"
+   }
+  ],
+  "sides": [
+   {
+    "id": "kr_mongol.s_type",
+    "name": "금속 활자 한 벌"
+   },
+   {
+    "id": "kr_mongol.s_books",
+    "name": "맡긴 책 다시 찾기"
+   },
+   {
+    "id": "kr_mongol.s_hide",
+    "name": "여섯째 도깨비"
+   }
+  ]
+ },
+ {
+  "id": "kr_joseon",
+  "no": 7,
+  "title": "새 도읍, 새 글자",
+  "era": "14~15세기",
+  "stage": "한양",
+  "field": "solryeong",
+  "open": "kr_mongol",
+  "fact": "1392년 조선이 서고 1394년 한양으로 도읍을 옮긴다. 1443년 훈민정음을 만들어 1446년 반포한다. 같은 무렵 측우기·해시계 같은 기구가 만들어진다.",
+  "play": "머물기 · 떠돌기",
+  "chains": [
+   {
+    "id": "kr_joseon.gate",
+    "name": "새 도읍의 문"
+   },
+   {
+    "id": "kr_joseon.cheat",
+    "name": "속은 땅문서"
+   },
+   {
+    "id": "kr_joseon.letters",
+    "name": "스물여덟 자"
+   },
+   {
+    "id": "kr_joseon.rain",
+    "name": "비를 재다"
+   },
+   {
+    "id": "kr_joseon.plea",
+    "name": "제 손으로 쓴 소장"
+   }
+  ],
+  "sides": [
+   {
+    "id": "kr_joseon.s_bell",
+    "name": "종루 종지기"
+   },
+   {
+    "id": "kr_joseon.s_farmbook",
+    "name": "농사 책 나르기"
+   },
+   {
+    "id": "kr_joseon.s_ssireum",
+    "name": "일곱째 도깨비"
+   }
+  ]
+ },
+ {
+  "id": "kr_imjin",
+  "no": 8,
+  "title": "일곱 해의 전쟁",
+  "era": "1592~1598",
+  "stage": "남해 바다 · 산골 고을",
+  "field": "jugeup",
+  "open": "kr_joseon",
+  "fact": "1592년 전쟁이 터져 1598년까지 이어진다. 곳곳에서 의병이 일어나고, 수군은 판옥선과 거북선으로 바닷길을 막는다. 1597년 명량에서 적은 배로 큰 함대를 막아 낸다.",
+  "play": "겨루기 · 달리기",
+  "chains": [
+   {
+    "id": "kr_imjin.tide",
+    "name": "물목 재기"
+   },
+   {
+    "id": "kr_imjin.oar",
+    "name": "노꾼의 자리"
+   },
+   {
+    "id": "kr_imjin.strait",
+    "name": "좁은 물목"
+   },
+   {
+    "id": "kr_imjin.hill",
+    "name": "산길"
+   },
+   {
+    "id": "kr_imjin.names",
+    "name": "이름 적기"
+   }
+  ],
+  "sides": [
+   {
+    "id": "kr_imjin.s_joint",
+    "name": "못 없는 이음"
+   },
+   {
+    "id": "kr_imjin.s_library",
+    "name": "피란 간 서고의 책"
+   },
+   {
+    "id": "kr_imjin.s_bet",
+    "name": "여덟째 도깨비"
+   }
+  ]
+ },
+ {
+  "id": "kr_open",
+  "no": 9,
+  "title": "열린 항구",
+  "era": "19세기 끝",
+  "stage": "개항장 · 남쪽 들",
+  "field": "hwanggeum",
+  "open": "kr_imjin",
+  "fact": "1876년 항구가 열린다. 1894년 동학 농민 운동이 일어난다. 1897년 대한제국을 선포한다. 전등·전차·신문이 들어온다.",
+  "play": "떠돌기 · 달리기",
+  "chains": [
+   {
+    "id": "kr_open.pier",
+    "name": "부두"
+   },
+   {
+    "id": "kr_open.paper",
+    "name": "신문"
+   },
+   {
+    "id": "kr_open.field",
+    "name": "들의 편지"
+   },
+   {
+    "id": "kr_open.choice",
+    "name": "무엇을 받아들이고 무엇을 지킬까"
+   },
+   {
+    "id": "kr_open.lamp",
+    "name": "첫 전등"
+   }
+  ],
+  "sides": [
+   {
+    "id": "kr_open.s_photo",
+    "name": "사진관"
+   },
+   {
+    "id": "kr_open.s_tram",
+    "name": "전차 첫 손님"
+   },
+   {
+    "id": "kr_open.s_lamp9",
+    "name": "아홉째 도깨비"
+   }
+  ]
+ },
+ {
+  "id": "kr_dawn2",
+  "no": 10,
+  "title": "다시 찾는 아침",
+  "era": "1910~1945",
+  "stage": "경성 · 국경 너머",
+  "open": "kr_open",
+  "fact": "1910년 나라를 빼앗긴다. 1919년 3·1 운동이 일어나고 임시정부가 선다. 1945년 광복을 맞는다.",
+  "play": "떠돌기(싸움 없음)",
+  "chains": [
+   {
+    "id": "kr_dawn2.print",
+    "name": "인쇄소"
+   },
+   {
+    "id": "kr_dawn2.carry",
+    "name": "들키지 않기"
+   },
+   {
+    "id": "kr_dawn2.school",
+    "name": "불 켜진 교실"
+   },
+   {
+    "id": "kr_dawn2.pages",
+    "name": "책을 나누다"
+   },
+   {
+    "id": "kr_dawn2.morning",
+    "name": "아침"
+   }
+  ],
+  "sides": [
+   {
+    "id": "kr_dawn2.s_letter",
+    "name": "국경 너머 편지"
+   },
+   {
+    "id": "kr_dawn2.s_taeguk",
+    "name": "숨겨 둔 태극 무늬"
+   },
+   {
+    "id": "kr_dawn2.s_feast",
+    "name": "열째 도깨비 잔치",
+    "need": [
+     "kr_dawn.s_ssireum",
+     "kr_three.s_riddle",
+     "kr_unify.s_bat",
+     "kr_ns.s_song",
+     "kr_goryeo.s_baduk",
+     "kr_mongol.s_hide",
+     "kr_joseon.s_ssireum",
+     "kr_imjin.s_bet",
+     "kr_open.s_lamp9"
+    ],
+    "needText": "도깨비 아홉을 다 만나야"
+   }
+  ]
+ }
+]

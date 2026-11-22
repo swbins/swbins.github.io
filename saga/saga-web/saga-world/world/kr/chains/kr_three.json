@@ -1,0 +1,487 @@
+{
+ "id": "kr_three",
+ "chains": [
+  {
+   "id": "kr_three.salt",
+   "name": "소금 길",
+   "ar": 2,
+   "reward": {
+    "gold": 300,
+    "party": 150
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "nari",
+     "text": "소금 장수 나리를 따라 장터로",
+     "lines": [
+      "kr_three.salt.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      150,
+      -70
+     ],
+     "text": "북쪽 장 — 소금이 귀한 장"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -150,
+      -60
+     ],
+     "text": "서쪽 장 — 비단이 싼 장"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      60,
+      150
+     ],
+     "text": "동쪽 장 — 금붙이를 좋아하는 장"
+    },
+    {
+     "type": "talk",
+     "npc": "nari",
+     "text": "나리에게 세 장의 값 차이 말하기",
+     "lines": [
+      "kr_three.salt.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_three.forge",
+   "name": "무너진 쇠터",
+   "ar": 2,
+   "reward": {
+    "gold": 400
+   },
+   "steps": [
+    {
+     "type": "delve",
+     "door": "saga-dungeon",
+     "text": "무너진 쇠터 — 가람과 옛 쇳굴로 내려가 들어간 사람을 찾기",
+     "lines": [
+      "kr_three.forge.0"
+     ],
+     "delve": {
+      "key": "kr_forge",
+      "name": "무너진 쇳굴",
+      "hanja": "鐵窟",
+      "emoji": "⛏️",
+      "lv": 3,
+      "intro": "무너진 갱도 너머에서 쇠 긁는 소리가 난다",
+      "guard": {
+       "name": "갱도 쥐우두머리",
+       "emoji": "🐀",
+       "base": "역병쥐떼",
+       "color": "#6a5a4a",
+       "desc": "무너진 갱도를 차지한 쥐 떼의 우두머리"
+      },
+      "rooms": [
+       {
+        "kind": "fight",
+        "title": "무너진 어귀",
+        "pat": "hall",
+        "foes": [
+         [
+          "들쥐떼",
+          3
+         ],
+         [
+          "동굴슬라임",
+          2
+         ]
+        ]
+       },
+       {
+        "kind": "cave",
+        "title": "버려진 쇳돌 더미",
+        "pat": "cross",
+        "foes": [
+         [
+          "들쥐떼",
+          2
+         ],
+         [
+          "이끼괴물",
+          1
+         ]
+        ]
+       },
+       {
+        "kind": "boss",
+        "title": "막장(幕場)",
+        "pat": "open",
+        "foes": [
+         [
+          "들쥐떼",
+          2
+         ]
+        ]
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "kr_three.eater",
+   "name": "쇠를 먹는 것",
+   "ar": 2,
+   "reward": {
+    "gold": 500
+   },
+   "steps": [
+    {
+     "type": "delve",
+     "door": "saga-dungeon",
+     "text": "쇠를 먹는 것 — 굴 깊은 곳의 불가사리, 쓰러뜨리거나 쇠붙이로 달래 굴 밖으로",
+     "lines": [
+      "kr_three.eater.0"
+     ],
+     "delve": {
+      "key": "kr_eater",
+      "name": "쇠 먹는 굴",
+      "hanja": "食鐵窟",
+      "emoji": "🔩",
+      "lv": 4,
+      "intro": "굴 벽의 쇳줄이 이빨 자국을 따라 끊겨 있다",
+      "guard": {
+       "name": "쇠 먹는 불가사리",
+       "crea": "kr_bulgasari",
+       "emoji": "🦔",
+       "base": "뿔공룡",
+       "color": "#7a7f88",
+       "desc": "사람은 건드리지 않고 쇠만 먹는 짐승"
+      },
+      "rooms": [
+       {
+        "kind": "fight",
+        "title": "이빨 자국 갱도",
+        "pat": "hall",
+        "foes": [
+         [
+          "동굴슬라임",
+          3
+         ],
+         [
+          "들쥐떼",
+          2
+         ]
+        ]
+       },
+       {
+        "kind": "elite",
+        "title": "녹슨 수레길",
+        "pat": "ring",
+        "foes": [
+         [
+          "결정슬라임",
+          1,
+          true
+         ],
+         [
+          "동굴슬라임",
+          2
+         ]
+        ]
+       },
+       {
+        "kind": "boss",
+        "title": "쇳줄 바닥",
+        "pat": "cross",
+        "foes": []
+       }
+      ],
+      "lure": {
+       "need": 3,
+       "name": "쇠붙이"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "kr_three.ferry",
+   "name": "세 번 바뀐 나루",
+   "ar": 2,
+   "reward": {
+    "gold": 300,
+    "party": 150
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "sagong",
+     "text": "나루의 사공 — 첫 번째",
+     "lines": [
+      "kr_three.ferry.1"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      150,
+      -70
+     ],
+     "text": "북쪽 장에서 소금 받아 오기"
+    },
+    {
+     "type": "talk",
+     "npc": "sagong",
+     "text": "나루의 사공 — 두 번째(깃발이 바뀌었다)",
+     "lines": [
+      "kr_three.ferry.2"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      60,
+      150
+     ],
+     "text": "동쪽 장에 소금 넘기기"
+    },
+    {
+     "type": "talk",
+     "npc": "sagong",
+     "text": "나루의 사공 — 세 번째",
+     "lines": [
+      "kr_three.ferry.3"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_three.iron",
+   "name": "가람의 쇠",
+   "ar": 2,
+   "reward": {
+    "gold": 300,
+    "party": 150
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "garam",
+     "text": "가람의 쇠를 어느 장에 넘길까",
+     "lines": [
+      "kr_three.iron.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      150,
+      -70
+     ],
+     "text": "쇠 꾸러미를 장터 길목까지 나르기"
+    },
+    {
+     "type": "talk",
+     "npc": "garam",
+     "text": "가람에게 다녀왔다고 말하기",
+     "lines": [
+      "kr_three.iron.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_three.s_mural",
+   "name": "벽화 무덤",
+   "ar": 2,
+   "side": true,
+   "reward": {
+    "gold": 200
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "gomok",
+     "text": "무덤 앞 — 벽화가 바래 조각이 흩어졌다",
+     "lines": [
+      "kr_three.s_mural.0"
+     ]
+    },
+    {
+     "type": "seal",
+     "zone": "home",
+     "off": [
+      -70,
+      50
+     ],
+     "order": [
+      "sun",
+      "moon",
+      "star"
+     ],
+     "text": "벽화 조각을 해 → 달 → 별 차례로 맞추기(원소 스킬 E)"
+    },
+    {
+     "type": "talk",
+     "npc": "gomok",
+     "text": "사람 얼굴 새가 눈을 뜬다",
+     "lines": [
+      "kr_three.s_mural.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_three.s_goldthread",
+   "name": "금관 장인의 금실",
+   "ar": 2,
+   "side": true,
+   "reward": {
+    "gold": 150
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "nuri",
+     "text": "금실이 모자란 금관 장인",
+     "lines": [
+      "kr_three.s_goldthread.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      50,
+      70
+     ],
+     "text": "금실 감은 실패 — 장터 길에 떨어뜨렸다"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -40,
+      100
+     ],
+     "text": "떨어진 꾸미개 — 나뭇잎 모양 금 조각"
+    },
+    {
+     "type": "talk",
+     "npc": "nuri",
+     "text": "다시 꿰는 금관",
+     "lines": [
+      "kr_three.s_goldthread.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_three.s_gayageum",
+   "name": "가야금 줄",
+   "ar": 2,
+   "side": true,
+   "reward": {
+    "gold": 150
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "yeoul",
+     "text": "줄이 끊겨 소리가 안 맞는 악사",
+     "lines": [
+      "kr_three.s_gayageum.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      90,
+      -40
+     ],
+     "text": "명주실 — 줄로 꼴 실"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      120,
+      30
+     ],
+     "text": "오동나무 판 — 울림통"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      60,
+      -90
+     ],
+     "text": "안족 — 줄을 받치는 기러기발"
+    },
+    {
+     "type": "talk",
+     "npc": "yeoul",
+     "text": "다시 맞춘 열두 줄",
+     "lines": [
+      "kr_three.s_gayageum.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_three.s_riddle",
+   "name": "둘째 도깨비",
+   "ar": 2,
+   "side": true,
+   "reward": {
+    "gold": 200
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "dokkaebi2",
+     "text": "수수께끼 내는 도깨비",
+     "lines": [
+      "kr_three.s_riddle.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -100,
+      -60
+     ],
+     "text": "도깨비가 상을 숨겨 둔 둑 아래"
+    },
+    {
+     "type": "talk",
+     "npc": "dokkaebi2",
+     "text": "수수께끼 값",
+     "lines": [
+      {
+       "if": "kr_three.s_riddle",
+       "is": 0,
+       "key": "kr_three.s_riddle.ok"
+      },
+      {
+       "if": "kr_three.s_riddle",
+       "is": 1,
+       "key": "kr_three.s_riddle.no"
+      },
+      "kr_three.s_riddle.1"
+     ]
+    }
+   ]
+  }
+ ]
+}

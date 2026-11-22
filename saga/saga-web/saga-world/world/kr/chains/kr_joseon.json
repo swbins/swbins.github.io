@@ -1,0 +1,382 @@
+{
+ "id": "kr_joseon",
+ "chains": [
+  {
+   "id": "kr_joseon.gate",
+   "name": "새 도읍의 문",
+   "ar": 7,
+   "reward": {
+    "gold": 300,
+    "party": 150
+   },
+   "steps": [
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      0,
+      -160
+     ],
+     "text": "새 도읍의 문 — 북쪽 문: 산을 등진 문, 늘 닫혀 있다"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      170,
+      0
+     ],
+     "text": "동쪽 문 — 해 뜨는 쪽, 장꾼이 가장 먼저 드나든다"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      0,
+      170
+     ],
+     "text": "남쪽 문 — 가장 큰 문, 나라 손님이 들어오는 길"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -170,
+      0
+     ],
+     "text": "서쪽 문 — 서쪽 길로 떠나는 사람들이 쉬어 가는 문"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      30,
+      20
+     ],
+     "text": "종루 — 문 넷 한가운데, 아침저녁 문을 여닫는 종"
+    }
+   ]
+  },
+  {
+   "id": "kr_joseon.cheat",
+   "name": "속은 땅문서",
+   "ar": 7,
+   "reward": {
+    "gold": 400,
+    "party": 150
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "geulsaem",
+     "text": "속은 땅문서 — 글샘의 문서",
+     "lines": [
+      "kr_joseon.cheat.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -90,
+      70
+     ],
+     "text": "문서를 읽어 줄 사람 찾기 — 장터 대서방"
+    },
+    {
+     "type": "talk",
+     "npc": "geulsaem",
+     "text": "읽어 준 대로를 글샘에게",
+     "lines": [
+      "kr_joseon.cheat.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_joseon.letters",
+   "name": "스물여덟 자",
+   "ar": 7,
+   "reward": {
+    "gold": 400,
+    "party": 150
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "gungmun",
+     "text": "스물여덟 자 — 궁 문지기가 들은 소문",
+     "lines": [
+      "kr_joseon.letters.0"
+     ]
+    },
+    {
+     "type": "talk",
+     "npc": "geulsaem",
+     "text": "소리를 내 보고 꼴 고르기",
+     "lines": [
+      "kr_joseon.letters.q0",
+      {
+       "if": "kr_joseon.letters.g",
+       "is": 0,
+       "key": "kr_joseon.letters.ok"
+      },
+      "kr_joseon.letters.q1",
+      {
+       "if": "kr_joseon.letters.m",
+       "is": 1,
+       "key": "kr_joseon.letters.ok"
+      }
+     ]
+    },
+    {
+     "type": "talk",
+     "npc": "geulsaem",
+     "text": "내 입이 글자",
+     "lines": [
+      "kr_joseon.letters.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_joseon.rain",
+   "name": "비를 재다",
+   "ar": 7,
+   "reward": {
+    "gold": 400,
+    "party": 150
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "byeolman",
+     "text": "비를 재다 — 별만의 그릇",
+     "lines": [
+      "kr_joseon.rain.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -140,
+      -60
+     ],
+     "text": "첫째 고을 — 그릇을 수평으로 놓기"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      60,
+      -150
+     ],
+     "text": "둘째 고을 — 그릇을 수평으로 놓기"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      150,
+      90
+     ],
+     "text": "셋째 고을 — 그릇을 수평으로 놓기"
+    },
+    {
+     "type": "talk",
+     "npc": "byeolman",
+     "text": "별만에게 셋 다 놓았다고",
+     "lines": [
+      "kr_joseon.rain.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_joseon.plea",
+   "name": "제 손으로 쓴 소장",
+   "ar": 7,
+   "reward": {
+    "gold": 500,
+    "built": "school"
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "geulsaem",
+     "text": "제 손으로 쓴 소장 — 글샘이 쓴 글",
+     "lines": [
+      "kr_joseon.plea.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      110,
+      -40
+     ],
+     "text": "관아 — 글샘과 소장 내기"
+    },
+    {
+     "type": "talk",
+     "npc": "geulsaem",
+     "text": "관아에서 돌아와",
+     "lines": [
+      "kr_joseon.plea.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_joseon.s_bell",
+   "name": "종루 종지기",
+   "ar": 7,
+   "side": true,
+   "reward": {
+    "gold": 250
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "jongji",
+     "text": "문 닫는 종, 여는 종",
+     "lines": [
+      "kr_joseon.s_bell.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      40,
+      -60
+     ],
+     "text": "종루 계단 — 지붕 끝이 보이는 자리"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -30,
+      -40
+     ],
+     "text": "해시계 앞 — 그림자로 시각 읽기"
+    },
+    {
+     "type": "talk",
+     "npc": "jongji",
+     "text": "오늘 칠 종",
+     "lines": [
+      "kr_joseon.s_bell.1",
+      {
+       "if": "kr_joseon.s_bell",
+       "is": 0,
+       "key": "kr_joseon.s_bell.a"
+      },
+      {
+       "if": "kr_joseon.s_bell",
+       "is": 1,
+       "key": "kr_joseon.s_bell.b"
+      },
+      "kr_joseon.s_bell.2"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_joseon.s_farmbook",
+   "name": "농사 책 나르기",
+   "ar": 7,
+   "side": true,
+   "reward": {
+    "gold": 250
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "seori",
+     "text": "궁궐 문 앞 — 새로 찍은 농사 책",
+     "lines": [
+      "kr_joseon.s_farmbook.0"
+     ]
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      110,
+      30
+     ],
+     "text": "첫째 고을 — 논이 많은 들"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      -100,
+      60
+     ],
+     "text": "둘째 고을 — 비탈 밭"
+    },
+    {
+     "type": "go",
+     "zone": "home",
+     "off": [
+      20,
+      -120
+     ],
+     "text": "셋째 고을 — 바닷가 짠 땅"
+    },
+    {
+     "type": "talk",
+     "npc": "seori",
+     "text": "다 나눴다",
+     "lines": [
+      "kr_joseon.s_farmbook.1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kr_joseon.s_ssireum",
+   "name": "일곱째 도깨비",
+   "ar": 7,
+   "side": true,
+   "reward": {
+    "gold": 250
+   },
+   "steps": [
+    {
+     "type": "talk",
+     "npc": "dokkaebi7",
+     "text": "밤 씨름 대회",
+     "lines": [
+      "kr_joseon.s_ssireum.0"
+     ]
+    },
+    {
+     "type": "duel",
+     "zone": "home",
+     "off": [
+      -60,
+      80
+     ],
+     "kind": "imp",
+     "text": "밤 씨름 대회 결승 — 반만 넘기면 이긴다",
+     "enter": "구경꾼 도깨비 떼가 둘러앉는다 — 일곱째가 샅바를 잡는다",
+     "half": "일곱째가 모래판에 벌렁 누웠다 — 도깨비 떼가 함성을 지른다"
+    },
+    {
+     "type": "talk",
+     "npc": "dokkaebi7",
+     "text": "대회 끝",
+     "lines": [
+      "kr_joseon.s_ssireum.1"
+     ]
+    }
+   ]
+  }
+ ]
+}

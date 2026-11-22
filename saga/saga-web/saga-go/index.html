@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<script>/* 주소창에서 파일 이름을 지운다 — /xxx/index.html → /xxx/ */
+try{if(location.protocol!=='file:'&&/\/index\.html$/.test(location.pathname))history.replaceState(null,'',location.pathname.replace(/index\.html$/,'')+location.search+location.hash);}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#12141a">
+<title>1만리 — 걷고 만난다</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/ui-kit.css">
+<link rel="stylesheet" href="css/skin-ui.css">
+<link rel="stylesheet" href="css/encounter3d.css">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="1만리">
+<meta name="mobile-web-app-capable" content="yes">
+<style>/* W-0772 한 판 묶음 — 세계 편이 없다 */.mg-world{display:none!important}</style>
+</head>
+<body>
+
+<!-- 지도 (전체화면) -->
+<canvas id="map-ground"></canvas>
+<canvas id="map3d"></canvas>
+<canvas id="map"></canvas>
+<div id="vignette"></div>
+<!-- 가상 조이스틱 — 키보드(모의 이동) 모드 + 터치 기기에서만 보인다(ui.js) -->
+<div id="gjoy"><div id="gjoy-knob"></div></div>
+<!-- PC 마우스 클릭 방향버튼 — 키보드(모의 이동) 모드 + 터치가 아닐 때만 보인다(ui.js) -->
+<div id="gpad">
+  <button data-dir="up">▲</button>
+  <button data-dir="left">◀</button>
+  <button data-dir="down">▼</button>
+  <button data-dir="right">▶</button>
+</div>
+
+<!-- 지도를 크게 보기 — #top 밖에 따로 둔다. 도구줄을 감췄을 때도 이 단추만은
+     남아 있어야 다시 불러올 수 있다 -->
+<button class="icon-btn" id="btn-mapfocus" title="지도를 크게 봅니다 (도구줄 감추기)"><span data-icon="expand">⛶</span></button>
+
+<!-- 상단: 프로필 · 재화 · 도구 -->
+<div id="top">
+  <div class="glass profile" id="profile"></div>
+  <div class="tools">
+    <button class="icon-btn" id="btn-auto" title="자동 순행 (AI가 대신 걷고 만난다)"><span data-icon="bot">🤖</span></button>
+    <button class="icon-btn" id="btn-geo" title="실제 위치로 전환"><span data-icon="satellite-dish">📡</span></button>
+    <!-- 좁은 화면에서만 접힌다. 넓은 화면에서는 서랍이 `display:contents` 로
+         풀려 아래 단추들이 이 줄에 그대로 늘어선다 — 단추를 옮기지 않으므로
+         이벤트도 손잡이도 건드릴 것이 없다 -->
+    <div class="tools-drawer" id="tools-drawer">
+      <button class="icon-btn" id="btn-owmap" title="전체 지도 (M) — 지금까지 밟은 곳을 한눈에"><span data-icon="compass">🧭</span></button>
+      <button class="icon-btn txt" id="btn-tilt" title="2D / 2.5D / 3D 전환">2.5D</button>
+      <button class="icon-btn" id="btn-3inch" title="3인치 모드 — 화면을 멀리서 봅니다"><span data-icon="scan">🔍</span></button>
+      <button class="icon-btn" id="btn-help" title="도움말"><span data-icon="circle-question-mark">❔</span></button>
+      <button class="icon-btn" id="btn-reset" title="처음부터"><span data-icon="rotate-ccw">↺</span></button>
+    </div>
+    <button class="icon-btn" id="btn-more" title="도구 더 보기" aria-expanded="false"><span data-icon="ellipsis">⋯</span></button>
+  </div>
+  <div class="glass wallet" id="wallet"></div>
+</div>
+
+<!-- 자동 순행 상태 (자동일 때만 보인다) -->
+<div id="autobar"></div>
+
+<!-- 하단 중앙: 근처 대상 -->
+<div id="near"></div>
+
+<!-- 우하단: 액션 독 -->
+<nav id="dock">
+  <button data-sheet="me" title="나 — 내 프로필·장비"><span data-icon="circle-user">🧭</span><small>나</small></button>
+  <button data-sheet="quest"><span data-icon="clipboard-list">📋</span><small>사명</small></button>
+  <button data-sheet="party"><span data-icon="user">👤</span><small>동행</small></button>
+  <button id="btn-star" title="만리 성도 — 패시브 그물"><span data-icon="star">✨</span><small>성도</small></button>
+  <button data-sheet="bag"><span data-icon="backpack">🎒</span><small>행낭</small></button>
+  <button data-sheet="letters"><span data-icon="mail">✉️</span><small>천거</small></button>
+  <button data-sheet="dex"><span data-icon="book-open">📖</span><small>도감</small></button>
+  <button data-sheet="oracle"><span data-icon="sparkles">🔮</span><small>사관</small></button>
+  <button data-sheet="log"><span data-icon="scroll-text">📜</span><small>기록</small></button>
+  <button data-sheet="keys"><span data-icon="keyboard">⌨️</span><small>키설정</small></button>
+  <button data-sheet="settings"><span data-icon="settings">⚙️</span><small>설정</small></button>
+</nav>
+
+<!-- 슬라이드 시트 -->
+<div id="scrim"></div>
+<aside id="sheet">
+  <div class="sheet-head">
+    <div class="grip"></div>
+    <h3 id="sheet-title">서당</h3>
+    <button class="icon-btn sm" id="sheet-close">✕</button>
+  </div>
+  <div id="sheet-body"></div>
+</aside>
+
+<div id="encounter"></div><div id="detail"></div>
+<div id="rogue-hud"></div>
+<div id="levelup"></div>
+<div id="toast"></div>
+
+<script src="dist/app.js"></script>
+<script>
+/* `?debug=1` 로 열면 화면 구석에 GLB/3D 상태를 글자로 띄운다 — "인물이 도형인지
+   실제 모델인지" 를 실기기에서 콘솔 없이 바로 읽으려는 것이다(2026-09-04,
+   실기기에서 캐릭터가 무늬 없는 단색으로 보인다는 제보를 좁히던 자리).
+   평소에는 아무 영향이 없다 — 켜야만 만들어진다. */
+(function () {
+  if (!/[?&]debug=1\b/.test(location.search)) { return; }
+  var box = document.createElement('div');
+  box.style.cssText = 'position:fixed;left:0;bottom:0;z-index:99999;max-width:100vw;' +
+    'font:10px/1.4 monospace;color:#0f0;background:rgba(0,0,0,.72);padding:4px 6px;' +
+    'white-space:pre-wrap;pointer-events:none;';
+  document.body.appendChild(box);
+  setInterval(function () {
+    try {
+      var W = window.DG && window.DG.world3d, A = window.DG && window.DG.asset3d, P = window.DG && window.DG.perf;
+      var ws = W && W.stats ? W.stats() : null;
+      var as = A && A.stats ? A.stats() : null;
+      var ps = P && P.stats ? P.stats() : null;
+      var lines = [];
+      lines.push('actors=' + (ws ? ws.actors : '-') + ' meshActors=' + (ws ? ws.meshActors : '-'));
+      lines.push('asset3d built=' + (as ? as.built : '-') + ' swapped=' + (as ? as.swapped : '-') +
+        ' loaded=' + (as ? as.loaded : '-') + ' failed=' + (as ? as.failed : '-'));
+      if (as && as.broke) { lines.push('broke: ' + as.broke); }
+      lines.push('perf: ' + (ps ? JSON.stringify(ps) : '-'));
+      box.textContent = lines.join('\n');
+    } catch (e) { box.textContent = 'debug overlay error: ' + e.message; }
+  }, 1000);
+})();
+</script>
+<script>
+/* 서비스 워커 — 오프라인 모드의 캐시.
+   https 나 localhost 에서만 등록된다(브라우저 규칙). 사내 http 주소로 열면
+   홈 화면 추가는 되지만 이 캐시는 붙지 않는다 — 그때도 게임 자체는 그대로 돈다. */
+(function () {
+  if (!('serviceWorker' in navigator)) { return; }
+  var h = location.hostname;
+  var secure = location.protocol === 'https:' || h === 'localhost' || h === '127.0.0.1';
+  if (!secure) { return; }
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js')['catch'](function (e) {
+      console.warn('서비스 워커 등록 실패', e);
+    });
+  });
+})();
+</script>
+</body>
+</html>

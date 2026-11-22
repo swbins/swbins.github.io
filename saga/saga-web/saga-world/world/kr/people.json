@@ -1,0 +1,946 @@
+[
+ {
+  "id": "dolme",
+  "pid": "story_dolme",
+  "name": "석수 돌메",
+  "short": "돌메",
+  "role": "고인돌을 세우는 마을의 석수",
+  "body": "story_dolme",
+  "face": null,
+  "zone": "home",
+  "off": [
+   34,
+   -28
+  ],
+  "color": "#8a7a5c",
+  "idle": "돌은 처음엔 아무 무늬가 없지."
+ },
+ {
+  "id": "sil",
+  "pid": "story_sil",
+  "name": "곰 겨레 실이",
+  "short": "실이",
+  "role": "굴에서 백 날을 버틴 곰 겨레의 딸",
+  "body": "story_sil",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -70,
+   -55
+  ],
+  "color": "#6f5a46",
+  "idle": "벽에 금을 그어 세고 있어."
+ },
+ {
+  "id": "tigerkid",
+  "pid": "story_tigerkid",
+  "name": "범 겨레 아이",
+  "short": "범 겨레 아이",
+  "role": "범 겨레의 아이",
+  "body": "story_tigerkid",
+  "face": null,
+  "zone": "home",
+  "off": [
+   82,
+   64
+  ],
+  "color": "#b07a3a",
+  "idle": "저 소나무 하나하나가 다 사람이야."
+ },
+ {
+  "id": "nari",
+  "pid": "story_nari",
+  "name": "소금 장수 나리",
+  "short": "나리",
+  "role": "세 나라 장터를 도는 소금 장수",
+  "body": "story_nari",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -30,
+   64
+  ],
+  "color": "#c9a24a",
+  "idle": "소금엔 나라가 없어."
+ },
+ {
+  "id": "garam",
+  "pid": "story_garam",
+  "name": "대장장이 가람",
+  "short": "가람",
+  "role": "불이 꺼진 남쪽 쇠터의 대장장이",
+  "body": "story_garam",
+  "face": null,
+  "zone": "home",
+  "off": [
+   118,
+   -18
+  ],
+  "color": "#5c5f66",
+  "idle": "쇠는 두드린 만큼만 단단해진다."
+ },
+ {
+  "id": "sagong",
+  "pid": "story_sagong",
+  "name": "나루 사공",
+  "short": "사공",
+  "role": "깃발이 세 번 바뀐 나루의 사공",
+  "body": "story_sagong",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -150,
+   96
+  ],
+  "color": "#4f6a7a",
+  "idle": "강은 그대로야."
+ },
+ {
+  "id": "seolgi",
+  "pid": "story_seolgi",
+  "name": "서고지기 설기",
+  "short": "설기",
+  "role": "불탄 서고에서 책 수레를 끄는 서고지기",
+  "body": "story_seolgi",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -96,
+   -34
+  ],
+  "color": "#7a5a3a",
+  "idle": "이건 다시 못 씁니다."
+ },
+ {
+  "id": "bukseong",
+  "pid": "story_bukseong",
+  "name": "북쪽 성 사람",
+  "short": "성 사람",
+  "role": "마지막 겨울을 나는 북쪽 성의 사람",
+  "body": "story_bukseong",
+  "face": null,
+  "zone": "home",
+  "off": [
+   126,
+   -110
+  ],
+  "color": "#5a6a80",
+  "idle": "사람이 남으면 나라는 또 서."
+ },
+ {
+  "id": "badasol",
+  "pid": "story_badasol",
+  "name": "뱃사람 바다솔",
+  "short": "바다솔",
+  "role": "바닷길 진의 뱃사람",
+  "body": "story_badasol",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -24,
+   -6
+  ],
+  "color": "#2f7f8a",
+  "idle": "물때 보는 법부터 배워. 바다는 시계야."
+ },
+ {
+  "id": "moran",
+  "pid": "story_moran",
+  "name": "통역 모란",
+  "short": "모란",
+  "role": "북쪽 사신 일행의 통역",
+  "body": "story_moran",
+  "face": null,
+  "zone": "home",
+  "off": [
+   70,
+   40
+  ],
+  "color": "#8a5a7a",
+  "idle": "두 말을 오가다 보면, 어느 쪽 말로 꿈을 꾸는지 헷갈립니다."
+ },
+ {
+  "id": "heukdot",
+  "pid": "story_heukdot",
+  "name": "해적 두목 검은돛",
+  "short": "검은돛",
+  "role": "사람을 실어 나르는 해적선의 두목",
+  "body": "story_heukdot",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -110,
+   30
+  ],
+  "color": "#3a3a44",
+  "idle": "물어볼 거면 값부터 대."
+ },
+ {
+  "id": "seokgong",
+  "pid": "story_seokgong",
+  "name": "석공",
+  "short": "석공",
+  "role": "산 위 석굴을 깎는 늙은 석공",
+  "body": "story_seokgong",
+  "face": null,
+  "zone": "home",
+  "off": [
+   120,
+   -110
+  ],
+  "color": "#9a8f80",
+  "idle": "돌은 서두르면 깨지오."
+ },
+ {
+  "id": "suri",
+  "pid": "story_suri",
+  "name": "척후 수리",
+  "short": "수리",
+  "role": "북쪽 성에서 성까지 달리는 척후",
+  "body": "story_suri",
+  "face": null,
+  "zone": "home",
+  "off": [
+   40,
+   -60
+  ],
+  "color": "#7a5a3a",
+  "idle": "말 걸지 마. 숨 차."
+ },
+ {
+  "id": "dambi",
+  "pid": "story_dambi",
+  "name": "기록꾼 곁 담비",
+  "short": "담비",
+  "role": "담판에 붓을 들고 따라가는 겁 많은 기록꾼",
+  "body": "story_dambi",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -40,
+   30
+  ],
+  "color": "#5a6a8a",
+  "idle": "셋, 넷… 아, 세던 중이었어요."
+ },
+ {
+  "id": "seongkun",
+  "pid": "story_seongkun",
+  "name": "성 쌓는 사람",
+  "short": "성 쌓는 이",
+  "role": "새로 얻은 땅에 돌을 올리는 일꾼",
+  "body": "story_seongkun",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -110,
+   -90
+  ],
+  "color": "#8a7a62",
+  "idle": "돌 하나 올리면 한 뼘이야."
+ },
+ {
+  "id": "baetsagong",
+  "pid": "story_baetsagong",
+  "name": "뱃사공",
+  "short": "뱃사공",
+  "role": "피란 짐을 섬으로 나르는 뱃사공",
+  "body": "story_baetsagong",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -140,
+   110
+  ],
+  "color": "#4a5f70",
+  "idle": "물때 놓치면 끝이야."
+ },
+ {
+  "id": "ongyeol",
+  "pid": "story_ongyeol",
+  "name": "판 새기는 온결",
+  "short": "온결",
+  "role": "불탄 경판을 다시 새기는 사람",
+  "body": "story_ongyeol",
+  "face": null,
+  "zone": "home",
+  "off": [
+   30,
+   -40
+  ],
+  "color": "#6a5a48",
+  "idle": "…한 자. 그리고 절."
+ },
+ {
+  "id": "tteonabyeong",
+  "pid": "story_tteonabyeong",
+  "name": "떠나는 병사",
+  "short": "병사",
+  "role": "도읍이 뭍으로 돌아가도 남쪽 섬으로 가는 병사",
+  "body": "story_tteonabyeong",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -160,
+   120
+  ],
+  "color": "#5a4a3a",
+  "idle": "배 뜨기 전에 끝내야 해."
+ },
+ {
+  "id": "geulsaem",
+  "pid": "story_geulsaem",
+  "name": "당돌한 아이 글샘",
+  "short": "글샘",
+  "role": "땅문서에 속은 집 아이 — 묻기를 좋아한다",
+  "body": "story_geulsaem",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -40,
+   40
+  ],
+  "color": "#8a5a6a",
+  "idle": "이건 뭐라고 읽어요?"
+ },
+ {
+  "id": "byeolman",
+  "pid": "story_byeolman",
+  "name": "기구장이 별만",
+  "short": "별만",
+  "role": "하늘과 비를 재는 기구를 짜는 손",
+  "body": "story_byeolman",
+  "face": null,
+  "zone": "home",
+  "off": [
+   80,
+   -70
+  ],
+  "color": "#5a6a7a",
+  "idle": "거기 잡아. 수평."
+ },
+ {
+  "id": "gungmun",
+  "pid": "story_gungmun",
+  "name": "궁 문지기",
+  "short": "문지기",
+  "role": "새 궁궐 문을 지키는 군사",
+  "body": "story_gungmun",
+  "face": null,
+  "zone": "home",
+  "off": [
+   0,
+   -120
+  ],
+  "color": "#6a5a4a",
+  "idle": "소문은 들었지."
+ },
+ {
+  "id": "hanbada",
+  "pid": "story_hanbada",
+  "name": "노꾼 한바다",
+  "short": "한바다",
+  "role": "배 밑에서 노만 저은 수군 노꾼",
+  "body": "story_hanbada",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -60,
+   90
+  ],
+  "color": "#3a5a7a",
+  "idle": "북소리로 알지."
+ },
+ {
+  "id": "deulkkot",
+  "pid": "story_deulkkot",
+  "name": "훈장 딸 들꽃",
+  "short": "들꽃",
+  "role": "붓 대신 활을 잡은 의병",
+  "body": "story_deulkkot",
+  "face": null,
+  "zone": "home",
+  "off": [
+   90,
+   -40
+  ],
+  "color": "#7a4a5a",
+  "idle": "가르치신 대로 한 것뿐입니다."
+ },
+ {
+  "id": "halmi",
+  "pid": "story_halmi",
+  "name": "마을 할머니",
+  "short": "할머니",
+  "role": "막내를 바다 건너로 보낸 할머니",
+  "body": "story_halmi",
+  "face": null,
+  "zone": "home",
+  "off": [
+   30,
+   130
+  ],
+  "color": "#8a7a6a",
+  "idle": "우리 막내는 그릇 굽는 애였어."
+ },
+ {
+  "id": "saebom",
+  "pid": "story_saebom",
+  "name": "통역 견습 새봄",
+  "short": "새봄",
+  "role": "개항장 부두의 통역 견습 — 낱말을 지어낸다",
+  "body": "story_saebom",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -40,
+   60
+  ],
+  "color": "#6a8a5a",
+  "idle": "저거 뭐라고 불러요?"
+ },
+ {
+  "id": "mese",
+  "pid": "story_mese",
+  "name": "전령 메세",
+  "short": "메세",
+  "role": "들에서 일어난 농민군의 전령",
+  "body": "story_mese",
+  "face": null,
+  "zone": "home",
+  "off": [
+   100,
+   40
+  ],
+  "color": "#7a6a3a",
+  "idle": "이거. 다음 마을."
+ },
+ {
+  "id": "inswae",
+  "pid": "story_inswae",
+  "name": "인쇄공",
+  "short": "인쇄공",
+  "role": "우리 글자로만 찍는 인쇄소 일꾼",
+  "body": "story_inswae",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -90,
+   -80
+  ],
+  "color": "#4a4a5a",
+  "idle": "띄어 쓰고."
+ },
+ {
+  "id": "notin",
+  "pid": "story_notin",
+  "name": "상투 튼 노인",
+  "short": "노인",
+  "role": "개항장 거리의 노인",
+  "body": "story_notin",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -80,
+   100
+  ],
+  "color": "#7a6a5a",
+  "idle": "어려운 걸 묻네."
+ },
+ {
+  "id": "cheongnyeon",
+  "pid": "story_cheongnyeon",
+  "name": "양복 입은 청년",
+  "short": "청년",
+  "role": "기차를 타 본 거리의 청년",
+  "body": "story_cheongnyeon",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -20,
+   110
+  ],
+  "color": "#3a4a6a",
+  "idle": "타 보면 그런 말 못 하오."
+ },
+ {
+  "id": "dokkaebi9",
+  "pid": "story_dokkaebi9",
+  "name": "전등 겁내는 도깨비",
+  "short": "도깨비",
+  "role": "골목에 숨은 아홉째 도깨비",
+  "body": "story_dokkaebi9",
+  "face": null,
+  "zone": "home",
+  "off": [
+   140,
+   -90
+  ],
+  "color": "#5a7a6a",
+  "idle": "내 불보다 밝잖여."
+ },
+ {
+  "id": "doran",
+  "pid": "story_doran",
+  "name": "인쇄소 견습 도란",
+  "short": "도란",
+  "role": "밤에 전단을 찍는 겁 많은 견습 — 손이 빠르다",
+  "body": "story_doran",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -50,
+   70
+  ],
+  "color": "#5a5a6a",
+  "idle": "불 끄고요."
+ },
+ {
+  "id": "dasom",
+  "pid": "story_dasom",
+  "name": "야학 선생 다솜",
+  "short": "다솜",
+  "role": "밤에 우리말을 가르치는 선생 — 끝까지 존댓말",
+  "body": "story_dasom",
+  "face": null,
+  "zone": "home",
+  "off": [
+   90,
+   -50
+  ],
+  "color": "#6a5a4a",
+  "idle": "내일 한 명이라도 오면 엽니다."
+ },
+ {
+  "id": "dokkaebi1",
+  "pid": "story_dokkaebi1",
+  "name": "씨름 좋아하는 도깨비",
+  "short": "도깨비",
+  "role": "고인돌 들에 사는 첫째 도깨비",
+  "body": "story_dokkaebi1",
+  "face": null,
+  "zone": "home",
+  "off": [
+   60,
+   -60
+  ],
+  "color": "#7a5a4a",
+  "idle": "한 판 하자! 딱 한 판!"
+ },
+ {
+  "id": "gomok",
+  "pid": "story_gomok",
+  "name": "무덤지기 고목",
+  "short": "고목",
+  "role": "옛 벽화 무덤을 지키는 늙은 무덤지기",
+  "body": "story_gomok",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -70,
+   30
+  ],
+  "color": "#6a6458",
+  "idle": "그림은 바래도 눈은 남아."
+ },
+ {
+  "id": "nuri",
+  "pid": "story_nuri",
+  "name": "금관 장인 누리",
+  "short": "누리",
+  "role": "금실로 금관 꾸미개를 꿰는 장인",
+  "body": "story_nuri",
+  "face": null,
+  "zone": "home",
+  "off": [
+   30,
+   60
+  ],
+  "color": "#8a7438",
+  "idle": "실 한 올이 모자라면 관이 기운다."
+ },
+ {
+  "id": "yeoul",
+  "pid": "story_yeoul",
+  "name": "악사 여울",
+  "short": "여울",
+  "role": "열두 줄 악기를 뜯는 가야 악사",
+  "body": "story_yeoul",
+  "face": null,
+  "zone": "home",
+  "off": [
+   100,
+   -20
+  ],
+  "color": "#5a6a7a",
+  "idle": "줄이 하나 틀리면 노래가 다 틀려."
+ },
+ {
+  "id": "dokkaebi2",
+  "pid": "story_dokkaebi2",
+  "name": "수수께끼 도깨비",
+  "short": "도깨비",
+  "role": "둑 아래 사는 둘째 도깨비",
+  "body": "story_dokkaebi2",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -100,
+   -40
+  ],
+  "color": "#5a6a4a",
+  "idle": "맞혀 봐! 못 맞히면 한 번 더!"
+ },
+ {
+  "id": "pinan",
+  "pid": "story_pinan",
+  "name": "피란민 한올",
+  "short": "한올",
+  "role": "무너진 나라에서 내려온 피란민 — 편지를 모아 다닌다",
+  "body": "story_pinan",
+  "face": null,
+  "zone": "home",
+  "off": [
+   60,
+   20
+  ],
+  "color": "#6a5e52",
+  "idle": "받을 사람이 살아 있으면 좋겠어."
+ },
+ {
+  "id": "nongbu",
+  "pid": "story_nongbu",
+  "name": "늙은 농부 갈뫼",
+  "short": "갈뫼",
+  "role": "황산 들에서 평생 밭을 간 농부",
+  "body": "story_nongbu",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -40,
+   70
+  ],
+  "color": "#7a6a48",
+  "idle": "밭을 갈면 아직도 쇠붙이가 나와."
+ },
+ {
+  "id": "dokkaebi3",
+  "pid": "story_dokkaebi3",
+  "name": "방망이 도깨비",
+  "short": "도깨비",
+  "role": "장터 뒤에 사는 셋째 도깨비",
+  "body": "story_dokkaebi3",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -110,
+   30
+  ],
+  "color": "#6a4a5a",
+  "idle": "내 방망이 갖고 싶지? 잡아 봐!"
+ },
+ {
+  "id": "jongjang",
+  "pid": "story_jongjang",
+  "name": "종장 쇠울",
+  "short": "쇠울",
+  "role": "큰 종을 부어 만드는 장인",
+  "body": "story_jongjang",
+  "face": null,
+  "zone": "home",
+  "off": [
+   20,
+   20
+  ],
+  "color": "#7a5a3a",
+  "idle": "종소리는 쇠가 아니라 식는 때가 정해."
+ },
+ {
+  "id": "sangdan",
+  "pid": "story_sangdan",
+  "name": "상단 아이 다올",
+  "short": "다올",
+  "role": "바닷길 상단의 장부를 맡은 아이",
+  "body": "story_sangdan",
+  "face": null,
+  "zone": "home",
+  "off": [
+   100,
+   -30
+  ],
+  "color": "#5a6a8a",
+  "idle": "열 칸 다 채워야 배가 떠요."
+ },
+ {
+  "id": "giwa",
+  "pid": "story_giwa",
+  "name": "기와장이 너울",
+  "short": "너울",
+  "role": "북쪽 도읍에서 내려온 기와장이",
+  "body": "story_giwa",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -70,
+   20
+  ],
+  "color": "#6a5a5a",
+  "idle": "무늬 없는 기와는 비만 막지."
+ },
+ {
+  "id": "dokkaebi4",
+  "pid": "story_dokkaebi4",
+  "name": "뱃노래 도깨비",
+  "short": "도깨비",
+  "role": "나루에 사는 넷째 도깨비",
+  "body": "story_dokkaebi4",
+  "face": null,
+  "zone": "home",
+  "off": [
+   40,
+   90
+  ],
+  "color": "#4a6a7a",
+  "idle": "어기야 디야! 받아라!"
+ },
+ {
+  "id": "dogong",
+  "pid": "story_dogong",
+  "name": "도공 비취",
+  "short": "비취",
+  "role": "푸른 빛 그릇을 굽는 도공",
+  "body": "story_dogong",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -40,
+   40
+  ],
+  "color": "#4a7a6a",
+  "idle": "불은 눈으로 보는 게 아니야. 기다리는 거지."
+ },
+ {
+  "id": "seonbi",
+  "pid": "story_seonbi",
+  "name": "선비 글뫼",
+  "short": "글뫼",
+  "role": "과거 보러 도읍 가는 시골 선비",
+  "body": "story_seonbi",
+  "face": null,
+  "zone": "home",
+  "off": [
+   30,
+   -10
+  ],
+  "color": "#6a6a5a",
+  "idle": "책은 다 외웠는데, 길은 못 외웠소."
+ },
+ {
+  "id": "dokkaebi5",
+  "pid": "story_dokkaebi5",
+  "name": "바둑 도깨비",
+  "short": "도깨비",
+  "role": "개울가 너럭바위에 사는 다섯째 도깨비",
+  "body": "story_dokkaebi5",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -80,
+   -40
+  ],
+  "color": "#4a5a6a",
+  "idle": "한 판! 지면 바둑돌 주워 와!"
+ },
+ {
+  "id": "hwalja",
+  "pid": "story_hwalja",
+  "name": "활자장 쇠글",
+  "short": "쇠글",
+  "role": "쇠로 글자를 붓는 장인",
+  "body": "story_hwalja",
+  "face": null,
+  "zone": "home",
+  "off": [
+   30,
+   30
+  ],
+  "color": "#6a6050",
+  "idle": "나무 글자는 닳지만 쇠 글자는 남아."
+ },
+ {
+  "id": "dokkaebi6",
+  "pid": "story_dokkaebi6",
+  "name": "숨바꼭질 도깨비",
+  "short": "도깨비",
+  "role": "섬 안개 속에 사는 여섯째 도깨비",
+  "body": "story_dokkaebi6",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -30,
+   -90
+  ],
+  "color": "#6a6a7a",
+  "idle": "눈 감고 열 세! 셋에 찾으면 네가 이긴 거!"
+ },
+ {
+  "id": "jongji",
+  "pid": "story_jongji",
+  "name": "종지기 늘봄",
+  "short": "늘봄",
+  "role": "종루에서 도읍의 시각을 알리는 종지기",
+  "body": "story_jongji",
+  "face": null,
+  "zone": "home",
+  "off": [
+   30,
+   -40
+  ],
+  "color": "#6a5a4a",
+  "idle": "종 한 번 늦으면 도읍이 다 늦어."
+ },
+ {
+  "id": "seori",
+  "pid": "story_seori",
+  "name": "서리 바름",
+  "short": "바름",
+  "role": "책을 고을마다 나르는 관아 서리",
+  "body": "story_seori",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -20,
+   50
+  ],
+  "color": "#5a5a6a",
+  "idle": "책은 무겁고 고을은 멀다."
+ },
+ {
+  "id": "dokkaebi7",
+  "pid": "story_dokkaebi7",
+  "name": "밤 씨름 도깨비",
+  "short": "도깨비",
+  "role": "한양 밤마다 씨름판을 여는 일곱째 도깨비",
+  "body": "story_dokkaebi7",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -60,
+   60
+  ],
+  "color": "#7a4a3a",
+  "idle": "결승이다! 결승!"
+ },
+ {
+  "id": "moksu",
+  "pid": "story_moksu",
+  "name": "배 목수 단단",
+  "short": "단단",
+  "role": "쇠못 없이 배를 잇는 늙은 목수",
+  "body": "story_moksu",
+  "face": null,
+  "zone": "home",
+  "off": [
+   60,
+   20
+  ],
+  "color": "#7a6040",
+  "idle": "나무는 나무끼리 물려야 오래 가."
+ },
+ {
+  "id": "seogo",
+  "pid": "story_seogo",
+  "name": "서고지기 책보",
+  "short": "책보",
+  "role": "고을 서고를 지키던 사람 — 책을 지고 산으로",
+  "body": "story_seogo",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -20,
+   -20
+  ],
+  "color": "#5a5a4a",
+  "idle": "책 한 권이 사람 한 명이야."
+ },
+ {
+  "id": "dokkaebi8",
+  "pid": "story_dokkaebi8",
+  "name": "물가 내기 도깨비",
+  "short": "도깨비",
+  "role": "갯바위에 사는 여덟째 도깨비",
+  "body": "story_dokkaebi8",
+  "face": null,
+  "zone": "home",
+  "off": [
+   100,
+   -10
+  ],
+  "color": "#3a5a6a",
+  "idle": "내기다, 내기! 이기면 내 거, 지면 네 거!"
+ },
+ {
+  "id": "sajin",
+  "pid": "story_sajin",
+  "name": "사진사 빛담",
+  "short": "빛담",
+  "role": "항구에 처음 사진관을 연 사진사",
+  "body": "story_sajin",
+  "face": null,
+  "zone": "home",
+  "off": [
+   -40,
+   30
+  ],
+  "color": "#4a4a5a",
+  "idle": "숨 참으세요. 하나, 둘…"
+ },
+ {
+  "id": "chajang",
+  "pid": "story_chajang",
+  "name": "전차 차장 땡땡",
+  "short": "땡땡",
+  "role": "첫 전차의 차장 — 종을 땡땡 친다",
+  "body": "story_chajang",
+  "face": null,
+  "zone": "home",
+  "off": [
+   80,
+   -20
+  ],
+  "color": "#5a6a5a",
+  "idle": "땡땡! 타세요, 타!"
+ },
+ {
+  "id": "milsu",
+  "pid": "story_milsu",
+  "name": "밀수꾼 두목 검은갓",
+  "short": "검은갓",
+  "role": "부두에서 몰래 물건을 빼돌리는 두목",
+  "body": "story_milsu",
+  "face": null,
+  "zone": "home",
+  "off": [
+   120,
+   30
+  ],
+  "color": "#2a2a30",
+  "idle": "표 한 장에 엽전 열 닢이면 남는 장사지."
+ },
+ {
+  "id": "dokkaebi10",
+  "pid": "story_dokkaebi10",
+  "name": "막내 도깨비",
+  "short": "도깨비",
+  "role": "고인돌 들에 사는 열째 — 형들을 다 불러 모은 막내",
+  "body": "story_dokkaebi10",
+  "face": null,
+  "zone": "home",
+  "off": [
+   20,
+   30
+  ],
+  "color": "#8a5a4a",
+  "idle": "형들 다 왔어? 그럼 시작!"
+ }
+]
