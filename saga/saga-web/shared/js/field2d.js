@@ -200,6 +200,9 @@
   /* W-0372 — 나무를 땅 단계에서 그리면 인물이 늘 그 위에 덧그려져 "나무를 밟고 다녔다"(사용자 10-22). 키 큰 소품(k ≥ TALL)은 목록(tall)으로 넘겨
      world 가 인물과 발 y 로 함께 정렬해 그리고, 줄기는 작은 상자로 걷기를 막는다. 손잡이 go.propDepth·go.treeBlock(0 = 옛) */
   var TALL = 0.9, tall = [], noProps = false;
+  /* W-0775 사용자 11-22 「건물들이 떠있는 느낌」 — 바위·이끼 바위·드러난 바위(키 < TALL)는 눍힌 땅 조각에 구워져 납작하게 눌려 밑면이 보이는 떠다니는 섬처럼 보였다 — 나무처럼 서서 그린다(부딪힘은 그대로). 손잡이 world.field2dStandRocks 0 = 옛 길 */
+  var STAND = { rock_large_01: 1, rock_large_02: 1, rock_outcrop_01: 1, rock_moss_01: 1, haystack_01: 1 };
+  function standP(p) { if (p.k >= TALL) { return true; } var C = core(); return !!STAND[p.id] && !(C && C.tuned && !+C.tuned('world.field2dStandRocks', 1)); }
   function tallOn() { var C = core(); return !(C && C.tuned && !+C.tuned('go.propDepth', 1)); }
   /** 둘레 3×3 칸 나무 줄기 상자 [{x, z, w, d, rot}] — world 의 hitsHouse 꼴(세계 좌표). 꺼져 있으면 [] — 순수(지형 함수만 씀) */
   function treeRects(x, y, terrainAt) {
@@ -479,7 +482,7 @@
     var M = global.DG.mode2d, deep = tallOn(), x0 = cx * CH, y0 = cy * CH, tx, ty, ps, i, p, lo = [], hi = [], miss = {}, o;
     for (ty = y0 - 1; ty <= y0 + CH + 1; ty++) { for (tx = x0 - 1; tx <= x0 + CH; tx++) {
       ps = propsAt(terrainAt(tx, ty), tx, ty);
-      for (i = 0; i < ps.length; i++) { p = ps[i]; o = { id: p.id, x: (tx - x0 + p.dx) * T, y: (ty - y0 + p.dy) * T, h: T * p.k }; (deep && p.k >= TALL ? hi : lo).push(o); }
+      for (i = 0; i < ps.length; i++) { p = ps[i]; o = { id: p.id, x: (tx - x0 + p.dx) * T, y: (ty - y0 + p.dy) * T, h: T * p.k }; (deep && standP(p) ? hi : lo).push(o); }
     } }
     lo.sort(function (a, b2) { return a.y - b2.y; });
     for (i = 0; i < lo.length; i++) { if (!M.drawSprite(g, lo[i])) { miss[lo[i].id] = 1; } }
@@ -489,7 +492,7 @@
   }
   function tallListOn() { var C = core(); return !(C && C.tuned && !+C.tuned('world.field2dTallList', 1)); }
   /** W-0556 조각(cx, cy) 칸의 큰 소품 목록(깊이 가림 켬일 때만) — 칸 루프와 같은 꼴 {id,wx,wy,k,sb,flip} + 칸 tx·ty */
-  function chunkTall(cx, cy, terrainAt, deep) { var out = [], tx, ty, ps, i; if (!deep) { return out; } for (ty = cy * CH; ty < cy * CH + CH; ty++) { for (tx = cx * CH; tx < cx * CH + CH; tx++) { ps = propsAt(terrainAt(tx, ty), tx, ty); for (i = 0; i < ps.length; i++) { if (ps[i].k >= TALL) { out.push({ id: ps[i].id, wx: (tx + ps[i].dx) * CELL, wy: (ty + ps[i].dy) * CELL, k: ps[i].k, sb: true, flip: ps[i].flip, tx: tx, ty: ty }); } } } } return out; }
+  function chunkTall(cx, cy, terrainAt, deep) { var out = [], tx, ty, ps, i; if (!deep) { return out; } for (ty = cy * CH; ty < cy * CH + CH; ty++) { for (tx = cx * CH; tx < cx * CH + CH; tx++) { ps = propsAt(terrainAt(tx, ty), tx, ty); for (i = 0; i < ps.length; i++) { if (standP(ps[i])) { out.push({ id: ps[i].id, wx: (tx + ps[i].dx) * CELL, wy: (ty + ps[i].dy) * CELL, k: ps[i].k, sb: true, flip: ps[i].flip, tx: tx, ty: ty }); } } } } return out; }
   function prebakeOn() { var C = core(); return !(C && C.tuned && !+C.tuned('world.field2dPrebake', 1)); }
   function decorate(ctx, camX, camY, W, H, sc, terrainAt) {
     if (!on() || !terrainAt) { return false; }
@@ -528,7 +531,7 @@
         if (!useCache) { paintTile(ctx, kind, tx, ty, sx, sy, Tw, Th, T, b, terrainAt); }
         if (ty <= t1y - 1) {
           ps = propsAt(kind, tx, ty);
-          for (i = 0; i < ps.length; i++) { if (deep && ps[i].k >= TALL) { tall.push({ id: ps[i].id, wx: (tx + ps[i].dx) * CELL, wy: (ty + ps[i].dy) * CELL, k: ps[i].k, sb: baked, flip: ps[i].flip }); continue; } if (baked) { continue; } props.push({ id: ps[i].id, x: sx + ps[i].dx * T, y: sy + ps[i].dy * T, h: T * ps[i].k }); }
+          for (i = 0; i < ps.length; i++) { if (deep && standP(ps[i])) { tall.push({ id: ps[i].id, wx: (tx + ps[i].dx) * CELL, wy: (ty + ps[i].dy) * CELL, k: ps[i].k, sb: baked, flip: ps[i].flip }); continue; } if (baked) { continue; } props.push({ id: ps[i].id, x: sx + ps[i].dx * T, y: sy + ps[i].dy * T, h: T * ps[i].k }); }
         }
       }
     }
@@ -563,5 +566,5 @@
   function npcMps(bodyM) { var C = core(), b = C && C.tuned ? +C.tuned('world.npc2dBps', 0.6) : 0.6; return bodyM > 0 && b > 0 ? b * bodyM : 0; }
   function strideMul() { var C = core(); return C && C.tuned ? Math.max(0.3, +C.tuned('world.stride2d', 1.45)) : 1.45; }
 
-  global.DG.field2d = { _bake: function (cx, cy, T, terrainAt, pre) { return chunkOf(cx, cy, T, Math.max(2, T * 0.07), terrainAt, pre); }, _chunk: function (k) { return chunks[k]; }, _tilesReady: function () { return !!tjson; }, covers: function () { return on() && cacheOn(); }, setNoProps: function (v) { noProps = !!v; }, setTileRep: function (n) { TREP = Math.max(1, Math.round(+n || 1)); }, resetChunks: function () { chunks = {}; chunkKey = null; ST.resets++; INV = {}; INVN = 0; }, variantOf: variantOf, _stoneList: stoneList, _natField: natField, tall: function () { return tall; }, chunkStats: chunkStats, _chunkCells: chunkCells, paintTile: paintTile, autotile: { on: autotileOn, baseOf: baseOf, pairFor: pairFor, dualIndex: dualIndex, seamed: seamed, loaded: function () { return tLoaded; }, json: function () { return tjson; }, _set: function (j) { tjson = j; kindBase = null; tjTried = true; } }, treeRects: treeRects, TALL: TALL, walkMps: walkMps, strideMul: strideMul, wander: wander, npcMps: npcMps, CELL: CELL, color: color, BASE: BASE, zoomMul: zoomMul, KCOL: KCOL, on: on, h01: h01, PROPS: PROPS, propsAt: propsAt, villageHouse: villageHouse, roadDraw: roadDraw, edgeColor: edgeColor, decorate: decorate, seasonRgb: seasonRgb };
+  global.DG.field2d = { _standP: standP, _bake: function (cx, cy, T, terrainAt, pre) { return chunkOf(cx, cy, T, Math.max(2, T * 0.07), terrainAt, pre); }, _chunk: function (k) { return chunks[k]; }, _tilesReady: function () { return !!tjson; }, covers: function () { return on() && cacheOn(); }, setNoProps: function (v) { noProps = !!v; }, setTileRep: function (n) { TREP = Math.max(1, Math.round(+n || 1)); }, resetChunks: function () { chunks = {}; chunkKey = null; ST.resets++; INV = {}; INVN = 0; }, variantOf: variantOf, _stoneList: stoneList, _natField: natField, tall: function () { return tall; }, chunkStats: chunkStats, _chunkCells: chunkCells, paintTile: paintTile, autotile: { on: autotileOn, baseOf: baseOf, pairFor: pairFor, dualIndex: dualIndex, seamed: seamed, loaded: function () { return tLoaded; }, json: function () { return tjson; }, _set: function (j) { tjson = j; kindBase = null; tjTried = true; } }, treeRects: treeRects, TALL: TALL, walkMps: walkMps, strideMul: strideMul, wander: wander, npcMps: npcMps, CELL: CELL, color: color, BASE: BASE, zoomMul: zoomMul, KCOL: KCOL, on: on, h01: h01, PROPS: PROPS, propsAt: propsAt, villageHouse: villageHouse, roadDraw: roadDraw, edgeColor: edgeColor, decorate: decorate, seasonRgb: seasonRgb };
 })(typeof window !== 'undefined' ? window : this);

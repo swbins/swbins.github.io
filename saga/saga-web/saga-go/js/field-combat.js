@@ -537,6 +537,16 @@
     return false;
   }
   function allDown(S) { return aliveIdx(S).length === 0; }
+  /* W-0774 사용자 11-22 「자동퀘스트 부터 막히네」 — 싸움이 아닌 이야기 단계의 목표가 수호자 자리 겴(guardHushR × KDV) 안이면 그 수호자는 새로 안 쫓는다.
+     손으로 간 심부름 자리가 이웃 구역 수호자 싸움 한가운데였다(일지 thumb). 자동퀘스트는 W-0658 autoSkipGuard 가 따로 돌려보낸다. 손잡이 field.guardHush 0 = 옛 길 */
+  var HUSH_FIGHT = { kill: 1, duel: 1, defend: 1, boss: 1, domain: 1, chase: 1 };
+  function hushAt(stType, t, cp, R) { return !!(stType && !HUSH_FIGHT[stType] && t && cp && cp.kind === 'guard' && Math.hypot(t.x - cp.x, t.y - cp.y) < R); }
+  function storyHush(S, f) {
+    if (!+K('guardHush', 1)) { return false; }
+    var cp = S.camps && S.camps[f.camp]; if (!cp || cp.kind !== 'guard') { return false; }
+    var SD = global.DG.story, st = SD && SD.step ? SD.step() : null; if (!st || HUSH_FIGHT[st.type]) { return false; }
+    return hushAt(st.type, SD.targetOf ? SD.targetOf(st) : null, cp, K('guardHushR', 60) * KDV);
+  }
 
   /* ── 무리 들이기·치우기 ───────────────────────────────── */
   /** ⑲-16 그 등급에서 kind 의 공격(천하 등급 배율 포함) — 이야기 제단 체력을 이것으로 잰다 */
@@ -1064,7 +1074,7 @@
         if (f.so) { continue; } f.wa += dt * 0.35;   // W-0420 ② 대치 — 멈춰 노려봄(field-standoff 가 달려듦을 옮긴다)
         var tx = f.hx + Math.cos(f.wa) * 2.2 * KDV, ty = f.hy + Math.sin(f.wa * 0.8) * 2.2 * KDV;
         moveToward(f, tx, ty, 1.1 * KDV * dt);
-        if ((d < AGGRO_R() || f.siege) && !allDown(S) && !(S.talkCalm > 0) && !(S.travelCalm > 0)) { f.st = 'chase'; push(S, { t: 'aggro', uid: f.uid, camp: f.camp }); }
+        if ((d < AGGRO_R() || f.siege) && !allDown(S) && !(S.talkCalm > 0) && !(S.travelCalm > 0) && !(!f.siege && storyHush(S, f))) { f.st = 'chase'; push(S, { t: 'aggro', uid: f.uid, camp: f.camp }); }
       } else if (f.st === 'return') {
         f.calmReturn = Math.max(0, f.calmReturn - dt);
         moveToward(f, f.hx, f.hy, F.spd * KDV * 1.2 * dt);
@@ -1476,7 +1486,7 @@
     engaged: engaged, inCombat: inCombat, /* W-0655 자동 퀘스트 가는 길 — sec 초 동안 새로 안 쫓고(대치도 쉼), 쫓던 적은 거리 없이 매번 집으로(W-0658 2D — 먼 추격자가 calmT 를 0 으로 붙들어 제자리 「싸우는 중」) · 새 무리는 그대로 */ calmTravel: function (S, sec, px, py) { if (!S) { return; } living(S).forEach(function (f) { if ((f.st === 'chase' || f.st === 'wind' || f.st === 'recover') && !f.siege) { f.st = 'return'; f.mark = null; } }); S.travelCalm = Math.max(S.travelCalm || 0, sec); }, COMBAT_R: COMBAT_R, KDV: function () { return KDV; }, living: living, memberOf: memberOf, applyWorld: applyWorld, rescaleWorld: rescaleWorld, killGold: killGold, clearLoot: clearLoot,
     guardBack: guardBack, duelCamp: duelCamp, canChallenge: canChallenge, challenge: challenge, duelSpawn: duelSpawn,
     /* 런타임 */
-    init: init, tick: tick, act: act, live: live, leadId: leadId,
+    _hushAt: hushAt, init: init, tick: tick, act: act, live: live, leadId: leadId,
     state: function () { return S; }, autoOn: autoOn, toggleAuto: toggleAuto, _autoFight: function (pos) { return autoFight(pos); }, _kdForTest: function (v) { KDT = v || null; KDV = KD0(); if (S) { refreshStats(); } return KDV; }, kd: function () { return KDV; },   // W-0233   // W-0236 자동 사냥 · W-0233 배율
     _setStateForTest: function (st) { S = st; },
     _resetForTest: function () { S = null; partyKey = ''; popAcc = 9; }

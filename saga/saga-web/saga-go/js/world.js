@@ -1389,11 +1389,21 @@
   /* 성채·역참 한 채 그리기는 js/world-sites2d.js(R-4) — 같은 이름으로 넘긴다 */
   var spawnOff = null; var sitesObj = null; function SI() { return sitesObj || (sitesObj = global.DG.worldSites2d.make({ ctx: function () { return ctx; }, geom: function () { return geom; }, project: project, label: label, bodyK: bodyK, ENCOUNTER_RANGE: ENCOUNTER_RANGE })); }
   /** 11-03 마을 집 — 정면 그림(building_house_*) 을 폭 t.k 칸으로. 아직 안 실렸으면 건너뛴다 */
+  /* W-0775 사용자 11-22 「건물들이 떠있는 느낌」 — 집 그림은 내려다본 각이라 바닥(발자리)이 그림 아래 약 1/3 에 걸쳐 있다. 옛 그림자는 그림 밑줄 앞에만 있어 뒷쪽·옆 모서리가 떠 보였다. 발자리 전체에 진한 접지 그림자(가운데 진하고 가장자리 흐림) + 밑줄 따라 짧은 어두운 띠. 손잡이 go.house2dGround 0 = 옛 그림자 */
+  function houseGround(ctx, x, y, w, h) {
+    var fy = y - h * 0.2, rx = w * 0.56, ry = Math.max(4, h * 0.3), g;
+    ctx.save(); ctx.translate(x, fy); ctx.scale(1, ry / rx);
+    g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx); g.addColorStop(0, 'rgba(20,16,10,0.5)'); g.addColorStop(0.7, 'rgba(20,16,10,0.38)'); g.addColorStop(1, 'rgba(20,16,10,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, rx, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(x, y - h * 0.015); ctx.scale(1, 0.16);
+    g = ctx.createRadialGradient(0, 0, 0, 0, 0, w * 0.52); g.addColorStop(0, 'rgba(15,12,8,0.45)'); g.addColorStop(1, 'rgba(15,12,8,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, w * 0.52, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  }
   function drawHouse2d(t, p) {
     var im = global.DG.sprite.buildingImg('house_' + t.id.slice(6));
     if (!(im && im.complete && im.naturalWidth)) { return; }
     var w = t.k * 48 * scale() * p.s, h = w * im.naturalHeight / im.naturalWidth;
-    if (global.DG.mode2d && global.DG.mode2d.shadow) { global.DG.mode2d.shadow(ctx, p.x, p.y, w * 0.9, { a: 0.3 }); }
+    if (+global.DG.core.tuned('go.house2dGround', 1)) { houseGround(ctx, p.x, p.y, w, h); } else if (global.DG.mode2d && global.DG.mode2d.shadow) { global.DG.mode2d.shadow(ctx, p.x, p.y, w * 0.9, { a: 0.3 }); }   // W-0775
     ctx.save(); ctx.imageSmoothingEnabled = true; if (t.flip) { ctx.translate(p.x, 0); ctx.scale(-1, 1); ctx.drawImage(im, -w / 2, p.y - h, w, h); } else { ctx.drawImage(im, p.x - w / 2, p.y - h, w, h); } ctx.restore();
   }
   function drawFort(ft, u, v, now, pos) { return SI().drawFort(ft, u, v, now, pos); }

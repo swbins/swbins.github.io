@@ -299,7 +299,7 @@
   /** 인물의 제자리 — 이름 붙은 자리(spot, ⑲-28) 또는 ⑮ 땅 탑 + off */
   function homeOf(n) { return n.spot ? spotPos(n.spot, n.off) : at(n.zone, n.off); }
   /** 단계의 자리 — 이름 붙은 자리(spot) 또는 ⑮ 땅 탑 + off */
-  function posOf(st) { var off = st.offK && st.off ? [st.off[0] * K2(), st.off[1] * K2()] : st.off; return st.spot ? spotPos(st.spot, off) : at(st.zone, off); }   // W-0723 세계 편 묶음(offK) 자리도 2D 몸 배율로 — 반경만 늘고 자리는 그대로라 「…로 가기」가 서자마자 끝났다
+  function offScaled(off, k, max) { var x = off[0] * k, y = off[1] * k, L = Math.hypot(x, y); if (k > 1 && max > 0 && L > max) { x *= max / L; y *= max / L; } return [x, y]; } function posOf(st) { var off = st.offK && st.off ? offScaled(st.off, K2(), +K('offMax2d', 600)) : st.off; return st.spot ? spotPos(st.spot, off) : at(st.zone, off); }   // W-0723 세계 편 묶음(offK) 자리도 2D 몸 배율로 — 반경만 늘고 자리는 그대로라 「…로 가기」가 서자마자 끝났다   // W-0774 offScaled — 2D 길이 상한 story.offMax2d(600m): 이웃 구역 수호자 안으로 나갔다(961m)
   /** 인물 k 의 (ch, si) 칸 — appear·at 에서 그 장 그 단계를 덮는 것. ⑲-21 wq 칸은 그 세계 임무 단계(wq 를 주면 si, 아니면 지금) */
   function placeOf(k, ch, si, wq) {
     var n = NPCS[k], L = n ? (n.appear || n.at || []) : [];
@@ -1485,7 +1485,7 @@
     FOLLOW_NEAR: FOLLOW_NEAR, FOLLOW_LOST: FOLLOW_LOST,
     HARAM_OBS: HARAM_OBS, HARAM_SHIP: HARAM_SHIP, HARAM_FORT: HARAM_FORT, frostSpot: frostSpot, followPts: followPts,
     CAVE_FIGHT: CAVE_FIGHT, BANDI_CAVE: BANDI_CAVE, HEART: HEART, DAREUM_SHIP: DAREUM_SHIP, CAPTAIN_PATH: CAPTAIN_PATH, SEED_DRONE_PATH: SEED_DRONE_PATH, VAULT_DRONE_PATH: VAULT_DRONE_PATH, AMBER_THIEF_PATH: AMBER_THIEF_PATH, WING_SEAM: WING_SEAM, FORT_GATE: FORT_GATE, BAWOO_GATE: BAWOO_GATE, BEACON: BEACON, LAKE_SEAL: LAKE_SEAL, BAWOO_LAKE: BAWOO_LAKE, BEACON_DIRS: BEACON_DIRS, defendSlots: defendSlots,
-    on: on, anchorOf: anchorOf, npcPos: npcPos, visible: visible, targetOf: targetOf, trackText: trackText, listHtml: listHtml,
+    on: on, anchorOf: anchorOf, npcPos: npcPos, visible: visible, targetOf: targetOf, _offScaled: offScaled, trackText: trackText, listHtml: listHtml,
     state: sv, chapter: chapter, step: step, locked: locked, done: done, keyOf: keyOf, gathered: gathered,
     advance: advance, check: check, stepFollow: stepFollow, nearTalk: nearTalk, pickTalk: pickTalk, tapTalk: tapTalk, talkStart: talkStart, talking: talking, next: next,
     lineFull: lineFull, curLine: curLine, reveal: reveal, talkShot: talkShot,

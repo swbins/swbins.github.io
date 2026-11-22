@@ -447,6 +447,12 @@
     var t = isVroid(pool) && tuneOf('mode2d.self8', 1) && global.DG && global.DG.assets3dIds && global.DG.assets3dIds.self2d8;
     return (t && t[bare(pool).slice(VPRE.length)]) || null;
   }
+  /* W-0776 사용자 11-22 「vroid 캐릭터 안씀」 — 맨 풀(옛 K-0015 시트 sprites2d_sheets·공장 시트)도 자체 몸 표에 있으면 그 사람의 자체 시트로(VPRE 를 붙여 같은 8방향 길). 손잡이 mode2d.self8 0 = 옛 길 */
+  function selfPool(pool) {
+    if (typeof pool !== 'string' || isVroid(pool) || isCrea(pool) || !tuneOf('mode2d.self8', 1)) { return pool; }
+    var t = global.DG && global.DG.assets3dIds && global.DG.assets3dIds.self2d8;
+    return t && t[bare(pool)] ? VPRE + pool : pool;
+  }
   function sheet8(pool) {
     var sf = selfOf(pool); if (sf) { return [sf[1], sf[2]]; }
     var t = isVroid(pool) && global.DG && global.DG.assets3dIds && global.DG.assets3dIds.hero2d8;
@@ -517,6 +523,7 @@
 
   /** 풀 하나를 미리 받아 둔다(없으면 조용히 건너뜀) */
   function preload(pool, clips) {
+    pool = selfPool(pool);   // W-0776
     var sf = selfOf(pool);   // W-0771 자체 몸 시트가 있는 인물은 그 폴더(8방향 역할)로 — 옛 VRoid 3행 시트(characters2d/)를 헛받지 않게
     (clips || ['idle', 'walk', 'attack', 'hit', 'death']).forEach(function (c) { if (sf) { getImg(pool, roleOf(c, true), true); } else { getImg(pool, c); } });
   }
@@ -757,6 +764,7 @@
   function nowMs() { return global.performance && global.performance.now ? global.performance.now() : Date.now(); }
   function draw(ctx, o) {
     if (!ctx || !o || !o.pool || !isOn()) { return false; }
+    var sp0 = selfPool(o.pool); if (sp0 !== o.pool) { o.pool = sp0; }   // W-0776
     var c0 = C(), on = !(c0 && c0.tuned) || +c0.tuned('mode2d.fadeIn', 1);
     if (!on) { return draw0(ctx, o); }
     var k = o.pool, t = nowMs(), a0 = o.alpha, ok;
@@ -1063,12 +1071,16 @@
     if (o.alpha !== undefined) { ctx.globalAlpha = o.alpha; }
     if (heroBehind(ctx, o.x, o.y, w, h)) { ctx.globalAlpha *= tuneOf('mode2d.occludeA', 0.45); }   // W-0700 주인공을 가리는 앞 그림은 반투명
     ctx.imageSmoothingEnabled = true; hq(ctx); applyTone(ctx);
-    ctx.drawImage(e.img, b.sx, b.sy, b.sw, b.sh, o.x - w / 2, o.y - h, w, h);
+    var sk = sinkOf(o.id);   // W-0775
+    if (sk) { ctx.drawImage(e.img, b.sx, b.sy, b.sw, b.sh * (1 - sk), o.x - w / 2, o.y - h * (1 - sk), w, h * (1 - sk)); } else { ctx.drawImage(e.img, b.sx, b.sy, b.sw, b.sh, o.x - w / 2, o.y - h, w, h); }
     ctx.restore();
     return h || true;
   }
   /* 11-01 사용자 「모두 집들이 떠있는 느낌」 — 대각선 집은 그림의 맨 아래 점(앞 모서리)이 발 밑이라 타원 하나로는 바닥 면이 안 눌린다.
      폭이 높이의 0.8 이상인 그림(건물류)엔 바닥 면 크기의 접지 그림자를 한 겹 더 깐다(발 밑보다 살짝 위·납작·가장자리로 옅어짐). 손잡이 mode2d.spriteGround 0 = 옛 */
+  /* W-0775 사용자 11-22 「건물들이 떠있는 느낌」 — 바위 그림(3D 구운 것)은 밑면·옆면 아래가 보여 땅 위에 떠 있는 섬 같았다 — 그림 아래 얼마를 잘라(땅에 묻힌 것처럼) 발 줄에 맞춘다. 손잡이 mode2d.sink 0 = 옛 그림 */
+  var SINK = { puzzle_stone_01: 0.25, puzzle_stone_01_open: 0.25, rock_moss_01: 0.26, rock_outcrop_01: 0.3, rock_large_01: 0.12, rock_large_02: 0.12 };
+  function sinkOf(id) { return SINK[id] && tuneOf('mode2d.sink', 1) ? SINK[id] : 0; }
   function groundShadow(ctx, x, y, w, h) {
     if (!tuneOf('mode2d.spriteGround', 1) || !(w >= h * 0.8)) { return; }
     var rx = w * 0.5, g;
@@ -1134,7 +1146,7 @@
   }
 
   global.DG = global.DG || {};
-  global.DG.mode2d = { heroAt: heroAt, _selfOf: selfOf, _sheet8: sheet8, _spec16: spec16, _src8: function (pool, clip) { var e = getImg(pool, clip, true); return e.img ? e.img.src : ''; }, hero: function () { return heroLast; }, bmpStats: function () { return { n: BMP.n, live: BL.length, mb: Math.round(BMP.px * 4 / 1048576 * 10) / 10, fail: BMP.fail, closed: BMP.closed, remade: BMP.remade }; }, _bmpSweep: bmpSweep, _keepBmp: keepBmp,
+  global.DG.mode2d = { heroAt: heroAt, _selfOf: selfOf, _selfPool: selfPool, _sinkOf: sinkOf, _sheet8: sheet8, _spec16: spec16, _src8: function (pool, clip) { var e = getImg(pool, clip, true); return e.img ? e.img.src : ''; }, hero: function () { return heroLast; }, bmpStats: function () { return { n: BMP.n, live: BL.length, mb: Math.round(BMP.px * 4 / 1048576 * 10) / 10, fail: BMP.fail, closed: BMP.closed, remade: BMP.remade }; }, _bmpSweep: bmpSweep, _keepBmp: keepBmp,
     labels: labels,
     scaleOf: scaleOf, scaleOn: scaleOn, shadow: shadow, stepDust: stepDust, setTone: setTone, tone: function () { return toneF; }, SCALE: SCALE, BEAST: BEAST,   // W-0368 setTone·tone ·   // W-0349
     mark: mark, markSrc: markSrc, MARK: MARK, tintSheet: tintSheet, _sheetStats: function () { return { n: Object.keys(sheets).filter(function (x) { return sheets[x]; }).length, px: sheetPx, cap: SHEET_CAP, made: sheetSt.made, evict: sheetSt.evict, rows: sheetSt.rows, cells: sheetSt.cells, ms: Math.round(sheetSt.ms) }; }, poolBase: poolBase, sharedSheets: sharedSheets, markMisses: function () { return Object.assign({}, markMiss); },   // W-0350

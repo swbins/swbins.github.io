@@ -211,8 +211,26 @@
 
   /** 영웅 몸 레시피(asset3d `heroRecipe` 맨 앞) — 통일 GLB 가 있으면 `{key, body}`(몸짓은 몸에서 읽어 굽는다 = anim-own), 없으면 null */
   function heroRecipe(ref) {
-    var id = refId(ref), u = url('hero', id);
+    var id = refId(ref), sb = heroSelfOf(id);
+    if (sb) { return sb; }   // W-0773 자체 몸이 있으면 VRoid 통일 몸(characters3d) 대신
+    var u = url('hero', id);
     return u ? { key: 'uni:' + id, body: u } : null;
+  }
+  /* W-0773 K-0289 도감 인물 → 자체 몸(표 assets3d-ids heroSelf = {id: 몸}, 주역 30 = 제 몸 · 470 = 원형 66). 동작은 몸 짝 _anims(54) — 역할 몸 18 은 _ual(15).
+     손잡이 assets3d.selfHero 1(기본) · 0 = 옛 characters3d(VRoid). 시험 전·손잡이 끔이면 null */
+  var SELF_UAL = null;
+  function heroSelfOf(id) {
+    var C = global.DG && global.DG.core, T = global.DG && global.DG.assets3dIds && global.DG.assets3dIds.heroSelf, b = T && T[id];
+    if (!b) { return null; }
+    if (state === 'init') { probe(); }
+    if (state !== 'ok' || !tunedOn() || (C && C.tuned && (!+C.tuned('assets3d.selfHero', 1) || !+C.tuned('assets3d.selfBody', 1)))) { return null; }
+    return selfHeroRec(b, root);
+  }
+  /** 몸 id → 레시피(순수 — 진단이 본다). 역할 몸 18 은 동작 _ual(15), 주역·원형은 _anims(54) */
+  function selfHeroRec(b, r) {
+    if (!SELF_UAL) { SELF_UAL = {}; SELF_M.concat(SELF_F).forEach(function (k) { SELF_UAL[k] = 1; }); }
+    var base = r + 'characters-self/' + b;
+    return { key: 'self:' + b, body: base + '.glb', anim: base + (SELF_UAL[b] ? '_ual.glb' : '_anims.glb'), self: b };
   }
   /* W-0672 K-0287 자체 사람 몸 18(characters-self) — 통일 몸·빌린 몸이 없는 사람(땅 사람·고정 인물·빌리기 제외)이 VRoid 샘플·QRPG·MPFB·외부 고정 몸 대신 선다.
      동작은 몸 짝 `_ual`(15 — idle·walk·jog·sprint·sword_attack…, 같은 뼈) 을 rec.anim 으로 — 판 asset3d 의 「몸 ≠ 동작 파일 → retargetInto」 길. 손잡이 `assets3d.selfBody` 0 = 옛 길 */
@@ -303,7 +321,7 @@
   }
 
   global.DG.assets3d = {
-    hq: hq, selfPick: selfPick, selfRecipe: selfRecipe, selfRecipeOf: selfRecipeOf, SELF_M: SELF_M, SELF_F: SELF_F, url: url, spriteUrl: spriteUrl, creatureFor: creatureFor, modelShared: modelShared, CREATURE_OF: CREATURE_OF, CREATURE_DIR_OF: CREATURE_DIR_OF, CREATURE_SKIP: CREATURE_SKIP, CREATURE_DIR_SKIP: CREATURE_DIR_SKIP, probe: probe, heroRecipe: heroRecipe, borrowRecipe: borrowRecipe, borrowPick: borrowPick, borrowTable: borrowTable, applyProps: applyProps,
+    hq: hq, selfPick: selfPick, selfRecipe: selfRecipe, selfRecipeOf: selfRecipeOf, heroSelfOf: heroSelfOf, selfHeroRec: selfHeroRec, SELF_M: SELF_M, SELF_F: SELF_F, url: url, spriteUrl: spriteUrl, creatureFor: creatureFor, modelShared: modelShared, CREATURE_OF: CREATURE_OF, CREATURE_DIR_OF: CREATURE_DIR_OF, CREATURE_SKIP: CREATURE_SKIP, CREATURE_DIR_SKIP: CREATURE_DIR_SKIP, probe: probe, heroRecipe: heroRecipe, borrowRecipe: borrowRecipe, borrowPick: borrowPick, borrowTable: borrowTable, applyProps: applyProps,
     has: function (kind, id) { return !!set(kind)[id]; },
     /** 진단·점검용 — 'init' | 'probing' | 'ok' | 'fail' */
     state: function () { return state; },
