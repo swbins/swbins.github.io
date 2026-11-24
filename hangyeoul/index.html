@@ -41,9 +41,13 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
   </section>
 
   <section class="hero">
-    <figure class="film" id="demo">
-      <img src="assets/poster.jpg" alt="제1화 「눈 내린 산장, 사라진 그림」 첫 화면 — 눈 덮인 산장 그림과 사건 시작 단추" width="1280" height="720" style="height:auto;aspect-ratio:16/9;object-fit:contain">
-      <figcaption class="cap">실제 앱 화면</figcaption>
+    <figure class="film promo" id="demo">
+      <video src="assets/promo.mp4" poster="assets/promo.jpg" controls playsinline preload="metadata" aria-label="한겨울 사진관 홍보 영상, 34초 — 사건 목록, 장소 살피기·심문·단서판 (소리 있음)"></video>
+      <figcaption class="cap">실제 앱 화면으로 만든 홍보 영상 · 소리 있음</figcaption>
+      <details class="more">
+        <summary>자세히 보기 — 앱 화면 사진</summary>
+        <img src="assets/poster.jpg" alt="제1화 「눈 내린 산장, 사라진 그림」 첫 화면 — 눈 덮인 산장 그림과 사건 시작 단추" width="1280" height="720" loading="lazy" style="height:auto;aspect-ratio:16/9;object-fit:contain;margin-top:10px">
+      </details>
     </figure>
 
     <div>
