@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>쉬어가기 — 심리테스트 · 추리 게임 · 오늘의 운세 · 타로</title>
-<meta name="description" content="일하다 잠깐 쉬어 가는 곳. 「나는 어떤 일 유형?」 「나의 회의 유형」 「점심 메뉴로 보는 일 스타일」 심리테스트 셋, 폭설에 갇힌 산장에서 사라진 그림을 쫓는 추리 게임 「한겨울 사진관 사건 수첩」, 날마다 바뀌는 오늘의 운세, 타로 한 장·세 장.">
+<title>쉬어가기 — 심리테스트 · 미니게임 · 오늘의 운세 · 타로</title>
+<meta name="description" content="일하다 잠깐 쉬어 가는 곳. 「나는 어떤 일 유형?」 「나의 회의 유형」 「점심 메뉴로 보는 일 스타일」 심리테스트 셋, 3D 미니게임 광장, 날마다 바뀌는 오늘의 운세, 타로 한 장·세 장.">
 <link rel="canonical" href="https://swbins.github.io/rest/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="swbins">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:url" content="https://swbins.github.io/rest/">
 <meta property="og:title" content="쉬어가기 — 나는 어떤 일 유형?">
-<meta property="og:description" content="심리테스트 셋(일 유형·회의 유형·점심 메뉴), 추리 게임 「눈 내린 산장, 사라진 그림」, 날마다 바뀌는 오늘의 운세, 타로 한 장·세 장.">
+<meta property="og:description" content="심리테스트 셋(일 유형·회의 유형·점심 메뉴), 3D 미니게임 광장, 날마다 바뀌는 오늘의 운세, 타로 한 장·세 장.">
 <meta property="og:image" content="https://swbins.github.io/rest/assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="../spine.css">
@@ -276,7 +276,7 @@ h1 { font-size: clamp(36px, 5.6vw, 64px); line-height: 1.12; }
   <header class="top">
     <a class="brand" href="../">swbins</a>
     <div class="right">
-      <nav aria-label="놀이"><a href="#test">심리테스트</a><a href="case/">추리 게임</a><a href="../mini/">미니게임</a><a href="#fortune">오늘의 운세</a><a href="#tarot">타로</a><a href="../">앱</a></nav>
+      <nav aria-label="놀이"><a href="#test">심리테스트</a><a href="../mini/">미니게임</a><a href="#fortune">오늘의 운세</a><a href="#tarot">타로</a><a href="../">앱</a></nav>
       <div class="theme" role="group" aria-label="화면 밝기"><button type="button" data-theme-btn="auto">자동</button><button type="button" data-theme-btn="light">밝게</button><button type="button" data-theme-btn="dark">어둡게</button></div>
     </div>
   </header>
@@ -303,15 +303,11 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
       </div>
     </section>
 
-    <div class="games-h"><h2>오늘의 놀이</h2><span>일곱 개 · 아무거나 먼저</span></div>
-    <section class="games" aria-label="놀이 일곱 개">
+    <div class="games-h"><h2>오늘의 놀이</h2><span>여섯 개 · 아무거나 먼저</span></div>
+    <section class="games" aria-label="놀이 여섯 개">
       <a class="game" href="#test">
         <figure><img src="assets/cover-test.webp" alt="돋보기 속 다른 내 모습" width="640" height="640" loading="lazy"><span class="time">2분 · 질문 9개</span></figure>
         <div class="txt"><h3>나는 어떤 일 유형?</h3><p>회사·집에서 흔히 겪는 장면 아홉 개. 제일 나 같은 걸 고르면 됩니다.</p><span class="btn start">시작</span></div>
-      </a>
-      <a class="game night" href="case/">
-        <figure><img src="case/img/cover.webp" alt="눈 덮인 밤 산장 앞, 필름 카메라를 든 탐정 한겨울과 고양이 도토리" width="1216" height="832" loading="lazy"><span class="time">10분 추리 게임</span><span class="copy">폭설에 갇힌 산장.<br>공개 전 그림이 사라졌다.</span></figure>
-        <div class="txt"><h3>한겨울 사진관 사건 수첩</h3><p>사진관 탐정과 고양이 조수가 되어 단서를 모으고, 네 사람을 심문하고, 범인을 지목하세요. 지금 제5화까지 — 진행은 저절로 저장돼요.</p><span class="btn main start">사건 시작</span></div>
       </a>
       <a class="game" href="../mini/plaza/">
         <figure><img src="assets/cover-mini.webp" alt="밤 골목의 주황 천막 포장마차, 탁자에 앉은 손님들" width="640" height="440" loading="lazy"><span class="time">1~2분 · 계속 늘어남</span></figure>
@@ -499,7 +495,6 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
   var HASH_SEC = { test: 'test', meeting: 'test', lunch: 'test', fortune: 'fortune', tarot: 'tarot' };
   var TEST_OF = { test: 'work', meeting: 'meeting', lunch: 'lunch' };
   function own(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
-  if (location.hash === '#case') { location.replace('case/'); return; }   // 옛 「야근 범인」 공유 주소 → 새 추리 게임
   var cameFromHome = false;
   function route() {
     var h = location.hash.slice(1);
