@@ -81,7 +81,7 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
   </section>
 
   <footer>
-    <span>Nameless World · <a href="../">다른 앱</a></span>
+    <span>Nameless World · <a href="https://github.com/swbins/nameless-world/blob/main/PRIVACY.md">개인정보 처리 안내</a> · <a href="https://github.com/swbins/nameless-world/blob/main/TERMS.md">이용 약관</a> · <a href="https://github.com/swbins/nameless-world/blob/main/THIRD-PARTY-NOTICES.md">오픈소스 고지</a> · <a href="https://github.com/swbins/nameless-world/issues">문의·버그</a> · <a href="../">다른 앱</a></span>
     <span>방문 수는 쿠키 없는 <a href="https://www.goatcounter.com">GoatCounter</a> 로만 셉니다(이 페이지만 — 앱은 아무것도 세지 않아요).</span>
   </footer>
   </div>
@@ -89,7 +89,7 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
 
 <script>
 // 무료판 받는 곳 — 저장소를 만들면 이 줄만 바꾼다
-var RELEASE_URL = '';   // 릴리스를 올리면 https://github.com/swbins/nameless-world/releases/latest
+var RELEASE_URL = 'https://github.com/swbins/nameless-world/releases/latest';
 document.querySelectorAll('[data-release]').forEach(function (a) {
   if (RELEASE_URL) a.href = RELEASE_URL;
   else a.addEventListener('click', function (e) { e.preventDefault(); alert('아직 받는 곳이 없습니다 — 무료판을 올리면 열립니다.'); });

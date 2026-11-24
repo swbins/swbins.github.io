@@ -102,7 +102,7 @@ h1 { font-size: clamp(34px, 5.4vw, 60px); line-height: 1.16; }
   <header class="top">
     <a class="brand" href="./">swbins</a>
     <div class="right">
-      <nav aria-label="앱"><a href="#taskhand">Taskhand</a><a href="#dungilog">둥이로그</a><a href="#usage-tray">Usage Tray</a><a href="rest/">쉬어가기</a><a href="https://github.com/swbins">GitHub</a></nav>
+      <nav aria-label="앱"><a href="#taskhand">Taskhand</a><a href="#dungilog">둥이로그</a><a href="#usage-tray">Usage Tray</a><a href="#games">게임</a><a href="rest/">쉬어가기</a><a href="https://github.com/swbins">GitHub</a></nav>
       <div class="theme" role="group" aria-label="화면 밝기"><button type="button" data-theme-btn="auto">자동</button><button type="button" data-theme-btn="light">밝게</button><button type="button" data-theme-btn="dark">어둡게</button></div>
     </div>
   </header>
@@ -191,6 +191,52 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
     </article>
   </section>
 
+  <section class="apps" id="games" aria-labelledby="games-h">
+    <h2 id="games-h">게임 세 개</h2>
+
+    <article class="app" id="hangyeoul">
+      <div>
+        <h3><a href="hangyeoul/">한겨울 사진관</a></h3>
+        <span class="tag">사진관 탐정의 추리 게임</span>
+        <p>사진관 탐정 한겨울과 고양이 도토리가 되어 장소를 살피고, 사람들을 심문하고, 범인을 지목해요. 한 사건에 10~20분.</p>
+        <p class="meta">추리 · 시즌 1 열 사건 + 번외편 열 편 · 인터넷 없어도</p>
+        <div class="acts">
+          <a class="btn main" href="hangyeoul/#get">받기</a>
+          <a class="btn" href="hangyeoul/">영상으로 보기</a>
+        </div>
+      </div>
+      <a class="shot" href="hangyeoul/" tabindex="-1" aria-hidden="true"><img src="hangyeoul/assets/poster.jpg" alt="" loading="lazy"></a>
+    </article>
+
+    <article class="app" id="nunmaeul">
+      <div>
+        <h3><a href="nunmaeul/">눈마을</a></h3>
+        <span class="tag">눈 내리는 3D 마을의 추리</span>
+        <p>작은 눈마을을 탐정이 되어 걸으며 단서를 줍고, 미행하고, 사진으로 순간을 잡아 범인을 찍어요. 같은 사건을 하는 사람들이 마을에서 서로 보여요.</p>
+        <p class="meta">3D 추리 · 다 같이 걷기</p>
+        <div class="acts">
+          <a class="btn main" href="nunmaeul/#get">받기</a>
+          <a class="btn" href="nunmaeul/">영상으로 보기</a>
+        </div>
+      </div>
+      <a class="shot" href="nunmaeul/" tabindex="-1" aria-hidden="true"><img src="nunmaeul/assets/poster.jpg" alt="" loading="lazy"></a>
+    </article>
+
+    <article class="app" id="nameless-world">
+      <div>
+        <h3><a href="nameless-world/">Nameless World</a></h3>
+        <span class="tag">문을 열면 다른 곳</span>
+        <p>분수 광장 둘레의 문을 골라 들어가면 포장마차, 남극 기지, 우주정거장, 조선 장터. 장소마다 1~2분이면 끝나는 놀이가 있어요.</p>
+        <p class="meta">3D 미니게임 · 다 같이 걷기</p>
+        <div class="acts">
+          <a class="btn main" href="nameless-world/#get">받기</a>
+          <a class="btn" href="nameless-world/">영상으로 보기</a>
+        </div>
+      </div>
+      <a class="shot" href="nameless-world/" tabindex="-1" aria-hidden="true"><img src="nameless-world/assets/poster.jpg" alt="" loading="lazy"></a>
+    </article>
+  </section>
+
   <a class="rest" href="rest/">
     <h2>쉬어가기</h2>
     <p>앱 말고, 잠깐 놀다 가는 곳 — 「나는 어떤 일 유형?」 테스트 · 추리 게임 「한겨울 사진관 사건 수첩」 · 3D 「추리마을」·출근 도장부터 남극·우주까지 「미니게임」 · 오늘의 운세 · 타로 한 장</p>
@@ -198,7 +244,7 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
 
   <footer>
     <span>swbins · <a href="https://github.com/swbins">GitHub</a></span>
-    <span>문의·버그: 각 앱 저장소의 Issues — <a href="https://github.com/swbins/taskhand/issues">Taskhand</a> · <a href="https://github.com/swbins/dungilog/issues">둥이로그</a> · <a href="https://github.com/swbins/usage-tray/issues">Usage Tray</a></span>
+    <span>문의·버그: 각 앱 저장소의 Issues — <a href="https://github.com/swbins/taskhand/issues">Taskhand</a> · <a href="https://github.com/swbins/dungilog/issues">둥이로그</a> · <a href="https://github.com/swbins/usage-tray/issues">Usage Tray</a> · <a href="https://github.com/swbins/hangyeoul/issues">한겨울 사진관</a> · <a href="https://github.com/swbins/nunmaeul/issues">눈마을</a> · <a href="https://github.com/swbins/nameless-world/issues">Nameless World</a></span>
     <p class="legal">개인이 만든 독립 앱으로, 이름이 나오는 AI·플랫폼 회사들과 제휴·보증 관계가 없습니다. 방문 수는 쿠키 없는 <a href="https://www.goatcounter.com">GoatCounter</a> 로만 셉니다.</p>
   </footer>
   </div>
