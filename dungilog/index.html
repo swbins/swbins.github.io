@@ -41,9 +41,13 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
   </section>
 
   <section class="hero">
-    <figure class="film" id="demo">
-      <video src="assets/demo.webm" poster="assets/poster.png" controls muted playsinline preload="metadata" aria-label="둥이로그 소개 영상, 38초 — 체험단 메모가 6곳 글이 되고 마감·장부까지"></video>
-      <figcaption class="cap">실제 앱 화면을 녹화한 38초 영상 — 글 내용은 시연용으로 미리 써 둔 예시예요</figcaption>
+    <figure class="film promo" id="demo">
+      <video src="assets/promo.mp4" poster="assets/promo.jpg" controls playsinline preload="metadata" aria-label="둥이로그 홍보 영상, 36초 — 메모 몇 줄이 6곳 글로 (소리 있음)"></video>
+      <figcaption class="cap">실제 앱 화면으로 만든 홍보 영상 · 소리 있음</figcaption>
+      <details class="more">
+        <summary>자세히 보기 — 가로 시연 영상</summary>
+        <video src="assets/demo.webm" poster="assets/poster.png" controls muted playsinline preload="none" aria-label="둥이로그 시연 영상, 38초 — 체험단 메모가 6곳 글이 되고 마감·장부까지"></video>
+      </details>
     </figure>
 
     <div>

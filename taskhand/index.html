@@ -41,9 +41,13 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
   </section>
 
   <section class="hero">
-    <figure class="film" id="demo">
-      <video src="assets/demo.webm" poster="assets/poster.png" controls muted playsinline preload="metadata" aria-label="Taskhand 소개 영상, 42초"></video>
-      <figcaption class="cap">실제 앱 화면을 녹화한 소개 영상</figcaption>
+    <figure class="film promo" id="demo">
+      <video src="assets/promo.mp4" poster="assets/promo.jpg" controls playsinline preload="metadata" aria-label="Taskhand 홍보 영상, 43초 — 손 안 대고 주문 확인까지 (소리 있음)"></video>
+      <figcaption class="cap">실제 앱 화면으로 만든 홍보 영상 · 소리 있음</figcaption>
+      <details class="more">
+        <summary>자세히 보기 — 가로 시연 영상</summary>
+        <video src="assets/demo.webm" poster="assets/poster.png" controls muted playsinline preload="none" aria-label="Taskhand 시연 영상, 42초 — 실제 앱 화면"></video>
+      </details>
     </figure>
 
     <div>
