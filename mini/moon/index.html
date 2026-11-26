@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>달 기지</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 지구돋이에서 들려주는 한 줄 사실 — 날짜마다 하나씩 차례로
+const FACT = [
+  '달 중력은 지구의 약 6분의 1이에요. 같은 힘으로 뛰면 여섯 배쯤 높이, 여섯 배쯤 오래 떠 있어요.',
+  '달에는 공기가 없어서 소리가 전해지지 않아요. 우주인들은 무전으로 이야기해요.',
+  '달은 지구에 늘 같은 면만 보여 줘요. 자전하는 시간과 지구를 도는 시간이 같아서예요.',
+  '그래서 달의 앞면에서 보면 지구는 하늘의 한자리에 거의 멈춰 있어요. 뜨고 지지 않아요.',
+  '1969년 7월 아폴로 11호의 닐 암스트롱과 버즈 올드린이 처음으로 달 위를 걸었어요.',
+  '달 표면은 낮엔 100도 넘게 오르고, 밤엔 영하 170도 안팎까지 내려가요.',
+  '달에서 해가 떠서 다시 뜰 때까지는 지구 시간으로 약 29.5일이에요.',
+  '달에는 바람도 비도 없어서 발자국이 아주 오래 남아요.',
+  '달의 깃발은 펄럭이지 않아요. 공기가 없어서 아폴로 깃발은 가로대로 펼쳐 세웠어요.',
+  '달 먼지는 유리 조각처럼 날카롭고 장비에 잘 달라붙어요.',
+  '달의 크레이터는 대부분 운석이 부딪혀서 생겼어요.',
+  '달은 해마다 지구에서 약 3.8cm씩 멀어져요.',
+  '지구에서 달까지는 평균 약 38만 4천km예요.',
+  '1968년 아폴로 8호 우주인이 달 궤도에서 「지구돋이」 사진을 찍었어요.',
+  '아폴로 17호(1972년)가 지금까지 마지막으로 사람이 달에 내린 임무예요.',
+  '달에는 대기가 거의 없어서 낮에도 하늘이 까매요.',
+];
+const SYN = 29.530588853;   // 삭망월(일)
+function daily(d) {   // 오늘 달 위에서 보는 지구 — 날짜로만 정해진다
+  const dn = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
+  const age = (((d.getTime() / 864e5 - Date.UTC(2000, 0, 6, 18, 14) / 864e5) % SYN) + SYN) % SYN, ph = age / SYN * Math.PI * 2;
+  const lit = Math.round((1 + Math.cos(ph)) * 50);
+  const word = lit >= 94 ? '꽉 찬 둥근 모양' : lit >= 65 ? '볼록한 모양' : lit >= 35 ? '반쪽 모양' : lit >= 6 ? '가는 초승 모양' : '거의 안 보이는 모양';
+  return {dn, ph, lit, word};
+}
+const S = {pulse: 0};
+function rng(seed) { return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+
+start({
+  key: 'moon', title: '달 기지', enter: '우주복 입고 나가기', time: 'night', nickIcon: '🌕',
+  nick: [['가볍게 뛰는', '지구를 보는', '먼지 묻은', '산소가 넉넉한', '조용한', '느릿한'], ['월면차', '착륙선', '헬멧', '크레이터', '무전기', '발자국']],
+  intro: '<p>회색 먼지 위의 작은 달 기지.<br>깡충 뛰고, 발자국 남기고, 지구 한 번 보고 가요.</p>',
+  floor: {w: 30, d: 26, c1: '#8d8b87', c2: '#a09e99', around: '#64625f'},
+  bg: {night: 0x000000}, startPos: [0, 6], cam: {h: 10, back: 12},
+  playerLook: {coat: 0xf2f2ee, pants: 0xe2e2de, hat: {type: 'beanie', c: 0xf2f2ee}, goggles: true, scarf: 0xc9472f},
+  build(c) {
+    const {box, cyl, ball, glowBall, sign, solid, fx, THREE, scene, npc} = c;
+    const D = daily(c.now()), R = rng(7);
+    // 달 햇빛 — 그림자 없이 하얗게 한 줄기
+    const lit = new THREE.DirectionalLight(0xfff4e0, 1.1); lit.position.set(-16, 14, 8); scene.add(lit);
+    // 지구 — 오늘 해가 비치는 만큼만 환하다
+    const cv = document.createElement('canvas'); cv.width = 256; cv.height = 128; const g = cv.getContext('2d');
+    g.fillStyle = '#1f5fb0'; g.fillRect(0, 0, 256, 128);
+    for (let i = 0; i < 16; i++) { g.fillStyle = i % 4 === 0 ? '#c8b87a' : '#4f9a4a'; g.beginPath(); g.ellipse(R() * 256, 20 + R() * 88, 8 + R() * 22, 6 + R() * 14, R() * 3, 0, 7); g.fill(); }
+    g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 5; g.lineCap = 'round';
+    for (let i = 0; i < 12; i++) { const x = R() * 256, y = 10 + R() * 108; g.beginPath(); g.moveTo(x, y); g.lineTo(x + 18 + R() * 30, y + (R() - .5) * 8); g.stroke(); }
+    const tex = new THREE.CanvasTexture(cv); tex.wrapS = THREE.RepeatWrapping;
+    const Lv = new THREE.Vector3(Math.sin(D.ph), 0.1, Math.cos(D.ph)).normalize();
+    const em = new THREE.ShaderMaterial({uniforms: {L: {value: Lv}, map: {value: tex}, rot: {value: 0}},
+      vertexShader: 'varying vec3 vN; varying vec2 vUv; void main(){ vN = normalize(mat3(modelMatrix) * normal); vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: 'uniform vec3 L; uniform sampler2D map; uniform float rot; varying vec3 vN; varying vec2 vUv; void main(){ float l = dot(normalize(vN), normalize(L)); float k = 0.07 + 0.93 * smoothstep(-0.05, 0.35, l); gl_FragColor = vec4(texture2D(map, vec2(vUv.x + rot, vUv.y)).rgb * k, 1.0); }'});
+    const earth = new THREE.Mesh(new THREE.SphereGeometry(3, 32, 20), em); earth.position.set(-11, 3.6, -19); scene.add(earth);
+    const halo = new THREE.Mesh(new THREE.SphereGeometry(3.3, 24, 16), new THREE.MeshBasicMaterial({color: 0x6fb0ff, transparent: true, opacity: 0.12, side: THREE.BackSide, fog: false})); halo.position.copy(earth.position); scene.add(halo);
+    fx.push((dt) => { em.uniforms.rot.value += dt * 0.012; S.pulse = Math.max(0, S.pulse - dt); const s = 1 + Math.sin(Math.min(1, S.pulse / 1.6) * Math.PI) * 0.12; earth.scale.setScalar(s); halo.scale.setScalar(s); });
+    // 울퉁불퉁한 바닥 — 낮은 돌과 크레이터(납작한 원기둥 테두리)
+    for (let i = 0; i < 30; i++) { const x = (R() - .5) * 28, z = (R() - .5) * 24, r = 0.18 + R() * 0.35; const m = ball(r, R() < .5 ? 0x85827d : 0x77746f, x, 0.04, z); m.scale.y = 0.45; }
+    for (const [x, z, r] of [[-10.5, 7, 2.4], [10.5, 8.5, 1.7], [-3, -1, 1.3], [6.5, 1, 1.0], [-13, -3, 1.5]]) {
+      cyl(r, r, 0.1, 0xa8a6a1, x, 0.05, z, undefined, 24); cyl(r * 0.78, r * 0.78, 0.12, 0x55534f, x, 0.06, z, undefined, 24); }
+    // 하얀 돔 거주동 둘 + 이음 통로
+    const white = new THREE.MeshLambertMaterial({color: 0xf2f2ee});
+    for (const [x, z, r] of [[-4, -8, 3.2], [4, -9, 2.2]]) {
+      const d = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), white); d.position.set(x, 0, z); d.castShadow = d.receiveShadow = true; scene.add(d);
+      cyl(r + 0.1, r + 0.1, 0.15, 0xbfbdb8, x, 0.07, z, undefined, 28); }
+    cyl(0.6, 0.6, 2.6, 0xe4e4e0, 0.5, 0.6, -8.5).rotation.z = Math.PI / 2;
+    solid(-4, -8, 6.4, 6.4); solid(4, -9, 4.4, 4.4);
+    const door = new THREE.Mesh(new THREE.PlaneGeometry(1, 1.6), new THREE.MeshBasicMaterial({color: 0xffd27a})); door.position.set(-4, 0.85, -4.8); scene.add(door);
+    const dl = new THREE.PointLight(0xffd27a, 6, 8); dl.position.set(-4, 1.4, -4); scene.add(dl);
+    for (const [x, y, z] of [[-5.2, 1.8, -5.6], [-2.8, 1.8, -5.6], [4, 1.2, -7.15]]) glowBall(0.22, 0xffe9a8, x, y, z, 0);
+    // 간판 — 뒤쪽
+    for (const x of [-0.9, 2.9]) cyl(0.05, 0.05, 2.5, 0x9a9890, x, 1.25, -6.6);
+    sign(['고요의 바다 기지', '잠깐 쉬었다 가요'], 4.2, 0.95, '#20242c', '#f2efe6', 1, 3, -6.6, 0, [44, 24]);
+    // 착륙선 — 금박 몸통과 비스듬한 네 다리
+    const LX = 9.5, LZ = -3.5;
+    cyl(1.1, 1.2, 1.1, 0xd8b04a, LX, 2.0, LZ, undefined, 8); cyl(0.8, 1.0, 0.7, 0xe8e4dc, LX, 2.9, LZ, undefined, 8); box(0.9, 0.5, 0.9, 0x8a8a86, LX, 3.5, LZ);
+    for (const [sx, sz] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+      const a = new THREE.Vector3(0, 1.7, 0), b = new THREE.Vector3(sx * 1.9, 0.05, sz * 1.9), v = b.clone().sub(a), L = v.length();
+      const leg = cyl(0.06, 0.06, L, 0xbfbcb6, LX + (a.x + b.x) / 2, (a.y + b.y) / 2, LZ + (a.z + b.z) / 2); leg.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), v.normalize());
+      cyl(0.4, 0.4, 0.06, 0xd0cdc6, LX + b.x, 0.03, LZ + b.z); }
+    solid(LX, LZ, 3.2, 3.2);
+    // 깃발 — 가로대로 펼쳐 세웠다. 바람이 없으니 펄럭이지 않는다
+    cyl(0.5, 0.5, 0.06, 0xbfbdb8, -9, 0.03, -3); cyl(0.05, 0.05, 3.6, 0xdddddd, -9, 1.8, -3); box(1.5, 0.04, 0.04, 0xdddddd, -8.25, 3.3, -3);
+    box(1.4, 0.9, 0.03, 0x2a4a9a, -8.25, 2.82, -3); box(1.4, 0.18, 0.04, 0xf2f2ee, -8.25, 2.82, -3); solid(-9, -3, 0.6, 0.6);
+    // 월면차
+    box(2.0, 0.35, 1.1, 0xcfcdc7, -9, 0.85, 3.5); box(0.5, 0.5, 0.7, 0x3a3f4a, -9.4, 1.2, 3.5); box(0.5, 0.5, 0.7, 0x3a3f4a, -8.5, 1.2, 3.5);
+    for (const [x, z] of [[-0.8, -0.65], [0.8, -0.65], [-0.8, 0.65], [0.8, 0.65]]) cyl(0.4, 0.4, 0.25, 0x4a4a4a, -9 + x, 0.4, 3.5 + z).rotation.x = Math.PI / 2;
+    cyl(0.03, 0.03, 1.1, 0x9a9890, -8.1, 1.5, 3.5); cyl(0.4, 0.4, 0.05, 0xe8e4dc, -8.1, 2.1, 3.5).rotation.x = 0.5; solid(-9, 3.5, 2.4, 1.6);
+    // 산소 탱크 쉼터
+    for (const dz of [-0.55, 0, 0.55]) { cyl(0.3, 0.3, 1.4, 0xe8e8e4, 9.2, 0.7, 4.5 + dz); cyl(0.2, 0.2, 0.25, 0x3a7ab0, 9.2, 1.5, 4.5 + dz); }
+    box(1.0, 0.7, 1.8, 0x6a6e76, 9.9, 0.35, 4.5); solid(9.4, 4.5, 2.2, 2.0);
+    // 태양광판 둘
+    for (const z of [-7, -9.4]) { const p = box(2.2, 0.06, 1.3, 0x1f3a6a, -12.5, 0.9, z); p.rotation.x = -0.5; cyl(0.05, 0.05, 0.9, 0x888888, -12.5, 0.45, z + 0.3); solid(-12.5, z, 2.4, 1.4); }
+    // 남겨 둔 발자국 — 바람이 없으니 이전에 남긴 것도 그대로
+    const prints = [];
+    function printAt(x, z, ry, saveIt) {
+      const p = new THREE.Group(); p.position.set(x, 0, z); p.rotation.y = ry; scene.add(p);
+      box(0.2, 0.03, 0.3, 0x4e4c49, 0, 0.02, 0.12, p); box(0.17, 0.03, 0.13, 0x4e4c49, 0, 0.02, -0.17, p);
+      prints.push(p); if (prints.length > 40) scene.remove(prints.shift());
+      if (saveIt) { c.DB.prints = [...(c.DB.prints || []), [+x.toFixed(2), +z.toFixed(2), +ry.toFixed(2)]].slice(-40); }
+    }
+    for (const [x, z, ry] of c.DB.prints || []) printAt(x, z, ry, false);
+    c.printAt = printAt; c.earthPulse = () => { S.pulse = 1.6; };
+    // 우주복 둘 — 하나는 가만히, 하나는 거주동 앞을 오간다
+    const look = {coat: 0xf2f2ee, pants: 0xe2e2de, hat: {type: 'beanie', c: 0xf2f2ee}, goggles: true, scarf: 0xd9902a};
+    npc(look, [[-6.5, 1.2]], {face: Math.PI / 2, idle: ['wave', 'stretch']});
+    npc({...look, scarf: 0x2f6f6a}, [[-1.5, -3.2], [5.5, -3.2]], {speed: 1.6, idle: ['stretch']});
+  },
+  lamps: [],
+  acts: [
+    {id: 'hop', icon: '🦘', label: '깡충 걷기', face: Math.PI, run(c, done) {
+      const p = c.player, sh = p.children.find(m => m.geometry && m.geometry.type === 'CircleGeometry'), DUR = 4.4, H = 3; let t = 0;
+      c.beep(440, .08); c.doAct(p, 'cheer');
+      const f = (dt) => { t += dt; const k = Math.min(1, t / DUR), s = (k * 2) % 1, y = k >= 1 ? 0 : 4 * H * s * (1 - s);
+        p.position.y = y; if (sh) { sh.position.y = 0.02 - y / 1.2; sh.scale.setScalar(1 / (1 + y * 0.25)); }
+        if (k >= 1) { c.fx.splice(c.fx.indexOf(f), 1); const n = c.count('hop'); c.doAct(p, 'wave');
+          c.toast(n === 1 ? '🦘 달 중력은 지구의 6분의 1. 같은 힘으로 여섯 배쯤 높이 떠요' : `🦘 ${n}번째 깡충. 내려오는 게 한참 걸려요`, 3200); setTimeout(done, 1400); } };
+      c.fx.push(f); }},
+    {id: 'steps', icon: '👣', label: '발자국', spot: [-4.5, 6.5], face: Math.PI / 2, run(c, done) {
+      const p = c.player, ex = 2 + Math.random() * 3, ez = 5.5 + Math.random() * 3.5; let last = [p.position.x, p.position.z], side = 1, made = 0, over = false;
+      c.toast('👣 바람이 없어서 자국이 흐려지지 않아요', 2000);
+      const f = () => { if (over) { c.fx.splice(c.fx.indexOf(f), 1); return; }
+        const dx = p.position.x - last[0], dz = p.position.z - last[1];
+        if (Math.hypot(dx, dz) >= 0.9) { const ry = p.rotation.y; c.printAt(p.position.x + Math.cos(ry) * 0.18 * side, p.position.z - Math.sin(ry) * 0.18 * side, ry, true); side = -side; made++; last = [p.position.x, p.position.z]; c.beep(150, .04, 0, 'sine', .03); } };
+      c.fx.push(f);
+      c.goTo(ex, ez, () => { over = true; c.save(); const n = c.count('steps'); c.doAct(p, 'stretch');
+        c.toast(`👣 오늘 ${n}번째 길. 지금까지 남긴 자국 ${(c.DB.prints || []).length}개 — 아주 오래 남아요`, 3200); setTimeout(done, 1800); }); }},
+    {id: 'earth', icon: '🌍', label: '지구돋이', face: Math.PI, run(c, done) {
+      const d = c.now(), D = daily(d), first = !c.today().earth; c.doAct(c.player, 'wave'); c.earthPulse(); c.beep(520, .1, 0, 'sine'); c.beep(780, .16, .12, 'sine'); c.count('earth');
+      setTimeout(() => c.dialog('지구돋이', `${c.hm(d)} · ${c.visits()}번째 온 날`,
+        `<p style="font-size:15px;margin:4px 0"><b>오늘의 지구</b>: 해가 비치는 면 ${D.lit}% · ${D.word}</p>
+         <p style="font-size:12px;color:#7a6e5e;margin:0">달에서 보는 지구도 달처럼 차고 기울어요. 지구에서 달이 안 보이는 날에 지구는 가장 둥글게 꽉 차 보여요.</p>
+         <p style="font-size:16px">「${FACT[D.dn % FACT.length]}」</p>` + (first ? '' : '<p style="color:#7a6e5e;font-size:13px">오늘의 지구와 한마디는 하루에 하나. 내일 또 와요.</p>'), [['잘 봤어요', done, 'main']]), 900); }},
+    {id: 'o2', icon: '🫧', label: '산소 채우기', spot: [7.4, 4.5], face: Math.PI / 2, run(c, done) {
+      c.play(`<h3>산소 탱크 채우기</h3>
+        <p style="font-size:13px;color:#7a6e5e">바늘이 초록 칸에 있을 때 「채우기」. 세 번 해요</p>
+        <div style="position:relative;height:34px;background:#2b3140;border:1.5px solid #2b2620;border-radius:6px;overflow:hidden"><div id="zn" style="position:absolute;top:0;bottom:0;background:#5bb26a;left:40%;width:20%"></div><div id="nd" style="position:absolute;top:0;bottom:0;width:5px;background:#fff8ec;left:0"></div></div>
+        <p id="tk" style="font-size:22px;margin:10px 0 2px;letter-spacing:6px">○ ○ ○</p><p id="msg" style="min-height:22px;font-size:14px"></p>
+        <div class="row" id="ro" style="justify-content:center"><button class="btn main" id="go">시작</button><button class="btn" id="qt">그만두기</button></div>`,
+        (el, close) => {
+          let dead = false, raf = 0, round = 0, hits = 0, zl = 0, zw = 0, t0 = 0, res = [];
+          const nd = el.querySelector('#nd'), zn = el.querySelector('#zn'), ro = el.querySelector('#ro'), msg = el.querySelector('#msg'), tk = el.querySelector('#tk');
+          const pos = () => { const per = [1.7, 1.4, 1.1][Math.min(round, 2)], x = ((performance.now() - t0) / 1000 / per) % 2; return x < 1 ? x : 2 - x; };
+          const quit = () => { dead = true; cancelAnimationFrame(raf); close(); done(); };
+          el.querySelector('#qt').onclick = quit;
+          const setZone = () => { zw = [0.22, 0.18, 0.14][round]; zl = 0.05 + Math.random() * (0.9 - zw); zn.style.left = zl * 100 + '%'; zn.style.width = zw * 100 + '%'; };
+          const finish = () => { dead = true; cancelAnimationFrame(raf);
+            const n = c.count('o2'); c.DB.o2best = Math.max(c.DB.o2best || 0, hits); c.save(); ro.innerHTML = '';
+            msg.innerHTML = hits === 3 ? '<b>세 통 가득!</b>' : `<b>${hits}/3통 채웠어요</b>`;
+            setTimeout(() => { close(); if (hits === 3) { c.doAct(c.player, 'cheer'); c.stamp('가득', '산소 세 통'); } else c.toast(`🫧 산소 ${hits}/3통. 한 번 더 채우고 가요`); setTimeout(done, 1600); }, 1300); };
+          const tick = () => { if (dead || !el.isConnected) return; nd.style.left = `calc(${pos() * 100}% - 2px)`; raf = requestAnimationFrame(tick); };
+          el.querySelector('#go').onclick = () => {
+            t0 = performance.now(); setZone(); ro.innerHTML = '<button class="btn main" id="fl" style="padding:10px 26px;font-size:16px">채우기</button><button class="btn" id="qt2">그만두기</button>';
+            ro.querySelector('#qt2').onclick = quit; msg.textContent = '';
+            setTimeout(() => { if (dead || !el.isConnected) return; while (round < 3) { res.push(0); round++; } tk.textContent = res.map(v => v ? '●' : '×').join(' '); finish(); }, 26000);   // 30초 안에 끝
+            ro.querySelector('#fl').onclick = () => { if (dead) return; const x = pos(), ok = x >= zl && x <= zl + zw; res.push(ok ? 1 : 0); if (ok) hits++; round++;
+              c.beep(ok ? 700 + round * 120 : 200, .1, 0, 'sine'); tk.textContent = [...res.map(v => v ? '●' : '×'), ...Array(3 - res.length).fill('○')].join(' ');
+              msg.textContent = ok ? '들어갔어요' : '비켜 갔어요'; if (round >= 3) finish(); else setZone(); };
+            tick(); };
+        }); }},
+  ],
+  recExtra: c => `<p style="font-size:13px;color:#7a6e5e">남긴 발자국 ${(c.DB.prints || []).length}개(최근 40개까지) · 산소 최고 기록 ${c.DB.o2best || 0}/3통</p>`,
+  onEnter(c) { c.toast((c.DB.prints || []).length ? '🌕 지난번 발자국이 그대로예요. 바람이 없으니까요' : '🌕 소리 없는 곳이에요. 무전기 소리만 들려요', 3200); },
+});
+</script></body></html>

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>심해 잠수정</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 오늘의 심해 한 줄 — 날짜마다 하나씩 차례로
+const FACT = [
+  '마리아나 해구의 가장 깊은 곳(챌린저 해연)은 수심이 약 1만 1천 m예요. 에베레스트산을 거꾸로 넣어도 2km 넘게 남아요.',
+  '1960년 자크 피카르와 돈 월시가 잠수정 트리에스테호를 타고 챌린저 해연 바닥까지 처음 내려갔어요.',
+  '물속에선 10m 내려갈 때마다 압력이 약 1기압씩 늘어요.',
+  '햇빛은 200m쯤 아래부터 거의 못 들어가고, 1000m보다 깊은 곳은 완전히 캄캄해요.',
+  '깊은 바다 생물 가운데엔 스스로 빛을 내는 것이 아주 많아요. 이걸 생물발광이라고 해요.',
+  '위에서 내려오는 하얀 알갱이 마린 스노우는 눈이 아니에요. 죽은 생물과 찌꺼기 조각이 가라앉는 거예요.',
+  '열수 분출구는 1977년 갈라파고스 근처 바다 밑에서 처음 발견됐어요.',
+  '열수 분출구의 물은 300도가 넘게 뜨거워도, 바다 밑 압력이 높아서 끓지 않아요.',
+  '미국 잠수정 앨빈호는 1964년부터 쓰였고, 1986년에는 가라앉은 타이타닉호를 살펴봤어요.',
+  '고래가 죽어 바닥에 가라앉으면 그 몸을 먹고 사는 생물들이 수십 년씩 모여 살아요.',
+  '혹등고래 수컷은 몇 분짜리 노래를 불러요. 그 노래는 해마다 조금씩 바뀌어요.',
+  '심해 바닥의 물은 대개 1~4도로 차가워요. 열수 분출구 곁만 따뜻한 곳이에요.',
+];
+// 발광 생물 도감 — 반짝임 찾기 놀이를 맞히면 하나씩
+const CREA = [
+  ['해파리', '몸의 95%쯤이 물이에요. 뇌도 심장도 없어요.'],
+  ['아귀', '암컷은 머리 위 낚싯대 끝 미끼에서 빛을 내 먹이를 불러요.'],
+  ['빗해파리', '몸 옆의 섬모줄이 빛을 받으면 무지갯빛으로 반짝여요.'],
+  ['흡혈오징어', '이름과 달리 피를 빨지 않고, 가라앉는 찌꺼기를 먹어요.'],
+  ['관벌레', '입이 없어요. 몸속 박테리아가 양분을 만들어 줘요.'],
+];
+const WHALE = [
+  '🐋 혹등고래 수컷은 몇 분짜리 노래를 부르고, 그 노래는 해마다 조금씩 바뀌어요',
+  '🐋 소리는 물속에서 공기 중보다 네 배 넘게 빨리 가요',
+  '🐋 고래 소리는 깊은 바닷속에서 아주 멀리까지 퍼져요',
+];
+const LIGHT = [
+  '🔦 빛 속으로 마린 스노우가 천천히 내려와요',
+  '🔦 저 멀리서 뭔가 반짝했어요',
+  '🔦 빛을 따라 해파리가 가까이 와요',
+];
+const JC = [0x6af0ff, 0xff7ad9, 0x9aff7a, 0xffb86a, 0xb08aff];
+const S = {lamp: 0, to: 0, whale: -1};   // 탐조등 밝기(0~1) · 고래 지나가는 시간
+function daily(d) {   // 오늘의 바다 — 날짜로만 정해진다
+  const dn = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
+  const depth = 2000 + ((dn * 97 + 13) % 90) * 50;
+  return {dn, depth, atm: Math.round(depth / 10) + 1, temp: 1 + ((dn * 31 + 5) % 4), cr: (dn * 7 + 3) % 5, hue: dn % 5, drift: (((dn * 5 + 2) % 7) - 3) * 0.15};
+}
+
+start({
+  key: 'deepsea', title: '심해 잠수정', enter: '잠수복 입고 나가기', time: 'night', nickIcon: '🌊',
+  nick: [['캄캄한', '가라앉는', '압력 센', '반짝이는', '조용한', '바닥의'], ['해파리', '잠수정', '탐조등', '관벌레', '아귀', '산소통']],
+  intro: '<p>캄캄한 바다 밑, 내려앉은 노란 잠수정 곁.<br>탐조등 켜고, 반짝이는 것 찾고, 고래 노래 한 번 듣고 가요.</p>',
+  floor: {w: 28, d: 22, c1: '#2b2c34', c2: '#3a3b44', around: '#0a1020'},
+  bg: {night: 0x050c24}, startPos: [0, 5], cam: {h: 10, back: 12},
+  playerLook: {coat: 0xe0672a, pants: 0x2b2f3a, goggles: true, hat: {type: 'bandana', c: 0x1f2a44}},
+  build(c) {
+    const {box, cyl, ball, glowBall, sign, solid, fx, THREE, scene, npc} = c;
+    const grp = (x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); scene.add(g); return g; };
+    const basic = col => new THREE.MeshBasicMaterial({color: col});
+    const D = daily(c.now());
+    // 푸르스름한 바닥 빛 하나
+    { const l = new THREE.PointLight(0x2a5a8a, 14, 34); l.position.set(0, 9, 0); scene.add(l); }
+    // 모래 물결무늬 · 바위
+    for (let i = 0; i < 12; i++) box(3 + Math.random() * 4, 0.04, 0.25, 0x353640, -11 + Math.random() * 22, 0.02, -8 + Math.random() * 18).rotation.y = 0.15 + Math.random() * 0.2;
+    for (const [x, z, r] of [[-12, -1, 1.3], [12, 2, 1.1], [-12, 7, 0.9], [11, 8, 1.4], [-3.5, 9, 0.8], [13, -3, 1.2]]) { const m = ball(r, 0x2a2c35, x, r * 0.3, z); m.scale.y = 0.6; }
+    // 잠수정 — 노란 캡슐(왼쪽 뒤)
+    const sub = grp(-5.5, 0, -4.5);
+    cyl(1.4, 1.4, 4, 0xf2c230, 0, 1.8, 0, sub).rotation.z = Math.PI / 2;
+    ball(1.4, 0xf2c230, 2, 1.8, 0, sub); ball(1.4, 0xf2c230, -2, 1.8, 0, sub);
+    cyl(0.68, 0.68, 0.1, 0x3a3a44, 0.8, 2.0, 1.36, sub).rotation.x = Math.PI / 2;
+    cyl(0.55, 0.55, 0.12, basic(0x9fe8ff), 0.8, 2.0, 1.4, sub).rotation.x = Math.PI / 2;
+    cyl(0.4, 0.4, 0.1, 0x3a3a44, -1.1, 2.0, 1.3, sub).rotation.x = Math.PI / 2;
+    cyl(0.3, 0.3, 0.12, basic(0x9fe8ff), -1.1, 2.0, 1.34, sub).rotation.x = Math.PI / 2;
+    cyl(0.5, 0.55, 0.5, 0xd9a82a, 0.2, 3.3, 0, sub); cyl(0.4, 0.4, 0.06, 0x555a66, 0.2, 3.58, 0, sub);
+    for (const z of [-0.9, 0.9]) { box(6.4, 0.12, 0.2, 0x555a66, 0, 0.2, z, sub); for (const x of [-2.2, 2.2]) box(0.14, 0.4, 0.14, 0x555a66, x, 0.4, z, sub); }
+    box(0.12, 1.1, 0.14, 0x555a66, -3.6, 1.8, 0, sub); box(0.12, 0.14, 1.1, 0x555a66, -3.6, 1.8, 0, sub); ball(0.18, 0x555a66, -3.5, 1.8, 0, sub);
+    solid(-5.5, -4.5, 7, 3);
+    // 탐조등 — 켜면 빛줄기와 불빛이 나온다
+    const LX = -3.3, LY = 3.3, LZ = -3.7, lensMat = basic(0x555540);
+    box(0.5, 0.35, 0.5, 0x555a66, LX, LY, LZ); ball(0.2, lensMat, LX + 0.3, LY, LZ + 0.05);
+    const beamG = new THREE.ConeGeometry(2.6, 9, 24, 1, true); beamG.translate(0, -4.5, 0);
+    const beamM = new THREE.MeshBasicMaterial({color: 0xfff0b0, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide});
+    const beam = new THREE.Mesh(beamG, beamM); beam.position.set(LX + 0.3, LY, LZ); beam.rotation.set(-0.4, 0, 1.05); beam.visible = false; scene.add(beam);
+    const lampL = new THREE.PointLight(0xfff0c0, 0, 26); lampL.position.set(-0.2, 3.2, -2.6); scene.add(lampL);
+    // 오늘의 수심 판 (뒤쪽)
+    for (const x of [-1.7, 1.7]) cyl(0.07, 0.07, 3, 0x8a8f99, x, 1.5, -9.3);
+    box(3.8, 1.7, 0.1, 0x1a2430, 0, 2.6, -9.3);
+    sign(['수심 ' + D.depth.toLocaleString('ko-KR') + ' m', '수온 ' + D.temp + '°C · ' + D.atm + '기압'], 3.6, 1.5, '#0f2236', '#9ef0ff', 0, 2.6, -9.24, 0, [50, 32]);
+    solid(0, -9.3, 4, 0.6);
+    // 열수 분출구 — 검은 굴뚝 둘, 위에서 붉게 달아오른 빛
+    for (const [x, z, h] of [[6.8, -5.2, 3.2], [9.8, -6.8, 2.2]]) {
+      cyl(0.45, 1.0, h, 0x17181e, x, h / 2, z); cyl(0.6, 0.5, 0.4, 0x23242c, x, h * 0.75, z);
+      glowBall(0.32, 0xff7a30, x, h, z, 0); solid(x, z, h > 3 ? 2.2 : 1.6, h > 3 ? 2.2 : 1.6);
+    }
+    { const l = new THREE.PointLight(0xff7a30, 10, 9); l.position.set(6.8, 3.6, -5.2); scene.add(l); }
+    for (let i = 0; i < 9; i++) { const a = i * 0.9, x = 6.8 + Math.cos(a) * (1.7 + (i % 3) * 0.3), z = -3.4 + Math.sin(a) * 0.9, h = 0.5 + (i % 4) * 0.2;
+      const w = cyl(0.045, 0.06, h, 0xf4efe4, x, h / 2, z); w.rotation.z = Math.sin(i) * 0.2; ball(0.08, 0xd63a34, x + Math.sin(i) * 0.2 * h * 0.5, h + 0.03, z); }
+    function plume(x, y, z, N, col, size, op, rise, spread, life) {
+      const g = new THREE.BufferGeometry(), p = new Float32Array(N * 3), age = new Float32Array(N), r = [];
+      for (let i = 0; i < N; i++) { age[i] = Math.random() * life; r.push([Math.random(), Math.random(), Math.random()]); }
+      g.setAttribute('position', new THREE.BufferAttribute(p, 3));
+      const pts = new THREE.Points(g, new THREE.PointsMaterial({color: col, size, sizeAttenuation: false, transparent: true, opacity: op})); pts.frustumCulled = false; scene.add(pts);
+      fx.push(dt => { for (let i = 0; i < N; i++) { age[i] += dt; if (age[i] > life) age[i] = 0; const a = age[i], q = r[i];
+        p[i * 3] = x + (q[0] - .5) * spread * a + D.drift * a * 2; p[i * 3 + 1] = y + a * rise * (1 + q[1] * .6); p[i * 3 + 2] = z + (q[2] - .5) * spread * a; }
+        g.attributes.position.needsUpdate = true; });
+    }
+    plume(6.8, 3.3, -5.2, 100, 0x6c7488, 6, 0.55, 1.0, 1.2, 4); plume(6.8, 3.2, -5.2, 40, 0xcfeeff, 3, 0.8, 2.2, 0.5, 2.6);
+    plume(9.8, 2.3, -6.8, 70, 0x6c7488, 6, 0.5, 0.9, 1.0, 4); plume(9.8, 2.2, -6.8, 30, 0xcfeeff, 3, 0.8, 2.0, 0.5, 2.6);
+    // 마린 스노우 — 위에서 천천히, 오늘의 해류 쪽으로 기울어
+    const N = 700, sg = new THREE.BufferGeometry(), sp = new Float32Array(N * 3), sv = new Float32Array(N);
+    for (let i = 0; i < N; i++) { sp[i * 3] = (Math.random() - .5) * 34; sp[i * 3 + 1] = Math.random() * 14; sp[i * 3 + 2] = (Math.random() - .5) * 28; sv[i] = Math.random(); }
+    sg.setAttribute('position', new THREE.BufferAttribute(sp, 3));
+    const snow = new THREE.Points(sg, new THREE.PointsMaterial({color: 0xdfe8ff, size: 2, sizeAttenuation: false, transparent: true, opacity: 0.75})); snow.frustumCulled = false; scene.add(snow);
+    fx.push((dt, t) => { for (let i = 0; i < N; i++) { let y = sp[i * 3 + 1] - (0.35 + sv[i] * 0.5) * dt, x = sp[i * 3] + D.drift * 1.5 * dt;
+      if (y < 0) { y = 14; x = (Math.random() - .5) * 34; } if (x > 17) x -= 34; if (x < -17) x += 34; sp[i * 3] = x; sp[i * 3 + 1] = y; sp[i * 3 + 2] += Math.sin(t * .6 + i) * dt * .15; }
+      sg.attributes.position.needsUpdate = true; });
+    // 해파리 넷 — 오늘의 색이 맨 앞
+    const jl = [];
+    function jelly(x, y, z, col, r, light) {
+      const m = glowBall(r, col, x, y, z, 0), tm = new THREE.MeshBasicMaterial({color: col, transparent: true, opacity: 0.6});
+      for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3; cyl(0.02, 0.02, r * 2.2, tm, Math.cos(a) * r * 0.6, -r * 1.3, Math.sin(a) * r * 0.6, m); }
+      if (light) { const l = new THREE.PointLight(col, 4, 7); m.add(l); }
+      jl.push({m, x, y, z, ph: Math.random() * 6, ax: 2 + Math.random() * 1.5, az: 1.2 + Math.random()}); }
+    jelly(-8, 3.2, 1, JC[D.hue], 0.55, true); jelly(8, 2.5, 3, JC[(D.hue + 1) % 5], 0.45, true);
+    jelly(3, 4, -4, JC[(D.hue + 2) % 5], 0.5, false); jelly(-10, 3, 7, JC[(D.hue + 3) % 5], 0.4, false);
+    // 아귀 — 미끼 불을 달고 천천히 오간다
+    const ag = grp(0, 1.3, -1.5), ab = ball(0.7, 0x3a3250, 0, 0, 0, ag); ab.scale.set(0.85, 0.8, 1.2);
+    box(0.5, 0.05, 0.5, 0x14121e, 0, -0.32, 0.5, ag);
+    for (let i = 0; i < 5; i++) box(0.03, 0.2, 0.03, 0xf4efe4, -0.2 + i * 0.1, -0.22, 0.78 - Math.abs(i - 2) * 0.05, ag);
+    for (const s of [-1, 1]) ball(0.09, basic(0xe8ffd0), s * 0.38, 0.2, 0.6, ag);
+    const tail = box(0.08, 0.55, 0.6, 0x2a2640, 0, 0, -0.95, ag);
+    cyl(0.02, 0.02, 0.8, 0x2a2640, 0, 0.65, 0.55, ag).rotation.x = 0.7; ball(0.13, basic(0xb8ff6a), 0, 1.0, 0.95, ag);
+    { const l = new THREE.PointLight(0xb8ff6a, 6, 7); l.position.set(0, 1, 0.95); ag.add(l); }
+    ag.scale.setScalar(1.2); const aq = {ph: Math.random() * 6, rot: Math.PI / 2};
+    // 멀리 지나가는 고래
+    const wg = grp(-32, 6.5, -15), wm = basic(0x2f4b6e); wg.visible = false;
+    ball(1, wm, 0, 0, 0, wg).scale.set(4.5, 1.1, 1.2);
+    const wt = grp(-4, 0, 0); wg.add(wt); box(0.4, 0.15, 3.2, wm, -0.4, 0, 0, wt); ball(0.5, wm, 0.4, 0, 0, wt);
+    for (const z of [-1, 1]) { const f = box(1.4, 0.1, 0.5, wm, 1.5, -0.7, z * 1.2, wg); f.rotation.y = z * 0.5; }
+    c.whale = () => { S.whale = 0; };
+    // 매 프레임 — 탐조등 · 해파리 · 아귀 · 고래
+    fx.push((dt, t) => {
+      S.lamp += (S.to - S.lamp) * Math.min(1, dt * 3); if (Math.abs(S.to - S.lamp) < 0.01) S.lamp = S.to;
+      beamM.opacity = 0.13 * S.lamp; beam.visible = S.lamp > 0.02; lampL.intensity = S.lamp * 55;
+      lensMat.color.setRGB(0.35 + 0.65 * S.lamp, 0.35 + 0.65 * S.lamp, 0.3 + 0.4 * S.lamp);
+      const f = scene.fog; if (f) { f.near = 14 + S.lamp * 8; f.far = 52 + S.lamp * 28; }
+      for (const q of jl) { q.m.position.set(q.x + Math.sin(t * .23 + q.ph) * q.ax, q.y + Math.sin(t * .6 + q.ph) * .5, q.z + Math.cos(t * .19 + q.ph) * q.az);
+        const s = 1 + Math.sin(t * 2 + q.ph) * .08; q.m.scale.set(s, .7 * (2 - s), s); }
+      const a = t * .12 + aq.ph; ag.position.x = Math.sin(a) * 11; ag.position.y = 1.3 + Math.sin(t * .8) * .2;
+      aq.rot += ((Math.cos(a) >= 0 ? Math.PI / 2 : -Math.PI / 2) - aq.rot) * Math.min(1, dt * 1.5); ag.rotation.y = aq.rot; tail.rotation.y = Math.sin(t * 3) * .4;
+      if (S.whale >= 0) { S.whale += dt; const p = S.whale / 14; wg.visible = p < 1; wg.position.set(-32 + p * 64, 6.5 + Math.sin(S.whale * .8) * .6, -15); wt.rotation.z = Math.sin(S.whale * 2) * .25; if (p >= 1) S.whale = -1; }
+    });
+    // 같이 잠수한 동료 둘 — 잠수정 앞에 하나, 모래밭을 오가는 하나
+    const look = {coat: 0xe0672a, pants: 0x2b2f3a, goggles: true, hat: {type: 'bandana', c: 0x1f2a44}};
+    npc(look, [[-0.4, -1.8]], {face: -Math.PI / 2, idle: ['wave', 'stretch']});
+    npc({...look, coat: 0x2f6f6a}, [[2.5, 3], [8.5, 3]], {speed: 1.6, idle: ['stretch']});
+  },
+  lamps: [],
+  acts: [
+    {id: 'light', icon: '🔦', label: '탐조등', spot: [-0.9, -4.2], face: -Math.PI / 2, run(c, done) {
+      S.to = 1; c.beep(300, .08, 0, 'square', .04); c.beep(520, .1, .1, 'square', .04); c.toast('🔦 탐조등을 켰어요', 1600);
+      const n = c.count('light'); setTimeout(() => c.toast(LIGHT[n % LIGHT.length], 2400), 1500);
+      setTimeout(() => { S.to = 0; c.stamp('환하다', `오늘 ${n}번째`); setTimeout(done, 900); }, 5500); }},
+    {id: 'find', icon: '✨', label: '반짝임 찾기', run(c, done) {
+      c.play(`<style>.dc{width:64px;height:64px;border-radius:50%;background:#0a1224;border:1.5px solid #20405a;transition:background .12s,box-shadow .12s;cursor:pointer}.dc.on{background:#7af0ff;box-shadow:0 0 22px 6px #5ad8ff}.dc.bad{background:#ff6a6a}</style>
+        <h3>반짝이는 곳 찾기</h3><p style="font-size:13px;color:#7a6e5e">어둠 속에서 네 군데가 차례로 반짝여요. 같은 순서로 눌러요</p>
+        <div id="gr" style="display:grid;grid-template-columns:repeat(3,64px);gap:12px;justify-content:center;padding:16px;background:#050a18;border-radius:6px;border:1.5px solid #2b2620"></div>
+        <p id="msg" style="min-height:22px;font-size:14px"></p><div class="row" id="ro" style="justify-content:center"><button class="btn main" id="go">시작</button><button class="btn" id="qt">그만두기</button></div>`,
+        (el, close) => {
+          let dead = false, acc = false, k = 0; const gr = el.querySelector('#gr'), ro = el.querySelector('#ro'), msg = el.querySelector('#msg'), cells = [];
+          const lit = (i, ms) => { cells[i].classList.add('on'); c.beep(380 + i * 70, .2, 0, 'sine', .05); setTimeout(() => cells[i]?.classList.remove('on'), ms); };
+          el.querySelector('#qt').onclick = () => { dead = true; close(); done(); };
+          for (let i = 0; i < 9; i++) { const d = document.createElement('div'); d.className = 'dc'; gr.appendChild(d); cells.push(d);
+            d.onclick = () => { if (!acc || dead) return;
+              if (i !== seq[k]) { acc = false; d.classList.add('bad'); finish(false); return; }
+              lit(i, 200); k++; if (k === seq.length) { acc = false; finish(true); } }; }
+          let seq = [];
+          function finish(ok) {
+            c.count('find'); const got = new Set(c.DB.found || []), D = daily(c.now());
+            if (ok) { const cand = CREA.filter(s => !got.has(s[0])), pool = cand.length ? cand : CREA, f = CREA[D.cr], s = pool.includes(f) ? f : pool[Math.random() * pool.length | 0], isNew = !got.has(s[0]);
+              got.add(s[0]); c.DB.found = [...got]; c.DB.findOk = (c.DB.findOk || 0) + 1; c.save(); msg.innerHTML = `<b>${s[0]}</b>${isNew ? ' — 도감에 담았어요' : ''}`;
+              setTimeout(() => { if (dead) return; close(); c.doAct(c.player, 'cheer'); c.stamp(s[0], `도감 ${got.size}/${CREA.length}`); c.toast(`✨ ${s[0]} — ${s[1]}`, 3600); setTimeout(done, 1800); }, 1200); }
+            else { msg.textContent = '다른 자리였어요. 다음에 다시'; setTimeout(() => { if (dead) return; close(); c.toast('✨ 어둠 속에선 눈이 금방 속아요'); setTimeout(done, 800); }, 1300); }
+          }
+          el.querySelector('#go').onclick = () => {
+            ro.innerHTML = ''; msg.textContent = '잘 봐요…'; seq = [];
+            while (seq.length < 4) { const v = Math.random() * 9 | 0; if (v !== seq[seq.length - 1]) seq.push(v); }
+            seq.forEach((v, i) => setTimeout(() => { if (!dead) lit(v, 500); }, 600 + i * 800));
+            setTimeout(() => { if (dead) return; msg.textContent = '같은 순서로 눌러요'; acc = true; }, 600 + 4 * 800);
+          };
+        }); }},
+    {id: 'whale', icon: '🐋', label: '고래 소리', run(c, done) {
+      c.doAct(c.player, 'crouch'); c.whale(); c.toast('🐋 …멀리서 낮은 소리가 울려요', 2400);
+      [98, 123, 147, 131, 110, 165, 147, 123].forEach((f, i) => { c.beep(f, 1.1, i * .75, 'sine', .09); c.beep(f * 2, .8, i * .75 + .05, 'sine', .025); });
+      setTimeout(() => { const n = c.count('whale'); c.toast(WHALE[n % WHALE.length], 3600); c.stamp('들었다', `오늘 ${n}번째`); }, 6200);
+      setTimeout(done, 7200); }},
+    {id: 'fact', icon: '📋', label: '오늘의 심해', spot: [0, -8], face: Math.PI, run(c, done) {
+      const d = c.now(), D = daily(d), first = !c.today().fact; c.beep(700, .05, 0, 'sine', .04); c.beep(900, .05, .07, 'sine', .04); c.count('fact');
+      setTimeout(() => c.dialog('오늘의 심해', `${c.hm(d)} · ${c.visits()}번째 온 날`,
+        `<p style="font-size:28px;margin:4px 0"><b>${D.depth.toLocaleString('ko-KR')} m</b></p><p style="font-size:13px;color:#7a6e5e;margin:0">수온 ${D.temp}°C · 압력 약 ${D.atm}기압 · 오늘 곁에 온 생물: ${CREA[D.cr][0]}</p>
+         <p style="font-size:16px">「${FACT[D.dn % FACT.length]}」</p>` + (first ? '' : '<p style="color:#7a6e5e;font-size:13px">오늘의 수심과 한마디는 하루에 하나. 내일 또 와요.</p>'), [['계속 잠수', done, 'main']]), 500); }},
+  ],
+  recExtra: c => `<p style="font-size:13px;color:#7a6e5e">발광 생물 도감 ${(c.DB.found || []).length}/${CREA.length}종: ${(c.DB.found || []).join(' · ') || '아직 없음'}<br>반짝임 찾기 맞힌 횟수 ${c.DB.findOk || 0}번</p>`,
+  onEnter(c) { c.toast(c.visits() > 1 ? `🌊 ${c.visits()}번째 잠수. 오늘도 캄캄해요` : '🌊 바다 밑은 조용해요. 탐조등부터 켜 볼까요', 3000); },
+});
+</script></body></html>

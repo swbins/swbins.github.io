@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>새벽 수산시장 경매</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 오늘 들어온 것 — [이름, 몸 색, 배 색, 길이, 한 상자 기준 값(만 원)]
+const FISH = [['고등어', 0x3a6a8a, 0xd8e0e8, 0.9, 9], ['갈치', 0xd0d8e0, 0xf0f4f8, 1.6, 22], ['광어', 0x6a5a48, 0xf4f0e8, 1.1, 18], ['방어', 0x3a5a7a, 0xe8e8e0, 1.4, 30],
+  ['오징어', 0xd8a888, 0xf0d8c8, 0.9, 12], ['꽃게', 0x8a5a3a, 0xe8d8c0, 0.6, 16], ['전어', 0x8a9aa8, 0xe8eef0, 0.7, 8], ['대구', 0x8a7a60, 0xf0ece0, 1.3, 20]];
+const SOUP = ['새벽 해장국 한 그릇. 국물이 속을 데워요','상인 아주머니가 믹스커피를 타 줬어요','어묵 국물 한 컵 — 손이 녹아요','경매 끝나고 먹는 회덮밥. 아침인지 밤인지'];
+const seed = c => { const d = c.now(); return d.getFullYear() * 400 + (d.getMonth() + 1) * 32 + d.getDate(); };
+const todayFish = c => FISH[seed(c) % FISH.length];
+
+start({
+  key: 'fish-auction', title: '새벽 수산시장 경매', enter: '장화 신고 들어가기', time: 'night', nickIcon: '🦀',
+  nick: [['새벽 네 시','장화 신은','손 빠른','얼음 나르는','처음 온','눈 밝은'],['중매인','경매사','얼음','스티로폼','장화','종소리']],
+  intro: '<p>해 뜨기 전 수산시장. 종이 울리면 경매가 시작돼요.<br>오늘 들어온 생선을 보고, 낙찰가를 맞혀 봐요.</p>',
+  floor: {w: 26, d: 22, c1: '#4a525c', c2: '#525a66', pattern: 'tile', around: 0x1a2230},
+  bg: {night: 0x0d1424},
+  startPos: [0, 7], cam: {h: 9, back: 11},
+  playerLook: {coat: 0x2f5a4a, pants: 0x2b2f3a, hair: 0x2a2018, hat: {type: 'cap', c: 0x2b2b2b}},
+  build(c) {
+    const {box, cyl, ball, sign, solid, npc, fx, THREE, scene} = c;
+    // 지붕 기둥 + 형광등 줄(빛)
+    for (const x of [-11, -4, 4, 11]) box(0.3, 7, 0.3, 0x7a8088, x, 3.5, -9);   // 앞줄 기둥은 카메라를 가려 뺌
+    for (const x of [-6, 0, 6]) { const t = box(3, 0.08, 0.2, new THREE.MeshBasicMaterial({color: 0xe8f4ff}), x, 5.2, -2); t.castShadow = false; }
+    box(26, 6, 0.4, 0x3a424c, 0, 3, -10.8);
+    sign(['위판장 3번 줄', '경매 04:30'], 4, 1.2, '#f4ecdc', '#2f5a4a', 0, 4.6, -10.55, 0, [60, 40]);
+    // 젖은 바닥 반짝이(물웅덩이)
+    for (const [x, z, s] of [[-5, 4, 1.4], [6, 5, 1], [1, 2, 0.8]]) { const p = new THREE.Mesh(new THREE.CircleGeometry(s, 20), new THREE.MeshBasicMaterial({color: 0x6a8aa8, transparent: true, opacity: .35})); p.rotation.x = -Math.PI / 2; p.position.set(x, 0.015, z); scene.add(p); }
+    // 스티로폼 상자 줄 + 오늘의 생선
+    const [name, body, belly, len] = todayFish(c);
+    const fish = (x, z, ry) => { if (name === '꽃게') { const b = ball(0.22, body, x, 0.72, z); b.scale.set(1.3, 0.45, 1); for (const s of [-1, 1]) ball(0.08, 0xb84a2a, x + s * 0.3, 0.72, z + 0.12); return; }
+      const f = ball(0.16, body, x, 0.72, z); f.scale.set(len * 1.8, 0.5, 1); f.rotation.y = ry; const bl = ball(0.12, belly, x, 0.68, z); bl.scale.set(len * 1.7, 0.4, 0.9); bl.rotation.y = ry; };
+    for (let row = 0; row < 3; row++) for (let i = 0; i < 6; i++) { const x = -6.5 + i * 2.6, z = -6 + row * 2.4;
+      box(2, 0.6, 1.3, 0xf4f4f0, x, 0.3, z); box(1.8, 0.04, 1.1, 0xd8eef8, x, 0.62, z);
+      for (let k = 0; k < 3; k++) fish(x - 0.5 + k * 0.5, z + (k % 2 ? 0.2 : -0.2), 0.2 * (k - 1)); }
+    solid(0, -3.6, 15.6, 6.6);
+    // 얼음 더미 + 삽
+    for (let i = 0; i < 14; i++) { const b = box(0.4, 0.3, 0.4, 0xdff0fa, 9.5 + Math.random() * 1.6, 0.15 + Math.random() * 0.5, 2 + Math.random() * 1.6); b.rotation.y = Math.random(); }
+    solid(10.3, 2.8, 2.2, 2);
+    // 경매사 — 종 들고 단 위에
+    box(2, 0.5, 1.4, 0x5a4a3a, -9.5, 0.25, 0); solid(-9.5, 0, 2, 1.4);
+    c.boss = npc({coat: 0x2b3a5a, hat: {type: 'cap', c: 0xe8e0c0}, pants: 0x2b2f3a}, [[-9.5, 0]], {face: Math.PI / 2, idle: ['wave', 'cheer']}); c.boss.o.position.y = 0.5;
+    c.bell = cyl(0.1, 0.16, 0.2, 0xd9b45a, -9.0, 1.9, 0.3);
+    // 중매인들(모자에 번호표처럼 색)
+    c.buyers = [[-3, 2.2, 0xc9472f], [0, 2.4, 0xe0b040], [3.4, 2.1, 0x4fa0ff], [-5.6, 2.6, 0x6fb07a]].map(([x, z, h]) =>
+      npc({coat: 0x3a3f48, hat: {type: 'cap', c: h}, pants: 0x2b2f3a}, [[x, z]], {face: Math.PI, idle: ['wave']}));
+    npc({coat: 0x5a3a3a, apron: 0x2f5a4a, hat: {type: 'beanie', c: 0x777777}}, [[-11, 7], [11, 7]], {wait: 5, speed: 1.8});   // 수레 미는 사람
+    // 바다 쪽 — 뒤로 배 불빛
+    for (let i = 0; i < 5; i++) c.glowBall(0.15, [0xffe2a0, 0x9ad0ff][i % 2], -10 + i * 5, 2.2 + (i % 2) * 0.4, -10.5, 0);
+  },
+  lamps: [[-6, -2], [6, -2], [0, 5]],
+  acts: [
+    {id: 'look', icon: '👀', label: '오늘 생선', spot: [1.3, 0.4], face: Math.PI, run(c, done) {
+      c.player.rotation.y = Math.PI; c.doAct(c.player, 'crouch'); const [name] = todayFish(c), n = c.count('look');
+      const note = ['눈이 맑아요 — 새벽에 막 들어왔대요', '배가 단단해요. 좋은 놈들이에요', '아가미가 선홍색. 오늘 거 맞아요', '얼음을 두툼하게 덮었어요'][(seed(c) + n) % 4];
+      c.toast(`👀 오늘은 ${name} · ${note}`, 3200); setTimeout(done, 2000); }},
+    {id: 'bid', icon: '✋', label: '경매', spot: [-1.6, 0.8], face: -Math.PI / 2, run(c, done) {
+      const [name, , , , base] = todayFish(c), s = seed(c), n = (c.today().bid || 0);
+      const real = base + ((s * 7 + n * 3) % 9) - 3, three = [real - 2 - (s % 2), real, real + 3 + (n % 2)], r = (s + n) % 3, opts = [...three.slice(r), ...three.slice(0, r)];
+      [0, .25, .5].forEach(w => c.beep(1300, .12, w, 'triangle', .07)); c.doAct(c.boss.o, 'wave'); c.bell.rotation.z = .4; setTimeout(() => c.bell.rotation.z = 0, 700);
+      c.play(`<h3>${name} 한 상자 — 얼마에 떨어질까?</h3><p style="font-size:13px;color:#7a6e5e">경매사: 「자, ${base - 4}부터! 올라갑니다~」<br>중매인들 손가락이 바쁘게 움직여요</p>
+        <div class="row" style="justify-content:center;margin:14px 0" id="ops">${opts.map(v => `<button class="btn" data-v="${v}">${v}만 원</button>`).join('')}</div><p id="msg" style="min-height:24px"></p>`,
+        (el, close) => {
+          el.querySelectorAll('#ops button').forEach(b => b.onclick = () => {
+            const v = +b.dataset.v, ok = v === real; el.querySelectorAll('#ops button').forEach(x => x.disabled = true);
+            const k = c.count('bid'); if (ok) c.count('hit'); c.beep(ok ? 1500 : 260, .15);
+            el.querySelector('#msg').textContent = ok ? `「${real}만 원, 낙찰!」 딱 맞혔어요` : `「${real}만 원에 낙찰!」 — ${v < real ? '더 올라갔어요' : '거기까진 안 갔어요'}`;
+            const win = c.buyers[(s + k) % c.buyers.length]; c.doAct(win.o, 'cheer');
+            setTimeout(() => { close(); c.stamp(ok ? '낙찰!' : '땡~', `${name} ${real}만 원 · 오늘 ${k}번째`); done(); }, 1400);
+          });
+        });
+    }},
+    {id: 'ice', icon: '🧊', label: '얼음', spot: [8.4, 2.8], face: Math.PI / 2, run(c, done) {
+      c.player.rotation.y = Math.PI / 2; c.doAct(c.player, 'throw'); c.beep(500, .08, 0, 'sawtooth', .03); c.beep(420, .08, .1, 'sawtooth', .03);
+      const n = c.count('ice'); c.toast(n === 1 ? '🧊 얼음 한 삽 — 생선 위로 촤르르' : n < 5 ? `🧊 ${n}삽째. 손이 얼얼해요` : `🧊 ${n}삽… 「일 잘하네, 내일도 와」`);
+      setTimeout(done, 1800); }},
+    {id: 'soup', icon: '🍲', label: '해장국', spot: [5, 6.2], face: 0, run(c, done) {
+      c.doAct(c.player, 'sip'); const n = c.count('soup');
+      c.toast('🍲 ' + SOUP[(seed(c) + n - 1) % SOUP.length], 3000); setTimeout(done, 2400); }},
+  ],
+  recExtra: c => `<p style="font-size:13px;color:#7a6e5e">낙찰가 맞힌 횟수 모두 ${c.DB.total.hit || 0}번</p>`,
+  onEnter(c) { c.toast(`🦀 「오늘은 ${todayFish(c)[0]}가 좋아요. 종 곧 울려요」`, 3200); },
+});
+</script></body></html>

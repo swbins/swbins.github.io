@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>퇴근길 포장마차</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start, THREE, doAct} from '../mini.js';
+
+const IMO = ['오늘 고생 많았어. 국물 더 줄까?','월급날까지 며칠 남았니? 힘내.','그 사람 말은 반만 들어. 원래 그래.','내일 비 온대. 우산 챙겨.','혼자 와도 돼. 여기선 다 혼자야.',
+  '잘한 거 하나만 생각하고 자.','배고픈 게 제일 서러워. 먹고 가.','오늘은 일찍 들어가. 내일도 와.','다 지나가. 이모가 40년 봤어.','떡볶이 서비스. 아무한테도 말하지 마.'];
+const SIGH = ['후—','하아…','오늘 진짜 길었다','집에 가기 싫다… 아니 가고 싶다','내일 월요일 아니지?'];
+
+start({
+  key: 'pocha', title: '퇴근길 포장마차', enter: '천막 걷고 들어가기', time: 'night', nickIcon: '🍢',
+  nick: [['지친','배고픈','혼자 온','단골','오늘 칼퇴한','국물 좋아하는'],['어묵','떡볶이','소주잔','국자','천막','꼬치']],
+  intro: '<p>골목 끝 주황 천막. 어묵 하나, 짠 한 번,<br>한숨 한 번 쉬고 가요.</p>',
+  floor: {w: 26, d: 22, c1: '#3a3a40', c2: '#45454c', around: 0x2a2a30},
+  bg: {night: 0x0b0f1e},
+  startPos: [0, 8], cam: {h: 9, back: 11},
+  playerLook: {coat: 0x2b3a5a, pants: 0x3a3f4a, hair: 0x2a2018},
+  build(c) {
+    const {box, cyl, glowBall, sign, solid, npc, fx, THREE, scene} = c;
+    // 골목 벽
+    box(26, 7, 0.5, 0x5a5048, 0, 3.5, -11); box(0.5, 7, 22, 0x4a4440, -13, 3.5, 0); box(0.5, 7, 22, 0x4a4440, 13, 3.5, 0);
+    for (const [x, y] of [[-8, 4.5], [7, 5], [10, 2.6]]) { const w = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.3), new THREE.MeshBasicMaterial({color: 0xffd27a})); w.position.set(x, y, -10.74); scene.add(w); }
+    // 천막 — 기둥 넷 + 주황 지붕·벽(반투명)
+    const tent = new THREE.MeshLambertMaterial({color: 0xe8732a, transparent: true, opacity: .55, side: THREE.DoubleSide, emissive: 0x803010});
+    for (const [x, z] of [[-6, -6], [6, -6], [-6, 3], [6, 3]]) box(0.15, 4, 0.15, 0x8a8a8a, x, 2, z);
+    // 지붕은 카메라를 가리니 앞·뒤 띠만(위에서 내려다봐도 안이 보이게)
+    for (const z of [3.05, -6.1]) box(12.4, 0.5, 0.1, 0xe8732a, 0, 4.05, z);
+    for (let i = 0; i < 12; i++) { const s = box(0.5, 0.3, 0.1, i % 2 ? 0xf4ecdc : 0xe8732a, -5.75 + i * 1.04, 3.65, 3.07); s.castShadow = false; }
+    for (const [w, x, z, ry] of [[12.4, 0, -6.2, 0], [9.4, -6.2, -1.5, Math.PI / 2], [9.4, 6.2, -1.5, Math.PI / 2]]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(w, 3), tent); p.position.set(x, 2.5, z); p.rotation.y = ry; scene.add(p); }
+    sign(['오늘도 포차', '어묵 · 떡볶이 · 순대'], 5, 1.4, '#c9472f', '#fff8ec', 0, 5.2, -6.0, 0, [70, 34]);
+    // 꼬마전구 줄
+    for (let i = 0; i < 18; i++) glowBall(0.09, [0xffd27a, 0xff9a5a, 0xfff0b0][i % 3], -6 + i * 0.7, 3.85 - Math.sin(i / 17 * Math.PI) * 0.4, 3.1, 0);
+    // 조리대 + 어묵 통(김)
+    box(8, 1.1, 1.6, 0x8a6a4a, 0, 0.55, -4.2); box(8.2, 0.1, 1.8, 0xb8bcc2, 0, 1.12, -4.2); solid(0, -4.2, 8, 1.6);
+    cyl(0.9, 0.9, 0.5, 0x9aa0a8, -1.8, 1.4, -4.2); cyl(0.85, 0.85, 0.05, 0xc9a060, -1.8, 1.64, -4.2);
+    for (let i = 0; i < 6; i++) { const s = c.box(0.04, 0.9, 0.04, 0xd9c29a, -2.3 + i * 0.2, 1.9, -4.2 + (i % 2) * 0.3); s.rotation.z = 0.3; }
+    box(1.6, 0.25, 1, 0x333333, 1.6, 1.25, -4.2); box(1.4, 0.12, 0.8, 0xc9472f, 1.6, 1.42, -4.2);   // 떡볶이 판
+    const steam = []; for (let i = 0; i < 14; i++) { const m = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 6), new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: .25})); m.userData.t = Math.random() * 2; scene.add(m); steam.push(m); }
+    fx.push(dt => steam.forEach((m, i) => { m.userData.t += dt; const k = m.userData.t % 2; m.position.set(-1.8 + Math.sin(i + k * 2) * 0.3, 1.8 + k * 1.2, -4.2 + Math.cos(i) * 0.3); m.material.opacity = .3 * (1 - k / 2); m.scale.setScalar(1 + k); }));
+    // 탁자 둘 + 플라스틱 의자
+    for (const [x, z] of [[-3, 0], [3, 0]]) { cyl(0.9, 0.9, 0.08, 0xc9472f, x, 1.0, z); cyl(0.12, 0.12, 1, 0x888888, x, 0.5, z); solid(x, z, 1.8, 1.8);
+      for (const a of [0, Math.PI]) cyl(0.32, 0.32, 0.55, 0x3a6ab0, x + Math.cos(a) * 1.3, 0.28, z + Math.sin(a) * 1.3, undefined, 10);
+      cyl(0.12, 0.1, 0.25, 0x6fb07a, x - 0.2, 1.17, z); cyl(0.05, 0.05, 0.12, 0xffffff, x + 0.2, 1.1, z + 0.1); }
+    // 이모·손님
+    c.imo = npc({coat: 0xc9472f, hairStyle: 'perm', hair: 0x3a2a1a, apron: 0xf4ecdc}, [[0, -5.3]], {face: 0, idle: ['wave']});
+    c.guests = [npc({coat: 0x55606e, glasses: true}, [[-4.3, 0]], {face: Math.PI / 2}), npc({coat: 0x6b5a4a, hairStyle: 'bob', hair: 0x2a2018}, [[4.3, 0]], {face: -Math.PI / 2})];
+    npc({coat: 0x44506a, hat: {type: 'beanie', c: 0x777777}}, [[-11, 9], [11, 9]], {wait: 6, speed: 1.6});   // 골목 지나가는 사람
+    glowBall(0.3, 0xffe2a0, -10, 5.5, 6, 0);
+  },
+  lamps: [[0, -1], [-10, 6]],
+  acts: [
+    {id: 'eomuk', icon: '🍢', label: '어묵', spot: [-1.8, -2.6], face: Math.PI, run(c, done) {
+      const sk = new c.THREE.Group(); c.box(0.03, 0.8, 0.03, 0xd9c29a, 0, 0.1, 0, sk); for (let i = 0; i < 3; i++) c.box(0.22, 0.12, 0.05, 0xd9a85a, 0, 0.25 + i * 0.14, 0, sk);
+      c.hand.add(sk); c.player.rotation.y = 0; c.doAct(c.player, 'sip'); c.beep(330, .15, 0, 'sine', .08);
+      const n = c.count('eomuk'); setTimeout(() => { c.hand.remove(sk); c.toast(n === 1 ? '🍢 첫 꼬치. 국물이 뜨끈해요' : n < 5 ? `🍢 ${n}개째 — 국물은 무한` : `🍢 ${n}개째… 이모가 웃어요`); done(); }, 2300); }},
+    {id: 'cheers', icon: '🍻', label: '짠', spot: [-3, 1.6], face: Math.PI, run(c, done) {
+      c.doAct(c.player, 'cheer'); c.guests.forEach(g => c.doAct(g.o, 'cheer')); c.beep(1800, .06); c.beep(2200, .08, .08);
+      const n = c.count('cheers'); c.stamp('짠!', n === 1 ? '오늘도 수고했어요' : `오늘 ${n}번째 짠`); setTimeout(done, 1300); }},
+    {id: 'sigh', icon: '😮‍💨', label: '한숨', run(c, done) {
+      c.doAct(c.player, 'crouch'); c.count('sigh'); const s = SIGH[Math.random() * SIGH.length | 0];
+      c.toast(`「${s}」`); setTimeout(() => { c.toast('이모: 「' + ['그래 그래.', '한숨 쉬면 복 나간다~', '다 털고 가.'][Math.random() * 3 | 0] + '」'); done(); }, 1600); }},
+    {id: 'talk', icon: '👵', label: '이모', spot: [0.6, -2.7], face: Math.PI, run(c, done) {
+      c.player.rotation.y = 0; c.imo.talk = true; c.doAct(c.imo.o, 'wave'); const d = c.now(), first = !c.today().talk, line = IMO[(d.getDate() * 3 + d.getMonth() * 7) % IMO.length];
+      c.count('talk');
+      setTimeout(() => { c.imo.talk = false; c.dialog('이모의 오늘 한마디', `${c.hm(d)} · ${c.visits()}번째 온 날`, `<p style="font-size:17px">「${line}」</p>` + (first ? '' : '<p style="color:#7a6e5e;font-size:13px">한마디는 하루에 하나. 내일 또 와요.</p>'), [['고마워요', done, 'main']]); }, 900); }},
+  ],
+  onEnter(c) { c.toast(c.visits() > 1 ? `🍢 또 왔네. ${c.visits()}번째` : '🍢 어서 와. 앉아.', 3000); },
+});
+</script></body></html>

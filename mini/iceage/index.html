@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>빙하기 들판</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 이야기 돌에 새겨진 한 줄 사실 — 날짜마다 하나씩 차례로
+const FACT = [
+  '마지막 빙하기에서 가장 추웠던 때는 약 2만 년 전쯤이에요.',
+  '털매머드는 온몸이 긴 털로 덮였고, 피부 밑엔 두툼한 지방층이 있었어요.',
+  '프랑스의 라스코 동굴 벽화는 약 1만 7천 년 전 무렵에 그린 것으로 봐요.',
+  '그때는 바닷물이 얼음으로 많이 갇혀서, 해수면이 지금보다 100m 넘게 낮았어요.',
+  '북극 가까운 랭겔섬에서는 매머드가 약 4천 년 전까지 살았어요.',
+  '시베리아의 얼어붙은 땅에서 털과 살이 남은 매머드가 발견된 적이 있어요.',
+  '빙하기라고 지구 전체가 얼음이었던 건 아니에요. 얼음 없는 땅도 많았어요.',
+  '빙하기 사람들은 뼈로 만든 바늘로 가죽을 꿰매 옷을 지었어요.',
+  '지금도 지구는 빙하기 사이의 따뜻한 때(간빙기)로 봐요. 남극과 그린란드엔 큰 얼음판이 남아 있어요.',
+  '마지막 빙하기엔 지금의 캐나다 대부분과 북유럽이 두꺼운 얼음판 아래에 있었어요.',
+  '사람이 불을 다룬 흔적은 수십만 년 전부터 있어요. 빙하기 사람들도 불을 썼어요.',
+  '털매머드의 엄니는 위로 크게 휘어 자랐어요.',
+];
+// 오늘 동굴 벽에 그려 볼 것
+const TOPIC = ['매머드', '들소', '말', '내 손바닥', '사냥하는 사람들', '불꽃', '별과 달', '오늘 본 구름'];
+const MAMMOTH_LINE = [
+  '큰 매머드가 코로 눈 속을 헤쳐요',
+  '새끼가 어미 뒤를 졸졸 따라가요',
+  '무리 맨 앞 녀석이 이쪽을 한 번 쳐다봐요',
+  '엄니가 햇빛에 하얗게 빛나요',
+  '발걸음이 느릿느릿, 서두르는 법이 없어요',
+];
+const S = {fire: 0.35, lit: 0, ptr: 0, refresh: null};
+
+function daily(d) {   // 오늘 들판 — 날짜로만 정해진다
+  const dn = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
+  return {dn, t: -8 - ((dn * 37 + 11) % 18), snow: (dn * 53 + 7) % 3, topic: TOPIC[dn % TOPIC.length]};
+}
+const SNOWTXT = ['잔눈', '보통 눈', '함박눈'];
+
+start({
+  key: 'iceage', title: '빙하기 들판', enter: '털옷 입고 나가기', time: 'day', nickIcon: '🦣',
+  nick: [['털옷 입은', '눈 밟는', '동굴 앞의', '불 지키는', '털모자 쓴', '숨이 하얀'], ['사냥꾼', '화가', '불씨', '매머드 친구', '돌도끼', '털장화']],
+  intro: '<p>눈 덮인 들판, 뒤로는 하늘색 얼음벽.<br>불 피우고, 매머드 구경하고, 동굴 벽에 그림 하나 남기고 가요.</p>',
+  floor: {w: 30, d: 24, c1: '#e8eff5', c2: '#d2dfea', around: '#e1eaf1'},
+  bg: {day: 0xb9d4ea}, startPos: [0, 7], cam: {h: 10, back: 12},
+  playerLook: {coat: 0x8a5a3a, pants: 0x4a3a2e, hat: {type: 'beanie', c: 0xd8c8a8}, scarf: 0xf0e6cf},
+  build(c) {
+    const {box, cyl, ball, glowBall, sign, solid, fx, THREE, scene, npc} = c;
+    const grp = (x, y, z, p = scene) => { const g = new THREE.Group(); g.position.set(x, y, z); p.add(g); return g; };
+    const D = daily(c.now());
+    const rnd = i => ((i * 7919 + 13) % 97) / 97;
+
+    // 뒤쪽 빙하 벽 — 하늘색 얼음 덩어리를 이어 붙인다
+    const ice = [0xa8d8ee, 0xc4e6f4, 0x8fc6e0, 0xd6eef8];
+    for (let i = -8; i <= 8; i++) {
+      const w = 5 + rnd(i) * 3, h = 6 + rnd(i + 20) * 7, x = i * 4.6, z = -16 - rnd(i + 40) * 2;
+      box(w, h, 4, ice[(i + 8) % 4], x, h / 2 - 0.3, z).rotation.y = (rnd(i + 5) - .5) * .3;
+      box(w * .7, h * .5, 3, ice[(i + 9) % 4], x + 1.2, h + h * .25 - 0.3, z + 0.2).rotation.z = (rnd(i + 9) - .5) * .3;
+      box(w + 0.2, 0.5, 4.2, 0xf4f8fc, x, h - 0.05, z);
+    }
+    // 눈 더미
+    for (const [x, z, r] of [[-13, 4, 1.7], [-6.5, 9, 1.2], [12.5, 2, 1.5], [5, 9.5, 1.1], [13, -3, 1.6], [-13, 9.5, 1.5]]) { const m = ball(r, 0xf0f5fa, x, 0.2, z); m.scale.y = 0.45; }
+    // 가문비나무
+    for (const [x, z] of [[-13.6, 7], [13.6, 8], [13.4, -9.8], [-13.8, 0.5]]) {
+      cyl(0.18, 0.22, 1, 0x5a4030, x, 0.5, z);
+      for (let k = 0; k < 3; k++) { const m = new THREE.Mesh(new THREE.ConeGeometry(1.3 - k * .3, 1.6, 8), new THREE.MeshLambertMaterial({color: k ? 0x3f6a52 : 0x35604a}));
+        m.position.set(x, 1.6 + k * 0.95, z); m.castShadow = true; scene.add(m);
+        const cap = new THREE.Mesh(new THREE.ConeGeometry(0.9 - k * .25, 0.5, 8), new THREE.MeshLambertMaterial({color: 0xf4f8fc})); cap.position.set(x, 2.1 + k * 0.95, z); scene.add(cap); }
+      solid(x, z, 0.8, 0.8);
+    }
+    // 제목 팻말
+    cyl(0.07, 0.07, 3.6, 0x5a4030, 4.4, 1.8, -11.4); cyl(0.07, 0.07, 3.6, 0x5a4030, 7.6, 1.8, -11.4);
+    sign(['빙하기 들판'], 3.6, 0.8, '#e8dcc0', '#3a2a1c', 6, 3.3, -11.3, 0, [46]);
+
+    // 동굴 — 회색 바위 더미 + 어두운 입구
+    for (const [x, y, z, r] of [[-11, 1.2, -10.2, 3.2], [-13.8, 1, -9.5, 2.1], [-8.3, 0.9, -9.8, 1.8], [-11, 3.0, -11, 2.0]]) { const m = ball(r, 0x7d7a76, x, y, z); m.scale.y = 0.8; }
+    box(2.6, 2.1, 0.3, 0x15120f, -11, 1.05, -6.95); cyl(1.3, 1.3, 0.3, 0x15120f, -11, 2.1, -6.95).rotation.x = Math.PI / 2;
+    for (const [x, z] of [[-9.5, -6.7], [-12.5, -6.7]]) ball(0.55, 0x8a8782, x, 0.25, z).scale.y = .6;
+    solid(-11, -9, 7, 4.5);
+
+    // 벽화 바위 — 그려서 저장한 최근 그림 셋이 걸린다
+    box(5.2, 2.8, 0.6, 0x7f7b74, -3.5, 1.4, -10); solid(-3.5, -10, 5.2, 0.8);
+    const slots = [];
+    [-5, -3.5, -2].forEach((x, i) => { box(1.5, 1.2, 0.05, 0x5a4f46, x, 1.5, -9.69);
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 1), new THREE.MeshBasicMaterial({color: 0x8a7a68})); m.position.set(x, 1.5, -9.65); scene.add(m); slots.push(m); });
+    S.refresh = () => { const arts = (c.DB.art || []).slice(-3).reverse();
+      slots.forEach((m, i) => { const a = arts[i]; if (!a) return; const im = new Image(); im.onload = () => { const tx = new THREE.Texture(im); tx.colorSpace = THREE.SRGBColorSpace; tx.needsUpdate = true; m.material.map = tx; m.material.color.setHex(0xffffff); m.material.needsUpdate = true; }; im.src = a.img; }); };
+    S.refresh();
+
+    // 이야기 돌 — 오늘의 사실
+    box(0.9, 2.2, 0.6, 0x8d8a85, -1.5, 1.1, -6.3); solid(-1.5, -6.3, 1, 0.8);
+    sign(['오늘의', '이야기'], 0.8, 0.8, '#8d8a85', '#3a3732', -1.5, 1.5, -5.99, 0, [34]);
+
+    // 모닥불 — 불씨로 시작, 부싯돌로 붙이면 활활
+    const FX = -7.5, FZ = -6;
+    for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; ball(0.22, 0x8a8782, FX + Math.cos(a) * 0.8, 0.15, FZ + Math.sin(a) * 0.8); }
+    for (let i = 0; i < 3; i++) box(1.1, 0.14, 0.14, 0x5a3a22, FX, 0.2 + (i % 2) * .1, FZ).rotation.y = i * 1.05;
+    const fl = [glowBall(0.4, 0xff7a2a, FX, 0.55, FZ, 0), glowBall(0.27, 0xffc24a, FX, 0.5, FZ, 0), glowBall(0.15, 0xfff0a0, FX, 0.45, FZ, 0)];
+    const fireLight = new THREE.PointLight(0xff9a40, 4, 9); fireLight.position.set(FX, 1.2, FZ); scene.add(fireLight);
+    solid(FX, FZ, 1.4, 1.4);
+    // 앉을 통나무
+    for (const [x, z, r] of [[-9.3, -4.3, 0.4], [-5.7, -4.5, -0.5]]) { const lg = cyl(0.25, 0.25, 1.3, 0x6a4a30, x, 0.25, z); lg.rotation.z = Math.PI / 2; lg.rotation.y = r; }
+
+    // 매머드 — 도형 조립. 무리가 천천히 걷는다
+    const herd = [];
+    function mammoth(x, z, sc, calf, mother) {
+      const g = grp(x, 0, z), fur = calf ? 0x7d5b3f : 0x5e3f2a, dk = calf ? 0x634730 : 0x4a301f, tone = calf ? 0x8a6a4c : 0x6b4a32;
+      ball(1, fur, 0, 1.55, 0, g).scale.set(0.95, 0.9, 1.35);
+      ball(0.72, fur, 0, 2.25, 0.35, g);                      // 어깨 혹
+      ball(0.78, tone, 0, 1.75, 1.35, g);                     // 머리
+      ball(0.62, tone, 0, 2.35, 1.3, g);                      // 이마 둥근 부분
+      ball(0.9, dk, 0, 1.0, 0, g).scale.set(1, .5, 1.5);      // 아래로 늘어진 긴 털
+      for (const s of [-1, 1]) {
+        ball(0.22, dk, s * 0.72, 1.9, 1.15, g).scale.set(0.4, 1, 0.9);
+        ball(0.07, 0x111111, s * 0.62, 1.95, 1.95, g);
+        const tk = grp(s * 0.5, 1.35, 1.95, g); tk.rotation.set(1.15, s * 0.2, 0);
+        cyl(0.05, 0.11, 1.3, 0xf2ecdc, 0, 0.65, 0, tk);
+        const tk2 = grp(0, 1.3, 0, tk); tk2.rotation.x = -1.0; cyl(0.03, 0.05, 0.7, 0xf2ecdc, 0, 0.35, 0, tk2);
+      }
+      const tg = grp(0, 1.6, 1.95, g); cyl(0.2, 0.3, 0.9, tone, 0, -0.4, 0, tg);
+      const t2 = grp(0, -0.85, 0, tg); t2.rotation.x = -0.35; cyl(0.13, 0.2, 0.8, tone, 0, -0.4, 0, t2);
+      ball(0.14, dk, 0, 1.5, -1.8, g);
+      const legs = [[-1, 1], [1, 1], [-1, -1], [1, -1]].map(([sx, sz]) => { const lg = grp(sx * 0.62, 1.05, sz * 0.8, g); cyl(0.27, 0.3, 1.05, dk, 0, -0.52, 0, lg); return lg; });
+      g.scale.setScalar(sc * (calf ? 0.55 : 1.1));
+      const q = {g, legs, tg, tx: x, tz: z, wait: Math.random() * 3, ph: Math.random() * 6, mv: 0, lift: 0, calf, mother, speed: calf ? 0.9 : 0.5}; herd.push(q); return q;
+    }
+    const mA = mammoth(6, -4, 1, false), mB = mammoth(10.5, -6, 0.95, false), mC = mammoth(3.8, -7, 1.1, false);
+    mammoth(7.4, -3, 1, true, mA);
+    c.herd = herd;
+    S.herd = herd;
+    const pick = q => { q.tx = 2.5 + Math.random() * 10.5; q.tz = -8 + Math.random() * 6; };
+    // 눈발 — 오늘 눈 양만큼
+    const N = 450 + D.snow * 250, sg = new THREE.BufferGeometry(), p = new Float32Array(N * 3), sv = new Float32Array(N);
+    for (let i = 0; i < N; i++) { p[i * 3] = (Math.random() - .5) * 34; p[i * 3 + 1] = Math.random() * 12; p[i * 3 + 2] = (Math.random() - .5) * 28; sv[i] = Math.random(); }
+    sg.setAttribute('position', new THREE.BufferAttribute(p, 3));
+    scene.add(new THREE.Points(sg, new THREE.PointsMaterial({color: 0xffffff, size: 2.5 + D.snow * .5, sizeAttenuation: false, transparent: true, opacity: .9})));
+
+    // 매 프레임
+    fx.push((dt, t) => {
+      const pa = sg.attributes.position.array;
+      for (let i = 0; i < N; i++) { let y = pa[i * 3 + 1] - (0.8 + sv[i] * .8) * dt * (1 + D.snow * .3), x = pa[i * 3] + (0.6 + D.snow * .3) * dt * (.6 + sv[i] * .4);
+        if (y < 0) { y = 12; x = (Math.random() - .5) * 34; } if (x > 17) x -= 34; pa[i * 3] = x; pa[i * 3 + 1] = y; pa[i * 3 + 2] += Math.sin(t + i) * dt * .2; }
+      sg.attributes.position.needsUpdate = true;
+      // 불
+      if (S.lit > 0) S.lit -= dt;
+      const goal = S.lit > 0 ? 1 : 0.35; S.fire += (goal - S.fire) * Math.min(1, dt * 2);
+      const fk = S.fire * (1 + Math.sin(t * 13) * .06 + Math.sin(t * 7.3) * .05);
+      fl.forEach((m, i) => { m.scale.set(fk, fk * (1.6 - i * .15) * (1 + Math.sin(t * 11 + i) * .08), fk); m.position.y = 0.2 + fk * (0.35 + i * .06); });
+      fireLight.intensity = 2 + S.fire * 6 + Math.sin(t * 17) * .4;
+      // 매머드
+      for (const q of herd) { const g = q.g;
+        let dx, dz, moving = false;
+        if (q.calf) { const m = q.mother.g.position; dx = m.x - 1.4 - g.position.x; dz = m.z + 0.2 - g.position.z; const d = Math.hypot(dx, dz); if (d > 1.1) { moving = true; const s = Math.min(d, q.speed * dt * Math.min(2, d / 1.6)); g.position.x += dx / d * s; g.position.z += dz / d * s; } else dx = null; }
+        else if (q.wait > 0) { q.wait -= dt; dx = null; }
+        else { dx = q.tx - g.position.x; dz = q.tz - g.position.z; const d = Math.hypot(dx, dz);
+          if (d < 0.2) { q.wait = 3 + Math.random() * 6; pick(q); dx = null; } else { moving = true; const s = Math.min(d, q.speed * dt); g.position.x += dx / d * s; g.position.z += dz / d * s; } }
+        if (moving && dx != null) { let df = Math.atan2(dx, dz) - g.rotation.y; df = Math.atan2(Math.sin(df), Math.cos(df)); g.rotation.y += df * Math.min(1, dt * 1.6); }
+        q.mv += ((moving ? 1 : 0) - q.mv) * Math.min(1, dt * 4); q.ph += dt * 2.2 * q.mv;
+        q.legs.forEach((l, i) => l.rotation.x = Math.sin(q.ph + (i === 1 || i === 2 ? Math.PI : 0)) * 0.35 * q.mv);
+        g.position.y = Math.abs(Math.sin(q.ph)) * 0.03 * q.mv;
+        if (q.lift > 0) q.lift -= dt;
+        q.tg.rotation.x = -Math.min(1, q.lift) * 1.3 + Math.sin(t * .8 + q.ph * .3) * .08;
+      }
+    });
+    // 털옷 사람들 — 불 곁 둘, 들판을 오가는 어른 하나, 아이 하나
+    const fur = {coat: 0x8a5a3a, pants: 0x4a3a2e, hat: {type: 'beanie', c: 0xd8c8a8}, scarf: 0xe8dcc0};
+    npc(fur, [[-9.3, -6.5]], {face: 1.35, idle: ['wave', 'stretch']});
+    npc({...fur, coat: 0x6a5a48, hair: 0x4a3322, hairStyle: 'bun', hat: null}, [[-5.7, -6.2]], {face: -1.41, idle: ['stretch', 'cheer']});
+    npc({...fur, coat: 0x9a7048}, [[-9.5, -2.8], [-3, -2.4]], {speed: 1.3, idle: ['wave']});
+    npc({...fur, coat: 0xb0703a, hat: {type: 'beanie', c: 0xc9472f}}, [[1, 3], [5, 3.6]], {speed: 1.2, scale: 0.95, idle: ['cheer', 'wave']});
+  },
+  lamps: [],
+  acts: [
+    {id: 'fire', icon: '🔥', label: '모닥불', spot: [-7.5, -4.3], face: Math.PI, run(c, done) {
+      c.play(`<h3>부싯돌 두 번</h3>
+        <p style="font-size:13px;color:#7a6e5e">막대가 초록 칸 안에 있을 때 「탁!」 두 번 맞춰요. 기회는 여섯 번.</p>
+        <div style="position:relative;height:34px;background:#d8cdb8;border:1.5px solid #2b2620;border-radius:4px;overflow:hidden;margin:8px 0">
+          <div id="zn" style="position:absolute;top:0;height:100%;background:#7fae6a"></div><div id="mk" style="position:absolute;top:0;width:6px;height:100%;background:#2b2620"></div></div>
+        <p id="msg" style="min-height:22px;font-size:14px">불꽃 0/2 · 기회 6</p>
+        <div class="row" style="justify-content:center"><button class="btn main" id="hit">탁!</button><button class="btn" id="qt">그만두기</button></div>`,
+        (el, close) => {
+          const zn = el.querySelector('#zn'), mk = el.querySelector('#mk'), msg = el.querySelector('#msg');
+          let hits = 0, tries = 6, ph = 0, ended = false, last = performance.now(), zl = 0, zw = 0;
+          const newZone = () => { zw = hits ? 14 : 22; zl = 6 + Math.random() * (88 - zw); zn.style.left = zl + '%'; zn.style.width = zw + '%'; };
+          const pos = () => (ph % 2 < 1 ? ph % 2 : 2 - ph % 2) * 100;
+          newZone();
+          (function tick(now) { if (ended || !el.isConnected) return; ph += (now - last) / 1000 * (0.9 + hits * 0.5); last = now; mk.style.left = `calc(${pos()}% - 3px)`; requestAnimationFrame(tick); })(last);
+          const fin = ms => setTimeout(() => { close(); done(); }, ms);
+          el.querySelector('#qt').onclick = () => { ended = true; close(); done(); };
+          el.querySelector('#hit').onclick = () => {
+            if (ended) return; const p = pos(), ok = p >= zl && p <= zl + zw; tries--;
+            if (ok) { hits++; c.beep(1300, .06, 0, 'square', .05); c.beep(1800, .04, .05, 'square', .04); } else c.beep(180, .15, 0, 'sawtooth', .04);
+            if (hits >= 2) { ended = true; msg.textContent = '불씨가 번졌어요!'; S.lit = 150; const n = c.count('fire'); c.DB.fireOk = (c.DB.fireOk || 0) + 1; c.save();
+              c.doAct(c.player, 'cheer'); setTimeout(() => c.stamp('불 붙였다', `오늘 ${n}번째`), 500); fin(900); }
+            else if (tries <= 0) { ended = true; msg.textContent = '불씨가 꺼졌어요'; c.count('fire'); c.toast('🔥 아쉽다. 바람이 불씨를 가져갔어요. 다시 해 봐요'); fin(1200); }
+            else { msg.textContent = `${ok ? '딱!' : '빗나갔어요'} · 불꽃 ${hits}/2 · 기회 ${tries}`; if (ok) newZone(); }
+          };
+        }); }},
+    {id: 'watch', icon: '🦣', label: '매머드', spot: [3, 4.5], face: Math.PI, run(c, done) {
+      c.doAct(c.player, 'crouch'); const n = c.count('watch');
+      setTimeout(() => { const q = S.herd[n % 3]; q.lift = 2; c.beep(110, 1.2, 0, 'sawtooth', .04); c.beep(150, 1, .25, 'sawtooth', .03);
+        c.toast('🦣 ' + MAMMOTH_LINE[(n + c.now().getDate()) % MAMMOTH_LINE.length], 3200); }, 900);
+      setTimeout(() => { if (n === 3) c.stamp('오래 봤다', '오늘 무리 구경 3번째'); done(); }, 3300); }},
+    {id: 'paint', icon: '🎨', label: '벽화', spot: [-4.6, -8], face: Math.PI, run(c, done) {
+      const D = daily(c.now());
+      c.play(`<h3>동굴 벽화</h3>
+        <p style="font-size:13px;color:#7a6e5e;margin:2px 0 8px">오늘 그려 볼 것: <b>${D.topic}</b></p>
+        <canvas id="cv" width="280" height="190" style="width:100%;max-width:280px;border:1.5px solid #2b2620;border-radius:4px;touch-action:none;cursor:crosshair"></canvas>
+        <div id="sw" style="display:flex;gap:8px;justify-content:center;margin:8px 0"></div>
+        <div class="row" style="justify-content:center"><button class="btn" id="tl">✋ 손바닥</button><button class="btn" id="cl">지우기</button><button class="btn main" id="sv">벽에 남기기</button><button class="btn" id="qt">닫기</button></div>`,
+        (el, close) => {
+          const cv = el.querySelector('#cv'), g = cv.getContext('2d'); let col = '#b8372a', down = false, last = null, drew = false, stampMode = false;
+          const bg = () => { g.fillStyle = '#6a5646'; g.fillRect(0, 0, 280, 190); g.fillStyle = '#76624f'; for (let i = 0; i < 90; i++) g.fillRect(Math.random() * 280, Math.random() * 190, 3 + Math.random() * 5, 2); drew = false; };
+          bg();
+          [['황토', '#c98a3a'], ['붉은 흙', '#b8372a'], ['숯', '#1e1a16'], ['흰 돌가루', '#efe6d2']].forEach(([n, cc]) => { const b = document.createElement('button');
+            b.title = n; b.style.cssText = `width:30px;height:30px;border-radius:50%;background:${cc};border:2px solid ${cc === col ? '#2b2620' : '#fff8ec'};cursor:pointer`;
+            b.onclick = () => { col = cc; stampMode = false; el.querySelector('#tl').style.background = ''; [...b.parentNode.children].forEach(x => x.style.borderColor = '#fff8ec'); b.style.borderColor = '#2b2620'; };
+            el.querySelector('#sw').appendChild(b); });
+          const P = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * 280 / r.width, (e.clientY - r.top) * 190 / r.height]; };
+          const hand = (x, y) => { g.fillStyle = col; g.beginPath(); g.ellipse(x, y, 15, 17, 0, 0, 7); g.fill();
+            for (const [dx, dy, r] of [[-14, -20, -.35], [-6, -28, -.1], [3, -29, .05], [11, -25, .25], [19, -5, .9]]) { g.beginPath(); g.ellipse(x + dx, y + dy, 4.5, 11, r, 0, 7); g.fill(); } };
+          cv.onpointerdown = e => { cv.setPointerCapture(e.pointerId); const [x, y] = P(e); drew = true;
+            if (stampMode) { hand(x, y); c.beep(300, .05, 0, 'sine', .04); return; }
+            down = true; last = [x, y]; g.fillStyle = col; g.beginPath(); g.arc(x, y, 3, 0, 7); g.fill(); };
+          cv.onpointermove = e => { if (!down) return; const [x, y] = P(e); g.strokeStyle = col; g.lineWidth = 6; g.lineCap = g.lineJoin = 'round'; g.beginPath(); g.moveTo(...last); g.lineTo(x, y); g.stroke(); last = [x, y]; };
+          cv.onpointerup = cv.onpointercancel = () => { down = false; };
+          el.querySelector('#tl').onclick = e => { stampMode = !stampMode; e.currentTarget.style.background = stampMode ? '#e2d3b3' : ''; };
+          el.querySelector('#cl').onclick = bg;
+          el.querySelector('#qt').onclick = () => { close(); done(); };
+          el.querySelector('#sv').onclick = () => {
+            if (!drew) { c.toast('🎨 아직 빈 벽이에요. 한 줄이라도 그려 봐요'); return; }
+            const th = document.createElement('canvas'); th.width = 200; th.height = 136; th.getContext('2d').drawImage(cv, 0, 0, 200, 136);
+            const d = c.now(); c.DB.art = (c.DB.art || []).concat({d: c.dkey(d), t: c.hm(d), topic: D.topic, img: th.toDataURL('image/jpeg', 0.8)}).slice(-6);
+            const n = c.count('paint'); c.save(); S.refresh && S.refresh(); close(); c.doAct(c.player, 'cheer');
+            c.stamp('벽에 남김', `오늘 ${n}번째 그림`); setTimeout(done, 1500); };
+        }); }},
+    {id: 'fact', icon: '📜', label: '사실', spot: [-1.5, -4.8], face: Math.PI, run(c, done) {
+      const d = c.now(), D = daily(d), i = D.dn % FACT.length, first = !c.today().fact; c.beep(260, .08, 0, 'sine', .05); c.count('fact');
+      const seen = new Set(c.DB.facts || []); seen.add(i); c.DB.facts = [...seen]; c.save();
+      setTimeout(() => c.dialog('오늘의 빙하기 사실', `${c.hm(d)} · ${c.visits()}번째 온 날`,
+        `<p style="font-size:13px;color:#7a6e5e;margin:0">오늘 들판 ${D.t}°C · ${SNOWTXT[D.snow]}</p>
+         <p style="font-size:16px">「${FACT[i]}」</p>
+         <p style="font-size:13px;color:#7a6e5e;margin:4px 0">오늘 벽에 그려 볼 것: ${D.topic}</p>` + (first ? '' : '<p style="color:#7a6e5e;font-size:13px">오늘의 사실은 하루에 하나. 내일 또 와요.</p>'), [['잘 읽었다', done, 'main']]), 500); }},
+  ],
+  recExtra: c => { const arts = (c.DB.art || []).slice().reverse();
+    return `<p style="font-size:13px;color:#7a6e5e">읽은 사실 ${(c.DB.facts || []).length}/${FACT.length}개 · 불 붙인 횟수 ${c.DB.fireOk || 0}번</p>`
+      + `<p style="font-size:13px;margin:8px 0 4px"><b>최근 벽화 ${arts.length}점</b></p>`
+      + (arts.length ? `<div style="display:flex;flex-wrap:wrap;gap:8px">${arts.map(a => `<div style="font-size:11px;color:#7a6e5e;text-align:center"><img src="${a.img}" style="width:96px;border:1.5px solid #2b2620;border-radius:3px;display:block"><span>${a.d.slice(5)} ${a.t}<br>${a.topic}</span></div>`).join('')}</div>` : '<p style="font-size:13px;color:#7a6e5e">아직 남긴 그림이 없어요</p>'); },
+  onEnter(c) { c.toast(c.visits() > 1 ? `🦣 ${c.visits()}번째 나들이. 오늘도 눈이 와요` : '🦣 매머드들은 오늘도 느긋해요. 불부터 쬐어 볼까요', 3000); },
+});
+</script></body></html>

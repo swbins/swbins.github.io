@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>쉬어가기 미니게임 — 잠깐 들렀다 가는 곳</title>
+<meta name="description" content="가입 없이 바로 들어가는 작은 3D 장소들. 포장마차·남극·우주정거장·공룡 시대 — 계속 늘어나요.">
+<style>
+  body{margin:0;background:#f4ecdc;color:#2b2620;font-family:"Pretendard","Malgun Gothic",sans-serif;
+    background-image:repeating-linear-gradient(#f4ecdc 0 31px,#e6dcc8 31px 32px)}
+  main{max-width:720px;margin:0 auto;padding:36px 18px 60px}
+  h1{font-size:30px;margin:0 0 6px}
+  .sub{color:#7a6e5e;margin:0 0 26px;line-height:1.6}
+  a.back{color:#c9472f;font-weight:600;text-decoration:none}
+  .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+  .g{display:block;background:#fffaf0;border:2px solid #2b2620;box-shadow:3px 3px 0 #2b2620;border-radius:6px;padding:16px;text-decoration:none;color:inherit}
+  .g:active{transform:translate(1px,1px);box-shadow:2px 2px 0 #2b2620}
+  .g .ic{font-size:34px}
+  .g h2{font-size:18px;margin:6px 0 4px}
+  .g p{font-size:13px;color:#5a4f42;margin:0;line-height:1.55}
+  .g .t{display:inline-block;margin-top:8px;font-size:11px;color:#7a6e5e;border:1px solid #b3a58c;border-radius:3px;padding:1px 6px}
+  .g{position:relative}
+  .g .now{position:absolute;right:10px;top:10px;background:#c9472f;color:#fff8ec;font-size:12px;font-weight:700;border-radius:10px;padding:2px 8px}
+  .plaza{display:flex;gap:14px;align-items:center;margin:0 0 18px;background:#2b3a5a;color:#fff8ec;border-color:#2b2620}
+  .plaza p{color:#e6dcc8}.plaza .ic{font-size:44px}.plaza .t{color:#e6dcc8;border-color:#8a9ab8}
+  .soon{opacity:.55;box-shadow:none;border-style:dashed;pointer-events:none}
+  footer{margin-top:30px;font-size:12px;color:#7a6e5e}
+</style></head>
+<body><main>
+<a class="back" href="../rest/">↩ 쉬어가기</a>
+<h1>미니게임</h1>
+<p class="sub">가입 없이 바로 들어가는 작은 장소들. 할 일은 단추 몇 개뿐 —<br>잠깐 머물다 가요. 기록은 이 기기에만 남고, 장소는 계속 늘어나요.</p>
+<a class="g plaza" href="plaza/"><div class="ic">⛲</div><div><h2>광장 — 다 같이 모이는 곳</h2><p>문 서른여덟 개가 둘러선 3D 광장. 다른 사람들과 같이 걷다가 마음에 드는 문으로 들어가요.</p><span class="t" id="plazaNow">같이 · 처음은 여기서</span></div></a>
+<div class="list">
+  <a class="g" href="village/"><div class="ic">🔍</div><h2>추리마을</h2><p>눈 내리는 3D 마을을 걸으며 단서를 줍고 범인을 찍어요. 사건 6개 — 다른 탐정들도 같이 돌아다녀요.</p><span class="t">10분 · 같이</span></a>
+  <a class="g" href="pocha/"><div class="ic">🍢</div><h2>퇴근길 포장마차</h2><p>어묵 하나, 짠 한 번, 한숨 한 번. 이모가 하루 한마디 해 줘요.</p><span class="t">밤 · 1분</span></a>
+  <a class="g" href="bungeo/"><div class="ic">🐟</div><h2>붕어빵 노점</h2><p>타이밍 맞춰 뒤집어 황금 붕어빵. 줄 선 손님에게 건네요.</p><span class="t">눈 · 2분</span></a>
+  <a class="g" href="rooftop/"><div class="ic">🌙</div><h2>옥상 별 캠핑</h2><p>날마다 바뀌는 별자리를 잇고, 소원 등불을 날려요.</p><span class="t">밤 · 2분</span></a>
+  <a class="g" href="mong/"><div class="ic">🌿</div><h2>몽글숲</h2><p>날마다 숨는 몽글이가 바뀌는 숲. 열매 건네고 친구 모으기 — 다른 사람도 같이 돌아다녀요.</p><span class="t">매일 · 같이</span></a>
+  <a class="g" href="office/"><div class="ic">🪪</div><h2>출근 도장</h2><p>회사 로비에서 출근 찍고, 퇴근은 엘리베이터로.</p><span class="t">매일 · 1분</span></a>
+  <a class="g" href="antarctica/"><div class="ic">🐧</div><h2>남극 기지</h2><p>펭귄 세기·눈보라 버티기·얼음 시추. 날마다 기온과 바람이 달라요.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="arctic/"><div class="ic">🌌</div><h2>북극 오로라</h2><p>가장 환할 때 셔터. 날마다 오로라 색이 바뀌어요.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="amazon/"><div class="ic">🐬</div><h2>아마존 강 배</h2><p>노 젓고, 새소리 맞히고, 분홍 돌고래를 찾아요.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="station/"><div class="ic">🛰</div><h2>우주정거장</h2><p>둥둥 떠서 창밖 지구를 보고, 도킹을 맞춰요.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="dino/"><div class="ic">🦕</div><h2>공룡 시대</h2><p>알을 지키고 발자국을 남겨요. 오늘의 공룡 한 종.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="future/"><div class="ic">🚖</div><h2>2100년 서울</h2><p>하늘 택시, 로봇 커피, 옛날 물건 박물관.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="moon/"><div class="ic">🌕</div><h2>달 기지</h2><p>깡충 걷고, 발자국을 남기고, 지구돋이를 봐요.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="deepsea/"><div class="ic">🐙</div><h2>심해 잠수정</h2><p>탐조등을 켜고 반짝이는 생물을 찾아요. 고래 소리도.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="joseon/"><div class="ic">🪙</div><h2>조선 장터</h2><p>오일장에서 옹기 값을 깎고, 주막 국밥 한 그릇.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="laundry/"><div class="ic">🫧</div><h2>동네 빨래방</h2><p>밤 11시 세탁기 멍때리기. 오늘의 동네 쪽지.</p><span class="t">밤 · 2분</span></a>
+  <a class="g" href="busstop/"><div class="ic">🚌</div><h2>비 오는 버스 정류장</h2><p>버스 기다리고, 김 서린 유리에 낙서하고, 우산 씌워 주기.</p><span class="t">저녁 · 2분</span></a>
+  <a class="g" href="hangang/"><div class="ic">🪁</div><h2>한강 돗자리</h2><p>치킨 배달, 연 날리기, 노을 보기, 한강 라면.</p><span class="t">2분</span></a>
+  <a class="g" href="cvs/"><div class="ic">🍙</div><h2>새벽 편의점</h2><p>오늘의 1+1 찾기, 컵라면 3분, 창가 혼잣말.</p><span class="t">새벽 · 2분</span></a>
+  <a class="g" href="jjim/"><div class="ic">🐑</div><h2>동네 찜질방</h2><p>양머리 접기, 식혜, 계란 이마로 깨기, 불가마 버티기.</p><span class="t">2분</span></a>
+  <a class="g" href="mars/"><div class="ic">🔴</div><h2>화성 기지</h2><p>먼지 폭풍 버티고, 로버 몰고, 온실 감자를 12일 동안 키워요.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="everest/"><div class="ic">🏔</div><h2>에베레스트 베이스캠프</h2><p>숨 고르기, 버터차, 오색 깃발 걸기, 오늘의 정상 날씨.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="pyramid/"><div class="ic">🔺</div><h2>피라미드 안쪽</h2><p>횃불 들고 상형 기호 짝 맞추기. 오늘의 이집트 이야기.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="volcano/"><div class="ic">🌋</div><h2>화산 관측소</h2><p>용암 줄기 지켜보기, 지진계 바늘 맞추기, 화산재 시료 모으기.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="sahara/"><div class="ic">🐪</div><h2>사하라 사막 밤</h2><p>낙타 곁에서 쉬고, 모래 언덕 미끄럼, 별똥별 세기, 오아시스 물 긷기.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="liner1912/"><div class="ic">🚢</div><h2>1912 대서양 여객선</h2><p>밤 갑판 산책, 모스 부호 따라 치기, 바다 위 별, 식당칸 홍차.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="iss-walk/"><div class="ic">🧑‍🚀</div><h2>우주 유영</h2><p>안전줄 잡고 레일 따라, 태양 전지판 닦기, 지구 위 번개 세기.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="cave/"><div class="ic">🦇</div><h2>깊은 동굴</h2><p>물방울 소리, 박쥐 세기, 헤드램프 끄고 완전한 어둠, 종유석 재기.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="treetop/"><div class="ic">🦥</div><h2>열대 우림 꼭대기</h2><p>흔들다리 건너기, 나무늘보 찾기, 갑자기 쏟아지는 스콜.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="dragon-palace/"><div class="ic">🐢</div><h2>바닷속 용궁</h2><p>거북 등에 타고, 별주부 이야기 한 토막, 조개 속 진주 찾기.</p><span class="t">옛이야기</span></a>
+  <a class="g" href="iceage/"><div class="ic">🦣</div><h2>빙하기 들판</h2><p>부싯돌로 불 피우고, 매머드 무리를 보고, 동굴 벽화를 그려요.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="stationery/"><div class="ic">🍬</div><h2>학교 앞 문방구</h2><p>뽑기, 딱지치기, 오늘의 불량 간식, 할아버지 한마디.</p><span class="t">오후 · 2분</span></a>
+  <a class="g" href="arcade/"><div class="ic">🕹</div><h2>지하 오락실</h2><p>동전 바꾸고 반응 속도 한 판, 인형 뽑기, 옆자리 형 훈수.</p><span class="t">밤 · 2분</span></a>
+  <a class="g" href="karaoke/"><div class="ic">🎤</div><h2>코인 노래방</h2><p>동전 넣고 오늘의 곡, 박자 맞춰 부르고 점수, 탬버린, 벽 방명록.</p><span class="t">밤 · 2분</span></a>
+  <a class="g" href="kimjang/"><div class="ic">🥬</div><h2>김장하는 마당</h2><p>잎 사이사이 속 넣기, 간 보기, 수육 한 점, 할머니 한마디.</p><span class="t">초겨울 · 2분</span></a>
+  <a class="g" href="fish-auction/"><div class="ic">🦀</div><h2>새벽 수산시장 경매</h2><p>오늘 들어온 생선 보고 낙찰가 맞히기, 얼음 한 삽, 새벽 해장국.</p><span class="t">새벽 · 2분</span></a>
+  <a class="g" href="lighthouse/"><div class="ic">🗼</div><h2>외딴섬 등대</h2><p>등대 신호 깜박임 세기, 지나가는 배, 갈매기, 오늘의 등대 일지.</p><span class="t">못 가는 곳</span></a>
+  <a class="g" href="night-flight/"><div class="ic">✈️</div><h2>밤 비행기 창가 자리</h2><p>창밖 구경, 기내식 고르기, 흔들리면 벨트 딸깍, 담요 덮고 졸기.</p><span class="t">밤 · 2분</span></a></div>
+<footer>swbins · 쉬어가기 미니게임</footer>
+<script type="module">
+// 카드마다 「지금 N명」 — 실시간 서버(live.js)에서 30초마다. 안 되면 그냥 안 보인다.
+import {liveCounts} from './live.js';
+async function show() {
+  const c = await liveCounts(); if (!c) return;
+  for (const a of document.querySelectorAll('a.g')) {
+    const slug = a.getAttribute('href').replace(/\/$/, ''), n = c[slug] || 0;
+    let b = a.querySelector('.now'); if (!n) { b?.remove(); continue; }
+    if (!b) { b = document.createElement('span'); b.className = 'now'; a.appendChild(b); }
+    b.textContent = `👥 지금 ${n}명`;
+  }
+}
+show(); setInterval(() => { if (!document.hidden) show(); }, 30000);
+</script>
+</main></body></html>

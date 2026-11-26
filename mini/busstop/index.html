@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>비 오는 버스 정류장</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+const ROUTES = [7, 143, 2412, 9, 6628, 34, 1100, 5516, 21, 472];
+const THEMES = ['우산', '고양이', '집', '별', '웃는 얼굴', '구름', '버스', '하트', '물웅덩이', '내일', '김밥', '달'];
+const MOODS = ['창문에 빗방울이 박자를 맞춰 주는 느린 피아노 소리.', '조금 졸린 기타 한 대. 보컬은 거의 속삭인다.', '퇴근길 같은 미디엄 템포. 후렴에서 괜히 고개가 끄덕여진다.',
+  '낮게 깔리는 베이스, 젖은 길 같은 리듬. 걷고 싶어진다.', '가사가 없는 노래. 대신 빗소리가 가사를 쓴다.', '옛날 노래 같은데 처음 듣는다. 이상하게 그립다.',
+  '신나는 노래인데 비 오는 날 들으니 약간 쓸쓸하다. 그래도 신난다.', '오르골 같은 소리. 집에 가고 싶다.', '재즈 같은 것. 정확히는 모르지만 우산을 천천히 돌리게 된다.',
+  '볼륨을 두 칸 올린다. 세상이 한 칸 멀어진다.', '목소리가 따뜻한 노래. 버스가 좀 늦어도 괜찮아진다.'];
+const AGAIN = ['같은 노래를 한 번 더 듣는다. 이번엔 둘째 소절이 들린다.', '이어폰 한쪽을 뺀다. 빗소리와 반반.'];
+const THANKS = ['어, 고맙습니다. 마침 우산을 두고 나왔어요.', '아, 괜찮은데… 안 괜찮았어요. 고마워요.', '모르는 사람이 우산을 씌워 주면 놀라는데, 고맙네요.',
+  '어깨가 반쯤 젖었었는데. 덕분에 반이 말랐어요.', '버스 오면 알려 줄게요. 아, 우산 쓰셨으니 먼저 타세요.', '이 정류장 사람들은 다 이래요? …좋네요.',
+  '내일은 제가 씌워 드릴게요. 내일 비 오면요.', '아까부터 계속 망설였어요. 먼저 해 주셔서 고마워요.'];
+const RIDE_BACK = ['한 정거장 가서 내렸다. 걸어서 돌아왔다. 오늘의 산책.', '창가에 앉았다가 졸았다. 종점 전에 겨우 깼다. 돌아왔다.', '탔다. 앉았다. 기사님과 눈이 마주쳤다. 한 정거장 만에 내렸다.'];
+const UMB = [0xe0b040, 0xc9472f, 0x3a8a5a, 0x6a5ab0, 0xd65a8a];
+const seedOf = d => d.getFullYear() * 372 + (d.getMonth() + 1) * 31 + d.getDate();
+const rng = seed => { let s = seed * 7919 % 2147483647 || 1; return () => (s = s * 48271 % 2147483647) / 2147483647; };
+const S = {route: 7, route2: 9, eta: 7, gap: 8, state: 'away', fast: false, hold: false, waiting: false, t: 0, vx: 0, bob: false, shown: '', umb: 0xe0b040, notes: []};
+
+start({
+  key: 'busstop', title: '비 오는 버스 정류장', enter: '우산 들고 서기', time: 'evening', nickIcon: '🌧',
+  nick: [['우산 없는', '막차 기다리는', '양말 젖은', '이어폰 낀', '몇 번 타는지 아는', '졸린'], ['승객', '우산', '정류장', '손잡이', '교통카드', '물웅덩이']],
+  intro: '<p>비 오는 저녁, 유리 대기소.<br>안내판 숫자가 줄어드는 걸 보다 가요.</p>',
+  floor: {w: 30, d: 24, c1: '#3a3f4a', c2: '#444a56', pattern: 'tile', around: 0x12161f},
+  bg: {evening: 0x1b2438}, startPos: [0, 8], cam: {h: 10, back: 12},
+  playerLook: {coat: 0x4a6a8a, pants: 0x2b2f3a, hair: 0x2a2018},
+  onTime(p, c) { c.scene.children.forEach(o => { if (o.isDirectionalLight) { o.color.setHex(0xa8bcd8); o.intensity = 0.6; } if (o.isHemisphereLight) o.intensity = 0.8; }); },
+  build(c) {
+    const {box, cyl, ball, glowBall, sign, solid, npc, fx, THREE, scene} = c;
+    const sd = seedOf(c.now());
+    S.route = ROUTES[sd % ROUTES.length]; S.route2 = ROUTES[(sd + 3) % ROUTES.length]; S.eta = 5 + sd % 6; S.gap = 6 + sd % 5; S.umb = UMB[sd % UMB.length];
+    const basic = (col, o = {}) => new THREE.MeshBasicMaterial({color: col, ...o});
+    const lamb = (col, o = {}) => new THREE.MeshLambertMaterial({color: col, ...o});
+    // 글자 판 — draw(g, W, H, ...인자) 를 다시 부르면 다시 그린다
+    function panel(w, h, draw, x, y, z, parent = scene) {
+      const cv = document.createElement('canvas'); cv.width = 512; cv.height = Math.round(512 * h / w); const g = cv.getContext('2d');
+      const tx = new THREE.CanvasTexture(cv); tx.colorSpace = THREE.SRGBColorSpace;
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({map: tx})); m.position.set(x, y, z); parent.add(m);
+      const redraw = (...a) => { draw(g, cv.width, cv.height, ...a); tx.needsUpdate = true; }; redraw(); return {m, redraw};
+    }
+    const FONT = '"Malgun Gothic",sans-serif';
+
+    // 길 — 젖은 아스팔트, 연석, 차선
+    box(30, 0.04, 7.6, 0x1b1e25, 0, 0.02, -7.7); box(30, 0.18, 0.35, 0x6a6e78, 0, 0.09, -3.85);
+    for (let i = 0; i < 10; i++) box(1.4, 0.02, 0.12, 0xd8d0a0, -13.5 + i * 3, 0.05, -8.2);
+    // 길 건너 건물 — 약국·편의점 간판, 창
+    box(30, 9, 0.5, 0x252b3a, 0, 4.5, -11.75);
+    const R = rng(77);
+    for (let r = 0; r < 2; r++) for (let i = 0; i < 9; i++) if (R() > 0.35) { const w = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.1), basic(R() > 0.5 ? 0xffd890 : 0xcfe0f0, {transparent: true, opacity: .8}));
+      w.position.set(-12.5 + i * 3.1, 3 + r * 2.6, -11.47); scene.add(w); }
+    sign(['24시 약국'], 5.2, 1.4, '#2f8a5a', '#f4ecdc', -8, 6.6, -11.45, 0, [64]); sign(['편의점'], 4.2, 1.2, '#2f6fb0', '#fff8ec', 8.5, 6.6, -11.45, 0, [60]);
+    for (const x of [-8, 8.5]) { const w = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 2.2), basic(0xfff0c8, {transparent: true, opacity: .75})); w.position.set(x, 1.8, -11.47); scene.add(w); }
+    // 가로등 둘
+    for (const x of [-9, 9.5]) { cyl(0.07, 0.09, 5, 0x3a3e48, x, 2.5, -3.3); box(0.8, 0.08, 0.08, 0x3a3e48, x + 0.3, 5, -3.3); glowBall(0.3, 0xffd890, x + 0.6, 4.95, -3.3, 0); }
+
+    // 유리 대기소 — 기둥 넷, 뒤·양옆 유리, 뒤쪽 지붕 띠만
+    const glass = lamb(0x9ac4e0, {transparent: true, opacity: .16, side: THREE.DoubleSide, emissive: 0x203040});
+    for (const [x, z] of [[-4, -3.1], [4, -3.1], [-4, 0.4], [4, 0.4]]) box(0.12, 3.4, 0.12, 0x5a606c, x, 1.7, z);
+    const gb = new THREE.Mesh(new THREE.PlaneGeometry(8, 2.6), glass); gb.position.set(0, 1.7, -3.1); scene.add(gb);
+    for (const x of [-4, 4]) { const gs = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 2.6), glass); gs.position.set(x, 1.7, -1.35); gs.rotation.y = Math.PI / 2; scene.add(gs); }
+    box(8.4, 0.14, 1.4, 0x4a505c, 0, 3.45, -2.9); box(8.4, 0.06, 0.1, 0x2f6fb0, 0, 3.32, -2.2);
+    glowBall(0.12, 0xe8f4ff, 0, 3.3, -2.4, 10, 12);
+    // 도착 안내판 — 숫자가 정말 줄어든다
+    const board = panel(3.6, 1.1, (g, W, H, a = '', b = '') => {
+      g.fillStyle = '#0c1018'; g.fillRect(0, 0, W, H); g.fillStyle = '#ffb347'; g.font = `800 58px ${FONT}`; g.textBaseline = 'middle';
+      g.textAlign = 'left'; g.fillText(S.route + '번', 24, H * 0.3); g.fillText(S.route2 + '번', 24, H * 0.72);
+      g.textAlign = 'right'; g.fillText(a, W - 24, H * 0.3); g.fillStyle = '#d89a50'; g.fillText(b, W - 24, H * 0.72);
+    }, 0.4, 2.8, -3.05);
+    // 노선도, 포스터
+    panel(1.5, 1.9, (g, W, H) => {
+      g.fillStyle = '#f4ecdc'; g.fillRect(0, 0, W, H); g.fillStyle = '#2b2620'; g.font = `800 40px ${FONT}`; g.textAlign = 'center'; g.fillText('노선도', W / 2, 44);
+      g.fillStyle = '#2f6fb0'; g.fillRect(W / 2 - 4, 80, 8, H - 120);
+      ['종점', '시장', '학교', '우체국', '골목 입구', '병원'].forEach((n, i) => { const y = 92 + i * ((H - 150) / 5); g.fillStyle = n === '골목 입구' ? '#c9472f' : '#2f6fb0';
+        g.beginPath(); g.arc(W / 2, y, n === '골목 입구' ? 14 : 9, 0, 7); g.fill(); g.fillStyle = '#2b2620'; g.font = `700 26px ${FONT}`; g.textAlign = 'left'; g.fillText(n, W / 2 + 24, y + 2); });
+    }, -2.9, 1.9, -3.05);
+    panel(1.6, 1.9, (g, W, H) => { g.fillStyle = '#e8c860'; g.fillRect(0, 0, W, H); g.fillStyle = '#2b2620'; g.textAlign = 'center'; g.font = `800 58px ${FONT}`;
+      g.fillText('내일은', W / 2, H * 0.3); g.font = `800 96px ${FONT}`; g.fillText('맑음', W / 2, H * 0.55); g.font = `700 38px ${FONT}`; g.fillText('(아마도)', W / 2, H * 0.82); }, 3.4, 1.9, -3.05);
+    // 벤치
+    box(3, 0.12, 0.8, 0x7a5a3a, -2.2, 0.55, -2.2); box(3, 0.7, 0.1, 0x7a5a3a, -2.2, 1.0, -2.6); for (const dx of [-1.3, 1.3]) box(0.1, 0.5, 0.7, 0x4a4e58, -2.2 + dx, 0.25, -2.2); solid(-2.2, -2.2, 3, 1.1);
+    // 정류장 표지, 쓰레기통
+    cyl(0.06, 0.06, 3.2, 0x888888, 6.2, 1.6, -2); sign(['버스', '정류장'], 1.3, 0.9, '#2f6fb0', '#fff8ec', 6.2, 3.4, -1.95, 0, [34]); solid(6.2, -2, 0.4, 0.4);
+    cyl(0.3, 0.26, 0.8, 0x3a6a4a, -6.8, 0.4, -2.6); solid(-6.8, -2.6, 0.7, 0.7);
+
+    // 버스 — 길 위, 오른쪽으로 달려 서고, 떠난다
+    const bus = new THREE.Group(); bus.position.set(-26, 0, -6.6); bus.visible = false; scene.add(bus);
+    box(7, 2.5, 2.4, 0x2f6fb0, 0, 1.45, 0, bus); box(7.05, 0.28, 2.42, 0xf4ecdc, 0, 0.55, 0, bus);
+    box(6.2, 0.85, 2.44, basic(0xffe6a8), -0.2, 1.85, 0, bus); for (const x of [-2.5, -0.9, 0.7]) box(0.12, 0.9, 2.46, 0x2f6fb0, x, 1.85, 0, bus);
+    box(1.1, 1.8, 0.04, 0x9ab6d0, 2.55, 1.25, 1.23, bus);
+    for (const x of [-2.2, 2.2]) for (const z of [-1.15, 1.15]) cyl(0.45, 0.45, 0.3, 0x1a1a1a, x, 0.45, z, bus).rotation.x = Math.PI / 2;
+    for (const z of [-0.8, 0.8]) { ball(0.18, basic(0xfff2c0), 3.5, 0.8, z, bus); ball(0.14, basic(0xff4a3a), -3.5, 0.8, z, bus); }
+    const pool = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 1.8), basic(0xfff0b8, {transparent: true, opacity: .16, depthWrite: false})); pool.rotation.x = -Math.PI / 2; pool.position.set(5.2, 0.06, 0); bus.add(pool);
+    panel(1.5, 0.36, (g, W, H) => { g.fillStyle = '#0c1018'; g.fillRect(0, 0, W, H); g.fillStyle = '#ffb347'; g.font = `800 ${Math.round(H * 0.8)}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(S.route + '번', W / 2, H / 2); }, 2.3, 2.5, 1.22, bus);
+    const STOP_X = -0.5, label = () => S.state === 'arriving' ? '곧 도착' : S.state === 'stopped' ? '도착' : Math.max(1, Math.ceil(S.eta)) + '분 후';
+    const label2 = () => (Math.max(1, Math.ceil(S.eta)) + S.gap) + '분 후';
+    S.label = label;
+    S.leave = () => { S.state = 'leaving'; S.vx = 0.5; S.eta = 7 + Math.random() * 5; S.hold = false; c.beep(160, .5, 0, 'sawtooth', .03); };
+    fx.push(dt => {
+      if (S.state === 'away') { S.eta -= dt / (S.fast ? 0.9 : 30); if (S.eta <= 0) { S.eta = 0; S.state = 'arriving'; bus.position.x = -26; } }
+      else if (S.state === 'arriving') { bus.position.x += Math.max(1.2, Math.min(11, (STOP_X - bus.position.x) * 1.1)) * dt;
+        if (STOP_X - bus.position.x < 0.05) { bus.position.x = STOP_X; S.state = 'stopped'; S.t = 0; c.beep(200, .4, 0, 'sawtooth', .03); if (!S.waiting) c.toast(`🚌 ${S.route}번이 섰다. 아무도 안 탄다`, 2400); } }
+      else if (S.state === 'stopped') { S.t += dt; if (!S.hold && S.t > 6) S.leave(); }
+      else if (S.state === 'leaving') { S.vx += 5 * dt; bus.position.x += S.vx * dt; if (bus.position.x > 26) S.state = 'away'; }
+      bus.visible = S.state !== 'away';
+      const a = label(), b = label2(); if (a + b !== S.shown) { S.shown = a + b; board.redraw(a, b); }
+    });
+
+    // 지나가는 차 — 불빛이 젖은 길에 번진다
+    const cars = [];
+    function mkCar(col, dir, z, wait) {
+      const g = new THREE.Group(); g.position.set(-dir * 22, 0, z); g.visible = false; scene.add(g);
+      box(2.6, 0.7, 1.3, col, 0, 0.6, 0, g); box(1.4, 0.5, 1.1, 0x1c2430, -0.1 * dir, 1.2, 0, g);
+      for (const dz of [-0.45, 0.45]) { ball(0.12, basic(0xfff2c0), dir * 1.32, 0.65, dz, g); ball(0.1, basic(0xff4a3a), -dir * 1.32, 0.65, dz, g); }
+      const p = new THREE.Mesh(new THREE.PlaneGeometry(4, 1.6), basic(0xfff0b8, {transparent: true, opacity: .15, depthWrite: false})); p.rotation.x = -Math.PI / 2; p.position.set(dir * 3.5, 0.06, 0); g.add(p);
+      cars.push({g, dir, wait, v: 9}); }
+    mkCar(0x8a3a3a, 1, -9.5, 2); mkCar(0x5a6a7a, -1, -10.5, 7);
+    fx.push(dt => cars.forEach(o => { if (o.wait > 0) { o.wait -= dt; return; } o.g.visible = true; o.g.position.x += o.dir * o.v * dt;
+      if (Math.abs(o.g.position.x) > 22) { o.g.visible = false; o.wait = 4 + Math.random() * 9; o.g.position.x = -o.dir * 22; o.v = 8 + Math.random() * 5; } }));
+
+    // 비 — 빗줄기, 웅덩이와 물결
+    const rg = new THREE.BoxGeometry(0.025, 0.7, 0.025), rm = basic(0xaec8ee, {transparent: true, opacity: .4}), drops = [];
+    for (let i = 0; i < 170; i++) { const m = new THREE.Mesh(rg, rm); m.position.set(-15 + Math.random() * 30, Math.random() * 9, -11 + Math.random() * 23); m.rotation.z = 0.12; m.userData.v = 13 + Math.random() * 4; scene.add(m); drops.push(m); }
+    fx.push(dt => drops.forEach(m => { m.position.y -= m.userData.v * dt; m.position.x += m.userData.v * dt * 0.12;
+      if (m.position.y < 0.2) { m.position.y = 9; m.position.x = -15 + Math.random() * 30; m.position.z = -11 + Math.random() * 23; } }));
+    const pmat = lamb(0x3a587a, {transparent: true, opacity: .6, emissive: 0x14233a}), ripples = [];
+    for (const [x, z, r] of [[-6.5, 4.2, 1.4], [4.5, 5.2, 1.1], [-1.5, 8.8, 1.2], [7, 0.8, 0.9]]) {
+      const p = new THREE.Mesh(new THREE.CircleGeometry(r, 24), pmat); p.rotation.x = -Math.PI / 2; p.position.set(x, 0.03, z); p.scale.set(1.4, 0.9, 1); scene.add(p);
+      for (let i = 0; i < 2; i++) { const m = new THREE.Mesh(new THREE.RingGeometry(0.18, 0.24, 24), basic(0xcfe0f5, {transparent: true, opacity: .4, depthWrite: false, side: THREE.DoubleSide}));
+        m.rotation.x = -Math.PI / 2; scene.add(m); ripples.push({m, x, z, r, ph: Math.random() + i * 0.5, last: 1}); } }
+    fx.push((dt, t) => ripples.forEach(o => { const k = (t * 0.9 + o.ph) % 1;
+      if (k < o.last) { const a = Math.random() * 6.28, rr = Math.random() * o.r * 0.6; o.m.position.set(o.x + Math.cos(a) * rr * 1.3, 0.06, o.z + Math.sin(a) * rr * 0.8); }
+      o.last = k; o.m.scale.setScalar(0.3 + k * 1.8); o.m.material.opacity = .5 * (1 - k); }));
+
+    // 사람 — 대기소 안 한 명(폰), 밖에서 비 맞는 한 명(우산 받을 사람)
+    npc({coat: 0x8a5a6a, hairStyle: 'bob', hair: 0x2a2018}, [[3.2, -1.2]], {face: Math.PI, idle: ['sip', 'stretch']});
+    S.rainer = npc({coat: 0x5a6a4a, hat: {type: 'beanie', c: 0xc9472f}, scarf: 0xe0b040}, [[-6.2, -0.6]], {face: Math.PI, idle: ['crouch']});
+
+    // 이어폰 — 음표와 고개 까딱
+    S.notes = [0xffd27a, 0x9ad0ff, 0xff9ab8].map(col => { const m = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), basic(col)); m.visible = false; scene.add(m); return m; });
+    fx.push((dt, t) => { const hd = c.player.userData.head;
+      if (S.bob) { if (hd) hd.rotation.z = Math.sin(t * 6) * 0.25; S.notes.forEach((m, i) => { m.visible = true; m.position.set(c.player.position.x + Math.sin(t * 2 + i * 2) * 0.6, 2.6 + ((t * 0.7 + i * 0.33) % 1) * 1.2, c.player.position.z + 0.2); }); }
+      else S.notes.forEach(m => m.visible = false); });
+  },
+  lamps: [[-9, -3], [9.5, -3]],
+  acts: [
+    {id: 'wait', icon: '🚌', label: '기다리기', spot: [0.2, -0.3], face: Math.PI, run(c, done) {
+      c.count('wait'); S.waiting = true; S.fast = true; const said = new Set(); let tries = 0;
+      c.toast(`안내판 「${S.route}번 ${S.label()}」 — 서서 기다린다`, 2200);
+      const iv = setInterval(() => { tries++; const m = Math.ceil(S.eta);
+        if (S.state === 'stopped') { clearInterval(iv); S.hold = true; S.fast = false; S.waiting = false;
+          c.stamp(S.route + '번', '버스가 섰다'); c.beep(520, .15); c.beep(390, .2, .17);
+          setTimeout(() => c.dialog(`${S.route}번 버스가 섰다`, '치익— 문이 열린다', '<p>우산을 접는 사람, 펴는 사람. 탈까요?</p>', [
+            ['탄다', () => { c.DB.rides = (c.DB.rides || 0) + 1; c.save(); c.player.visible = false; S.leave(); c.toast('창가 자리에 앉았다. 유리에 빗물이 흐른다', 2800);
+              setTimeout(() => { c.player.position.set(0.4, 0, 1.6); c.player.visible = true; c.toast(RIDE_BACK[Math.random() * RIDE_BACK.length | 0], 3200); done(); }, 3800); }, 'main'],
+            ['보낸다', () => { S.leave(); setTimeout(() => c.toast(`${S.route}번이 떠났다. 다음은 ${Math.ceil(S.eta)}분 뒤. 괜찮다`, 2800), 500); done(); }]]), 900);
+          return; }
+        if (tries > 160) { clearInterval(iv); S.fast = false; S.waiting = false; c.toast('버스는 아직이다. 일단 서 있는다'); done(); return; }
+        if (S.state === 'away') for (const [k, t] of [[5, '5분. 아직 멀었다'], [3, '발끝에 빗물이 튄다'], [1, '안내판을 다시 본다. 1분이라고 한다. 믿는다']]) if (m === k && !said.has(k)) { said.add(k); c.toast(t, 1400); }
+      }, 250); }},
+    {id: 'doodle', icon: '✏️', label: '낙서', spot: [1.4, -2.2], face: Math.PI, run(c, done) {
+      const d = c.now(), theme = THEMES[seedOf(d) % THEMES.length], W = 280, H = 190, LIMIT = 20000;
+      c.play(`<h3>김 서린 유리</h3><p style="font-size:14px;margin:4px 0">오늘의 주제: <b>${theme}</b> · 손가락으로 쓱</p>
+        <div style="height:8px;background:#e4d9c2;border:1.5px solid #2b2620;border-radius:4px;margin:8px 0"><div id="bar" style="height:100%;width:100%;background:#4a7ab0"></div></div>
+        <div style="position:relative;width:${W}px;height:${H}px;margin:0 auto;border:2px solid #2b2620;max-width:100%"><canvas id="base" width="${W}" height="${H}" style="position:absolute;left:0;top:0;width:100%;height:100%"></canvas>
+        <canvas id="fog" width="${W}" height="${H}" style="position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none;cursor:crosshair"></canvas></div>
+        <p id="msg" style="font-size:13px;min-height:20px;margin:6px 0">유리를 문지르면 바깥 불빛이 보인다</p>
+        <div class="row" style="justify-content:center"><button class="btn main" id="save">저장</button><button class="btn" id="giveup">그만두기</button></div>`,
+        (el, close) => {
+          const $ = s => el.querySelector(s), base = $('#base'), fog = $('#fog'), bg = base.getContext('2d'), fg = fog.getContext('2d'), R = rng(seedOf(d)); let drawing = false, last = null, len = 0, over = false;
+          const grd = bg.createLinearGradient(0, 0, 0, H); grd.addColorStop(0, '#1b2438'); grd.addColorStop(1, '#2a3248'); bg.fillStyle = grd; bg.fillRect(0, 0, W, H);
+          for (let i = 0; i < 14; i++) { bg.fillStyle = ['rgba(255,208,120,.6)', 'rgba(255,120,90,.5)', 'rgba(120,230,170,.45)', 'rgba(150,200,255,.5)'][i % 4]; bg.beginPath(); bg.arc(R() * W, H * 0.3 + R() * H * 0.65, 8 + R() * 16, 0, 7); bg.fill(); }
+          fg.fillStyle = 'rgba(206,220,232,.94)'; fg.fillRect(0, 0, W, H); fg.fillStyle = 'rgba(255,255,255,.35)'; for (let i = 0; i < 40; i++) { fg.beginPath(); fg.arc(R() * W, R() * H, 1 + R() * 2, 0, 7); fg.fill(); }
+          const pos = e => { const r = fog.getBoundingClientRect(); return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height]; };
+          const wipe = (a, b) => { fg.globalCompositeOperation = 'destination-out'; fg.lineWidth = 9; fg.lineCap = 'round'; fg.beginPath(); fg.moveTo(a[0], a[1]); fg.lineTo(b[0], b[1]); fg.stroke(); len += Math.hypot(b[0] - a[0], b[1] - a[1]); };
+          fog.onpointerdown = e => { if (over) return; drawing = true; last = pos(e); wipe(last, last); fog.setPointerCapture(e.pointerId); };
+          fog.onpointermove = e => { if (!drawing || over) return; const p = pos(e); wipe(last, p); last = p; };
+          fog.onpointerup = fog.onpointercancel = () => { drawing = false; };
+          const t0 = Date.now(), end = ok => { if (over) return; over = true; clearInterval(tick);
+            if (ok && len >= 40) { const out = document.createElement('canvas'); out.width = W; out.height = H; const og = out.getContext('2d'); og.drawImage(base, 0, 0); og.drawImage(fog, 0, 0);
+              c.DB.doodles = (c.DB.doodles || []).concat([{d: c.dkey(d), theme, img: out.toDataURL('image/jpeg', 0.6)}]).slice(-6); c.save(); c.count('doodle');
+              $('#msg').textContent = '유리에 남겼다'; setTimeout(() => { close(); c.stamp('쓱쓱', `${theme} · 유리에 남겼다`); done(); }, 600); }
+            else { $('#msg').textContent = ok ? '그은 게 거의 없다. 유리만 닦았다' : ''; setTimeout(() => { close(); c.toast(ok ? '아무것도 안 그렸다. 유리만 조금 닦였다' : '낙서는 다음에. 유리는 곧 다시 흐려진다', 2600); done(); }, ok ? 700 : 0); } };
+          const tick = setInterval(() => { const left = 1 - (Date.now() - t0) / LIMIT; $('#bar').style.width = Math.max(0, left * 100) + '%'; if (left <= 0) end(true); }, 100);
+          $('#save').onclick = () => end(true); $('#giveup').onclick = () => end(false);
+        }); }},
+    {id: 'umb', icon: '☂️', label: '우산', spot: [-5, 0.6], face: -2.3, run(c, done) {
+      const n = c.count('umb'), r = S.rainer, p = c.player, sd = seedOf(c.now());
+      r.face = Math.atan2(p.position.x - r.o.position.x, p.position.z - r.o.position.z);
+      const u = new c.THREE.Group(); u.position.set((p.position.x + r.o.position.x) / 2, 0, (p.position.z + r.o.position.z) / 2);
+      c.cyl(0.03, 0.03, 2.7, 0x333333, 0, 1.35, 0, u); c.cyl(0, 1.35, 0.55, S.umb, 0, 2.9, 0, u);
+      c.doAct(p, 'stretch');
+      setTimeout(() => { c.scene.add(u); c.toast('☂️ 우산을 옆으로 기울인다', 1500); c.beep(700, .06, 0, 'sine'); }, 700);
+      setTimeout(() => { r.talk = true; c.doAct(r.o, 'wave'); c.toast('「' + (n === 1 ? THANKS[sd % THANKS.length] : n === 2 ? '또요? 이번엔 제가 괜히 미안하네요.' : '이제 우산 값 내야 하나 싶은데요. 농담이에요.') + '」', 3200); }, 1700);
+      setTimeout(() => { r.talk = false; c.stamp('고마워요', n === 1 ? '오늘 첫 우산' : `오늘 ${n}번째 우산`); }, 4600);
+      setTimeout(() => { c.scene.remove(u); r.face = Math.PI; done(); }, 5800); }},
+    {id: 'ear', icon: '🎧', label: '이어폰', run(c, done) {
+      const n = c.count('ear'), d = c.now(); S.bob = true; c.toast('🎧 이어폰을 꽂는다. 빗소리가 한 칸 멀어진다', 2200);
+      [523, 659, 784].forEach((f, i) => c.beep(f, .18, i * .2, 'sine', .05));
+      setTimeout(() => c.dialog('이어폰 · 오늘의 노래', `${d.getMonth() + 1}월 ${d.getDate()}일 · ${n}번째`, `<p style="font-size:17px">「${MOODS[seedOf(d) % MOODS.length]}」</p>` +
+        `<p style="color:#7a6e5e;font-size:13px">${n > 1 ? AGAIN[n % 2] : '곡 이름은 모른다. 분위기만 들린다. 분위기는 하루에 하나.'}</p>`, [['빼기', () => { S.bob = false; done(); }, 'main']]), 2400); }},
+  ],
+  recExtra: c => { const L = (c.DB.doodles || []).slice(-4).reverse();
+    return `<p style="font-size:13px;color:#7a6e5e">탄 버스 ${c.DB.rides || 0}번 · 오늘 노선 ${S.route}번</p>` +
+      (L.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap">${L.map(x => `<figure style="margin:0"><img src="${x.img}" width="84" style="border:1.5px solid #2b2620;display:block"><figcaption style="font-size:11px">${String(x.d).slice(5)} · ${x.theme}</figcaption></figure>`).join('')}</div>`
+        : '<p style="font-size:13px;color:#7a6e5e">유리에 남긴 그림이 아직 없다</p>'); },
+  onEnter(c) { c.toast(c.visits() > 1 ? `🌧 또 왔네요. ${c.visits()}번째 — 안내판엔 「${S.route}번 ${S.label()}」` : `🌧 비 오는 저녁. 안내판엔 「${S.route}번 ${S.label()}」`, 3200); },
+});
+</script></body></html>

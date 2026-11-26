@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>김장하는 마당</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+const HALMI = ['속은 아끼지 마. 겨울 내내 먹는 거야.','손 시리면 수육 한 점 먹고 해.','김치는 손맛이 아니라 같이 한 맛이야.','올해 배추가 달다. 잘 됐어.','허리 펴고 해. 김치 도망 안 가.',
+  '한 통은 너희 집 거. 들고 가.','간은 내일 봐야 알아. 오늘은 믿고 넣어.','작년보다 손이 빨라졌네.','젓갈 냄새 나야 겨울이지.','다 하고 나면 굴 넣은 겉절이 줄게.'];
+const TASTE = [['딱 맞아요', '할머니가 고개를 끄덕여요'], ['살짝 싱거워요', '소금 한 줌 더 — 「익으면 맞아」'], ['좀 짜요', '「무 더 썰어 넣자」'], ['매콤해요', '올해 고춧가루가 세요'], ['달큰해요', '배를 갈아 넣었대요']];
+const seed = c => { const d = c.now(); return d.getFullYear() * 400 + (d.getMonth() + 1) * 32 + d.getDate(); };
+
+start({
+  key: 'kimjang', title: '김장하는 마당', enter: '고무장갑 끼기', time: 'day', nickIcon: '🥬',
+  nick: [['손 빠른','속 듬뿍','고무장갑 낀','수육 노리는','허리 아픈','막내'],['배추','양념','고무대야','김치통','무채','굴']],
+  intro: '<p>초겨울 시골집 마당. 빨간 고무대야에 절인 배추,<br>잎 사이사이 속을 넣고 수육 한 점 얻어먹어요.</p>',
+  floor: {w: 26, d: 22, c1: '#b8a890', c2: '#c4b49c', around: 0x8a9a6a},
+  bg: {day: 0xb8d4e8},
+  startPos: [0, 7], cam: {h: 9, back: 11},
+  playerLook: {coat: 0x6a7a5a, pants: 0x3a3f4a, hair: 0x2a2018, apron: 0xd9c29a},
+  build(c) {
+    const {box, cyl, ball, sign, solid, npc, fx, THREE, scene} = c;
+    // 집 + 담
+    box(14, 5, 5, 0xe6dcc8, -2, 2.5, -9); const roof = box(15.5, 0.5, 6.5, 0x4a4a52, -2, 5.3, -9); roof.rotation.x = 0.04; solid(-2, -9, 14, 5);
+    box(3, 3, 0.1, 0x8a6a4a, -2, 1.5, -6.45); box(1.5, 1.2, 0.1, 0xf4ecdc, -6, 3, -6.45); box(1.5, 1.2, 0.1, 0xf4ecdc, 2, 3, -6.45);
+    box(26, 1.6, 0.4, 0x9a8a78, 0, 0.8, 10.8); box(0.4, 1.6, 22, 0x9a8a78, -12.8, 0.8, 0); box(0.4, 1.6, 22, 0x9a8a78, 12.8, 0.8, 0);
+    // 장독대
+    for (const [x, z, r] of [[8, -8, 0.7], [9.6, -8, 0.55], [8.8, -6.6, 0.5], [10.4, -6.8, 0.6]]) { cyl(r * 0.7, r * 0.6, r * 1.6, 0x5a3a2a, x, r * 0.8, z); cyl(r * 0.75, r * 0.75, 0.1, 0x4a2a1a, x, r * 1.6 + 0.05, z); }
+    solid(9.2, -7.4, 3.4, 2.4);
+    // 빨간 고무대야 둘 + 절인 배추(반 갈린 공)
+    for (const [x, z] of [[-2, -1], [2.4, -1]]) { cyl(1.5, 1.2, 0.6, 0xc9302f, x, 0.3, z); cyl(1.35, 1.35, 0.05, 0xd9e8c8, x, 0.56, z); solid(x, z, 3, 3); }
+    c.cabbage = [];
+    for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2, x = -2 + Math.cos(a) * 0.8, z = -1 + Math.sin(a) * 0.8;
+      const b = ball(0.32, 0xeef2d0, x, 0.66, z); b.scale.set(1, 0.6, 1.4); b.rotation.y = a; const l = ball(0.3, 0x7aa84a, x + Math.cos(a) * 0.1, 0.7, z + Math.sin(a) * 0.1); l.scale.set(0.8, 0.5, 1.2); l.rotation.y = a; c.cabbage.push(b); }
+    // 양념 대야(빨강) — 무채 섞인 속
+    for (let i = 0; i < 18; i++) { const r = Math.random() * 1.1, a = Math.random() * 6.3; const s = box(0.18, 0.08, 0.18, i % 4 ? 0xb8301f : 0xf4ecdc, 2.4 + Math.cos(a) * r, 0.62, -1 + Math.sin(a) * r); s.castShadow = false; }
+    // 김치통 쌓기 — 속 넣을 때마다 한 통씩 늘어난다(오늘만)
+    c.tubs = []; c.tubN = 0;
+    c.addTub = () => { const k = c.tubN++, x = -9 + (k % 4) * 1.1, y = 0.35 + Math.floor(k / 4) % 3 * 0.72; if (k >= 12) return;
+      const t = box(0.9, 0.7, 0.7, 0xeef0f4, x, y, 3.5); box(0.94, 0.08, 0.74, 0xc9472f, x, y + 0.38, 3.5); c.tubs.push(t); };
+    solid(-7.4, 3.5, 4.6, 0.8);
+    // 평상 + 수육 접시 + 김 나는 솥
+    box(4, 0.5, 2.4, 0x9a7a50, 6, 0.45, 3); solid(6, 3, 4, 2.4);
+    cyl(0.55, 0.45, 0.08, 0xf4f4f0, 5.4, 0.74, 3); for (let i = 0; i < 6; i++) box(0.3, 0.08, 0.14, 0xd9a88a, 5.2 + (i % 3) * 0.2, 0.8, 2.9 + (i > 2 ? 0.18 : 0));
+    cyl(0.7, 0.6, 0.7, 0x2b2b2b, 9.6, 0.35, 3); solid(9.6, 3, 1.4, 1.4);
+    const steam = []; for (let i = 0; i < 10; i++) { const m = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: .3})); m.userData.t = Math.random() * 2; scene.add(m); steam.push(m); }
+    fx.push(dt => steam.forEach((m, i) => { m.userData.t += dt; const k = m.userData.t % 2; m.position.set(9.6 + Math.sin(i * 2 + k) * 0.25, 0.8 + k * 1.4, 3 + Math.cos(i) * 0.25); m.material.opacity = .35 * (1 - k / 2); m.scale.setScalar(1 + k); }));
+    sign(['올해 김장', '배추 백 포기'], 2.6, 1, '#f4ecdc', '#c9472f', -2, 4, -6.4, 0, [60, 40]);
+    // 할머니 + 이웃들(쪼그려 앉아 속 넣기)
+    c.halmi = npc({coat: 0x8a4a5a, hairStyle: 'perm', hair: 0xb8b0a8, apron: 0xc9472f}, [[0.2, -3.2]], {face: 0, idle: ['wave', 'crouch']});
+    npc({coat: 0x4a5a7a, apron: 0xd9c29a, hat: {type: 'bandana', c: 0xe0b040}}, [[-4, -1]], {face: Math.PI / 2, idle: ['crouch']});
+    npc({coat: 0x7a5a3a, hairStyle: 'bun', apron: 0xd9c29a}, [[4.6, -1.2]], {face: -Math.PI / 2, idle: ['crouch', 'sip']});
+    // 마당 감나무
+    cyl(0.25, 0.35, 3, 0x5a4030, -10, 1.5, 7); const crown = ball(2, 0x7a8a4a, -10, 4, 7); crown.scale.y = 0.8; solid(-10, 7, 1, 1);
+    for (let i = 0; i < 8; i++) ball(0.16, 0xe8732a, -10 + Math.cos(i) * 1.6, 3.6 + Math.sin(i * 3) * 0.8, 7 + Math.sin(i) * 1.5);
+  },
+  acts: [
+    {id: 'stuff', icon: '🥬', label: '속 넣기', spot: [-2, 1.4], face: Math.PI, run(c, done) {
+      c.player.rotation.y = Math.PI; c.doAct(c.player, 'crouch');
+      const need = 6 + seed(c) % 4;
+      c.play(`<h3>잎 사이사이</h3><p style="font-size:13px;color:#7a6e5e">8초 안에 「한 장」을 ${need}번 — 잎마다 속 한 번씩</p>
+        <p style="font-size:44px;margin:8px 0" id="leaf">🥬</p><p id="msg" style="min-height:24px;font-size:20px">0 / ${need}</p>
+        <div style="height:10px;border:1.5px solid #2b2620;border-radius:3px;margin:0 20px 12px;background:#e6dcc8"><div id="tm" style="height:100%;width:100%;background:#c9472f"></div></div>
+        <div class="row" style="justify-content:center"><button class="btn main" id="go" style="font-size:18px;padding:12px 26px">한 장</button></div>`,
+        (el, close) => {
+          let k = 0, alive = true; const t0 = performance.now(), msg = el.querySelector('#msg'), tm = el.querySelector('#tm'), leaf = el.querySelector('#leaf');
+          const end = ok => { alive = false; const n = c.count('stuff'); if (ok) { c.count('full'); c.addTub(); }
+            setTimeout(() => { close(); c.stamp(ok ? '한 포기!' : '반 포기…', ok ? `오늘 ${n}포기 · 김치통 ${c.tubN}개` : '속이 덜 들어갔어요. 할머니가 마저 해 줘요');
+              c.doAct(c.halmi.o, ok ? 'cheer' : 'wave'); done(); }, 600); };
+          (function tick() { if (!alive) return; const p = (performance.now() - t0) / 8000; tm.style.width = Math.max(0, 100 - p * 100) + '%'; if (p >= 1) return end(false); requestAnimationFrame(tick); })();
+          el.querySelector('#go').onclick = () => { if (!alive) return; k++; c.beep(300 + k * 40, .05, 0, 'sine', .06); msg.textContent = `${k} / ${need}`;
+            leaf.style.transform = `rotate(${k % 2 ? 12 : -12}deg)`; if (k >= need) end(true); };
+        });
+    }},
+    {id: 'taste', icon: '🤏', label: '간 보기', spot: [2.4, 1.4], face: Math.PI, run(c, done) {
+      c.player.rotation.y = Math.PI; c.doAct(c.player, 'sip'); const n = c.count('taste'), [a, b] = TASTE[(seed(c) + n - 1) % TASTE.length];
+      setTimeout(() => { c.toast(`🤏 「${a}」 — ${b}`, 3200); c.doAct(c.halmi.o, 'wave'); done(); }, 1500); }},
+    {id: 'suyuk', icon: '🍖', label: '수육', spot: [6, 1.2], face: Math.PI, run(c, done) {
+      c.player.rotation.y = Math.PI; c.doAct(c.player, 'sip'); const n = c.count('suyuk');
+      c.toast(n === 1 ? '🍖 배추 속에 수육 한 점 싸서. 이 맛에 김장해요' : n < 4 ? `🍖 ${n}점째 — 굴도 하나 얹어요` : `🍖 ${n}점째… 「일은 언제 하니?」`);
+      setTimeout(done, 2200); }},
+    {id: 'halmi', icon: '👵', label: '할머니', spot: [0.2, -1.6], face: Math.PI, run(c, done) {
+      c.player.rotation.y = Math.PI; c.halmi.talk = true; c.doAct(c.halmi.o, 'wave');
+      const first = !c.today().halmi, line = HALMI[seed(c) % HALMI.length]; c.count('halmi');
+      setTimeout(() => { c.halmi.talk = false; c.dialog('할머니 한마디', `${c.hm(c.now())} · ${c.visits()}번째 온 날`, `<p style="font-size:17px">「${line}」</p>` +
+        (first ? '' : '<p style="color:#7a6e5e;font-size:13px">한마디는 하루에 하나. 내일 또 와요.</p>'), [['네!', done, 'main']]); }, 900); }},
+  ],
+  recExtra: c => `<p style="font-size:13px;color:#7a6e5e">속 꽉 찬 포기 모두 ${c.DB.total.full || 0}포기</p>`,
+  onEnter(c) { c.toast('🥬 「왔니? 장갑 끼고 저기 앉아」', 3000); },
+});
+</script></body></html>

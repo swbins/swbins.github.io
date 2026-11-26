@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>깊은 동굴</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 단추마다 들려주는 한 줄 사실 — 날짜마다 하나씩 차례로
+const DRIP = [
+  '천장에서 떨어지는 물방울에는 녹아 있던 석회 성분이 아주 조금 들어 있어요. 방울 끝에서 조금씩 굳은 것이 종유석이 돼요.',
+  '위에서 내려오는 것은 종유석, 아래에서 솟는 것은 석순이에요. 둘이 만나 이어지면 석주(기둥)가 돼요.',
+  '석회동굴은 약한 산성을 띤 빗물과 지하수가 석회암을 아주 오랜 세월 녹여서 생겨요.',
+  '깊은 동굴 안은 한 해 내내 기온이 거의 일정해요. 여름엔 시원하고 겨울엔 덜 추워요.',
+  '종유석은 아주 천천히 자라요. 100년에 겨우 몇 cm쯤 자라는 속도예요.',
+  '종유석·석순의 단면에는 층이 있어요. 이 층을 분석해 옛 기후를 알아내기도 해요.',
+];
+const BAT = [
+  '동굴에 사는 작은 박쥐들은 초음파를 내고 돌아오는 메아리로 길과 먹이를 찾아요.',
+  '박쥐는 스스로 날갯짓해서 나는 유일한 포유류예요.',
+  '박쥐는 낮에 동굴 천장에 거꾸로 매달려 쉬어요.',
+  '박쥐는 눈이 멀지 않았어요. 눈도 보이고, 초음파도 함께 써요.',
+  '우리나라에 사는 박쥐는 대부분 곤충을 먹어요.',
+  '박쥐가 내는 초음파는 대부분 사람 귀로는 들리지 않아요.',
+];
+const DARK = [
+  '동굴 깊은 곳에는 햇빛이 전혀 닿지 않아요. 그래서 광합성을 하는 식물이 자랄 수 없어요.',
+  '동굴에서만 사는 동물 중에는 눈이 작아지거나 없어진 것이 많아요.',
+  '사람 눈이 어둠에 완전히 익숙해지는 데는 20~30분쯤 걸려요.',
+  '동굴 속 먹이는 대부분 바깥에서 들어와요. 박쥐 똥도 동굴 생물의 먹이가 돼요.',
+];
+const LEN = [
+  '종유석은 손으로 만지면 안 돼요. 손의 기름기가 닿은 곳은 더 자라지 못할 수 있어요.',
+  '종유석은 아주 천천히 자라서, 부러지면 다시 자라는 데 사람의 일생보다 오래 걸려요.',
+  '속이 빈 가는 종유석(빨대 종유석)은 물방울이 그 속으로 흘러내려 자라요.',
+  '천장에서 내려온 종유석과 바닥에서 올라온 석순이 만나면 석주가 돼요.',
+  '종유석의 층을 보면 물이 얼마나 흘렀는지, 옛 날씨가 어땠는지를 읽을 수 있어요.',
+];
+// 오늘 들어가는 동굴 갈래 — 이름은 지어낸 것
+const BR = [
+  ['속삭임 갈래', '좁아서 말소리가 벽에 스며요'],
+  ['물방울 갈래', '어디선가 늘 똑똑 소리가 나요'],
+  ['하얀 기둥 갈래', '기둥 몇 개가 천장과 바닥을 이어요'],
+  ['박쥐 쉼터 갈래', '천장이 높아 박쥐들이 쉬어 가요'],
+  ['메아리 갈래', '헛기침이 한참 뒤에 돌아와요'],
+  ['검은 웅덩이 갈래', '물이 거울처럼 가만히 있어요'],
+  ['긴 고드름 갈래', '종유석이 유난히 길어요'],
+];
+function daily(d) {
+  const dn = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5), br = dn % BR.length;
+  return {dn, br, name: BR[br][0], hint: BR[br][1], len: 40 + ((dn * 17 + 3) % 9) * 15 + (br === 6 ? 60 : 0), drip: 1.6 + ((dn * 13 + 5) % 7) * 0.3, bonus: (dn * 5 + 1) % 3};
+}
+const pick = (arr, D, k) => arr[(D.dn + k) % arr.length];
+function rng(s) { return () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const S = {lamp: 1, to: 1, listen: 0, lt: 0, gap: 0.9, tape: 0, tapeTo: 0};   // 헤드램프 밝기 · 물방울 듣기 · 줄자
+const BATSVG = '<svg viewBox="0 0 44 22" width="44" height="22"><path d="M22 6 L28 2 L40 6 L35 9 L38 16 L30 11 L26 17 L22 12 L18 17 L14 11 L6 16 L9 9 L4 6 L16 2 Z" fill="#1b1a22"/><circle cx="22" cy="9" r="4" fill="#1b1a22"/><polygon points="19,5 20,1 22,5" fill="#1b1a22"/><polygon points="22,5 24,1 25,5" fill="#1b1a22"/></svg>';
+const MOTH = '<svg viewBox="0 0 20 14" width="20" height="14"><ellipse cx="6" cy="6" rx="5.5" ry="4" fill="#efe3c8" stroke="#8a7a60" stroke-width=".6"/><ellipse cx="14" cy="6" rx="5.5" ry="4" fill="#efe3c8" stroke="#8a7a60" stroke-width=".6"/><rect x="9.2" y="3" width="1.6" height="8" rx=".8" fill="#6a5a44"/></svg>';
+
+start({
+  key: 'cave', title: '깊은 동굴', enter: '헤드램프 켜고 들어가기', time: 'night', nickIcon: '🔦',
+  nick: [['캄캄한', '젖은 장화의', '살금살금', '헬멧 쓴', '조용한', '깊이 들어간'], ['헤드램프', '종유석', '석순', '박쥐', '물웅덩이', '줄사다리']],
+  intro: '<p>빛이 닿지 않는 석회동굴 깊숙한 곳.<br>헤드램프 하나에 기대어 물방울 소리 듣고, 박쥐 세고, 종유석 재 보고 가요.</p>',
+  floor: {w: 28, d: 22, c1: '#5b5246', c2: '#6a6053', around: '#0a0909'},
+  bg: {night: 0x040406}, startPos: [0, 6], cam: {h: 10, back: 12},
+  playerLook: {coat: 0xd9a22b, pants: 0x2b2f3a, hat: {type: 'cap', c: 0xd9a22b}},
+  build(c) {
+    const {box, cyl, ball, sign, solid, fx, THREE, scene, player} = c;
+    const D = daily(c.now()), R = rng(D.dn * 7 + 1);
+    const ROCK = 0x6b5f52, WALL = 0x3a342d, CAL = 0xcabda4;
+    const hemi = scene.children.find(o => o.isHemisphereLight), sun = scene.children.find(o => o.isDirectionalLight);
+    hemi.color.setHex(0x6a7a9a); hemi.groundColor.setHex(0x1a1612);
+    const grp = (x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); scene.add(g); return g; };
+    // 헤드램프 — 머리에 붙은 불빛 하나
+    const head = player.userData.head;
+    const lamp = new THREE.PointLight(0xfff0d0, 160, 26); lamp.position.set(0, 0.35, 0.7); head.add(lamp);
+    const bead = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), new THREE.MeshBasicMaterial({color: 0xfff4c8})); bead.position.set(0, 0.32, 0.52); head.add(bead);
+    // 바위 벽 (뒤·양옆, 천장은 없고 뒤쪽 위에 종유석 띠만)
+    box(30, 7, 1, WALL, 0, 3.5, -12); box(1, 6, 24, WALL, -14.6, 3, 0); box(1, 6, 24, WALL, 14.6, 3, 0);
+    for (let i = 0; i < 13; i++) { const x = -13.2 + i * 2.2 + R() * 0.8; if (Math.abs(x) < 3) continue; ball(1.1 + R() * 1.5, ROCK, x, 0.5, -11.2 + R() * 0.6).scale.y = 0.8; }
+    for (let i = 0; i < 8; i++) for (const s of [-1, 1]) ball(0.9 + R() * 1.1, ROCK, s * 13.8, 0.4, -9.5 + i * 2.7 + R()).scale.y = 0.7;
+    box(30, 1.2, 11.5, WALL, 0, 9.6, -7.25);
+    { const sg = sign(['깊은 동굴', D.name], 3.6, 1, '#3b3128', '#e6d9bd', 0, 3.4, -11.45, 0, [46, 30]); sg.material = new THREE.MeshLambertMaterial({map: sg.material.map, transparent: true}); }
+    // 석순 · 석주(기둥) · 천장 띠에서 내려온 종유석
+    for (const [x, z, h] of [[-3.2, -6.5, 1.5], [1.2, -7.5, 2.2], [-11.5, -8, 2], [11.5, -9, 1.6], [-12, 3, 1], [11.8, 5, 0.9], [-4.6, 6.6, 0.6], [3, 7.8, 0.5], [-1.5, 2.2, 0.45]]) { cyl(0.04, 0.12 + h * 0.14, h, CAL, x, h / 2, z); solid(x, z, 0.4 + h * 0.2, 0.4 + h * 0.2); }
+    for (const [x, z, r] of [[-0.5, -9.2, 0.5], [4.8, -9.6, 0.65], [-5, -9.4, 0.55]]) { cyl(r * 0.55, r * 1.4, 4.6, CAL, x, 2.3, z); cyl(r * 1.4, r * 0.55, 4.6, CAL, x, 6.7, z); solid(x, z, r * 2.4, r * 2.4); }
+    for (let i = 0; i < 16; i++) { const L = 1 + R() * 2, r = 0.12 + L * 0.07, x = -13 + R() * 26, z = -12 + R() * 6.4; if (Math.abs(x - 7) < 1.5 && Math.abs(z + 4.5) < 2) continue; cyl(r, 0.03, L, CAL, x, 9 - L / 2, z); }
+    // 지하 물웅덩이 — 오른쪽, 위 종유석에서 물방울이 떨어진다
+    const PX = 7, PZ = -4.5;
+    const pool = new THREE.Mesh(new THREE.CircleGeometry(2.7, 36), new THREE.MeshPhongMaterial({color: 0x0b2a38, specular: 0xaaccdd, shininess: 90, transparent: true, opacity: 0.88}));
+    pool.rotation.x = -Math.PI / 2; pool.position.set(PX, 0.04, PZ); scene.add(pool); solid(PX, PZ, 4.8, 4.8);
+    for (let i = 0; i < 15; i++) { const a = i / 15 * Math.PI * 2, r = 2.75 + R() * 0.3; ball(0.35 + R() * 0.25, ROCK, PX + Math.cos(a) * r, 0.15, PZ + Math.sin(a) * r).scale.y = 0.6; }
+    cyl(0.3, 0.04, 1.8, CAL, PX, 8.1, PZ);
+    for (const [x, z, r] of [[-3, 8, 0.9], [-10.5, 7, 0.7]]) { const m = new THREE.Mesh(new THREE.CircleGeometry(r, 20), pool.material); m.rotation.x = -Math.PI / 2; m.position.set(x, 0.03, z); scene.add(m); }
+    // 낮은 바위 턱 — 아래로 종유석 하나(오늘 잴 것), 그 아래 석순. 박쥐 몇 마리가 매달려 있다
+    const LX = -8.2, LZ = -3.4, H = D.len / 100;
+    box(4.2, 0.7, 2.4, 0x4a4036, -8.5, 3.55, -3.8);
+    cyl(0.17, 0.03, H, CAL, LX, 3.2 - H / 2, LZ); cyl(0.03, 0.22, 0.5, CAL, LX, 0.25, LZ); solid(LX, LZ, 0.9, 0.9);
+    const bat = open => { const g = new THREE.Group(), wl = grp(0, 0, 0), wr = grp(0, 0, 0); g.add(wl, wr); wl.position.x = -0.1; wr.position.x = 0.1;
+      const b = ball(0.15, 0x4a3f48, 0, 0, 0, g); b.scale.set(1, 0.9, 1.5); ball(0.09, 0x4a3f48, 0, 0.02, 0.2, g);
+      box(0.6, 0.02, 0.3, 0x3a3038, -0.3, 0, 0, wl); box(0.6, 0.02, 0.3, 0x3a3038, 0.3, 0, 0, wr);
+      if (!open) { wl.scale.x = wr.scale.x = 0.3; wl.rotation.z = 1.2; wr.rotation.z = -1.2; } g.userData.w = [wl, wr]; return g; };
+    for (const [x, z] of [[-9.8, -3.9], [-9.3, -4.4], [-6.9, -4.1], [-7.4, -4.7]]) { const b = bat(false); b.position.set(x, 3.03, z); b.rotation.x = Math.PI; scene.add(b); }
+    // 줄자 — 종유석 옆으로 내려온다(재기 단추)
+    const TX = -7.85, TZ = -3.15, tape = box(0.05, 1, 0.03, 0xf2c230, TX, 3.2, TZ), ticks = [];
+    for (let i = 1; i <= 24; i++) ticks.push(box(0.14, 0.012, 0.04, 0x2b2620, TX, 3.2 - i * 0.1, TZ + 0.01));
+    ball(0.08, 0xf2c230, TX, 3.18, TZ);
+    // 매 프레임 — 헤드램프 · 물방울 · 물결 · 지나가는 박쥐 · 줄자
+    const drops = [], rips = [], dGeo = new THREE.SphereGeometry(0.07, 8, 6), dMat = new THREE.MeshPhongMaterial({color: 0xcfe8ff, specular: 0xffffff, shininess: 100});
+    const rGeo = new THREE.RingGeometry(0.1, 0.14, 28), flier = bat(true); flier.visible = false; scene.add(flier);
+    let tNext = 1, fT = 5, fOn = false, fDir = 1;
+    fx.push((dt, t) => {
+      S.lamp += (S.to - S.lamp) * Math.min(1, dt * (S.to ? 14 : 10)); if (Math.abs(S.to - S.lamp) < 0.01) S.lamp = S.to;
+      lamp.intensity = 160 * S.lamp * (S.lamp === 1 ? 1 + Math.sin(t * 23) * 0.012 : 1); hemi.intensity = 0.22 * S.lamp; sun.intensity = 0; bead.visible = S.lamp > 0.4;
+      if (scene.fog) { scene.fog.near = 8; scene.fog.far = 42; }
+      tNext -= dt;
+      if (S.listen > 0) { S.lt -= dt; if (S.lt <= 0) { S.lt = S.gap; S.listen--; spawn(true); } }
+      else if (tNext <= 0) { tNext = D.drip * (0.7 + Math.random() * 0.6); spawn(false); }
+      for (let i = drops.length - 1; i >= 0; i--) { const q = drops[i]; q.v += 9 * dt; q.m.position.y -= q.v * dt;
+        if (q.m.position.y <= 0.06) { scene.remove(q.m); drops.splice(i, 1); ripple(); if (q.loud) { c.beep(1700, 0.06, 0, 'sine', 0.05); c.beep(1500, 0.05, 0.2, 'sine', 0.025); c.beep(1400, 0.05, 0.42, 'sine', 0.012); } } }
+      for (let i = rips.length - 1; i >= 0; i--) { const q = rips[i]; q.age += dt; const s = 1 + q.age * 7; q.m.scale.set(s, s, s); q.m.material.opacity = 0.6 * (1 - q.age / 1.6);
+        if (q.age > 1.6) { scene.remove(q.m); q.m.material.dispose(); rips.splice(i, 1); } }
+      fT -= dt;
+      if (!fOn && fT <= 0) { fOn = true; fDir = Math.random() < 0.5 ? 1 : -1; flier.position.set(-fDir * 16, 4 + Math.random() * 2.5, -8 + Math.random() * 9); flier.rotation.y = fDir * Math.PI / 2; flier.visible = true; }
+      if (fOn) { flier.position.x += fDir * 6 * dt; const a = Math.sin(t * 16) * 0.7; flier.userData.w[0].rotation.z = -a; flier.userData.w[1].rotation.z = a;
+        if (Math.abs(flier.position.x) > 16.5) { fOn = false; flier.visible = false; fT = 12 + Math.random() * 14; } }
+      S.tape += Math.sign(S.tapeTo - S.tape) * Math.min(Math.abs(S.tapeTo - S.tape), dt * 0.45);
+      const h = H * S.tape; tape.visible = S.tape > 0.001; tape.scale.y = Math.max(h, 0.001); tape.position.y = 3.2 - h / 2; ticks.forEach((m, i) => m.visible = (i + 1) * 0.1 <= h);
+    });
+    function spawn(loud) { const m = new THREE.Mesh(dGeo, dMat); m.position.set(PX, 7.15, PZ); scene.add(m); drops.push({m, v: 0, loud}); }
+    function ripple() { const m = new THREE.Mesh(rGeo, new THREE.MeshPhongMaterial({color: 0xaad4ee, transparent: true, opacity: 0.6, side: THREE.DoubleSide})); m.rotation.x = -Math.PI / 2; m.position.set(PX, 0.07, PZ); scene.add(m); rips.push({m, age: 0}); }
+  },
+  lamps: [],
+  acts: [
+    {id: 'drip', icon: '💧', label: '물방울 소리', spot: [3.9, -3.8], face: Math.PI / 2, run(c, done) {
+      const D = daily(c.now()); c.doAct(c.player, 'crouch'); c.toast('💧 숨을 죽이고 귀를 기울여요', 2000); S.listen = 5; S.gap = 0.9; S.lt = 0.6;
+      setTimeout(() => { const n = c.count('drip'); c.stamp('똑, 똑', `오늘 ${n}번째 귀 기울이기`); c.toast('💧 ' + pick(DRIP, D, 0), 5200); setTimeout(done, 1600); }, 6200); }},
+    {id: 'bats', icon: '🦇', label: '박쥐 세기', spot: [-3.5, 0], face: Math.PI, run(c, done) {
+      const D = daily(c.now());
+      c.play(`<style>@keyframes fl{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-7px) scaleY(.7)}}</style><h3>박쥐 몇 마리?</h3>
+        <p style="font-size:13px;color:#7a6e5e">동굴 입구로 날아 나가는 박쥐를 세어요. 작은 나방은 빼고!</p>
+        <div id="ln" style="position:relative;height:96px;overflow:hidden;background:linear-gradient(#e9b98c,#6e5a7c);border:1.5px solid #2b2620;border-radius:6px"></div>
+        <p id="msg" style="min-height:22px;font-size:14px"></p><div class="row" id="ro" style="justify-content:center"><button class="btn main" id="go">시작</button><button class="btn" id="qt">그만두기</button></div>`,
+        (el, close) => {
+          let dead = false; const ln = el.querySelector('#ln'), ro = el.querySelector('#ro'), msg = el.querySelector('#msg');
+          el.querySelector('#qt').onclick = () => { dead = true; close(); done(); };
+          el.querySelector('#go').onclick = () => {
+            ro.innerHTML = ''; msg.textContent = '세는 중…';
+            const n = 4 + (Math.random() * 3 | 0) + D.bonus, seq = [...Array(n).fill(BATSVG), MOTH, MOTH, MOTH].sort(() => Math.random() - .5), W = ln.clientWidth; let at = 300;
+            for (const svg of seq) { const moth = svg === MOTH; at += 650 + Math.random() * 350;
+              setTimeout(() => { if (dead || !el.isConnected) return; const w = document.createElement('div'), dur = 2.2 + Math.random() * .8;
+                w.style.cssText = `position:absolute;left:-50px;top:${6 + Math.random() * 62}px;transition:left ${dur}s linear;animation:fl ${moth ? .25 : .4}s infinite;transform-origin:50% 100%`; w.innerHTML = svg; ln.appendChild(w);
+                requestAnimationFrame(() => requestAnimationFrame(() => { w.style.left = (W + 10) + 'px'; })); if (!moth) c.beep(3800, .02, 0, 'sine', .02); }, at); }
+            setTimeout(() => { if (dead || !el.isConnected) return; msg.textContent = '박쥐는 모두 몇 마리였을까요?';
+              const opt = new Set([n]); while (opt.size < 4) { const v = n - 2 + (Math.random() * 5 | 0); if (v > 0) opt.add(v); }
+              for (const v of [...opt].sort((a, b) => a - b)) { const b = document.createElement('button'); b.className = 'btn'; b.textContent = v + '마리'; ro.appendChild(b);
+                b.onclick = () => { dead = true; c.count('bats'); close();
+                  if (v === n) { c.DB.batOk = (c.DB.batOk || 0) + 1; c.save(); c.doAct(c.player, 'cheer'); c.stamp('정확!', `박쥐 ${n}마리`); }
+                  else c.toast(`🦇 ${n}마리였어요. 한 번 더 세어 봐요`);
+                  setTimeout(() => c.toast('🦇 ' + pick(BAT, D, 0), 5000), 2000); setTimeout(done, 2200); }; } }, at + 3300);
+          };
+        }); }},
+    {id: 'dark', icon: '🌑', label: '불 끄기', run(c, done) {
+      const D = daily(c.now()); c.toast('🔦 헤드램프를 꺼요. 가만히 있어 봐요', 1800); S.to = 0; S.listen = 4; S.gap = 1.3; S.lt = 1.6;
+      setTimeout(() => { S.to = 1; c.doAct(c.player, 'stretch'); const n = c.count('dark'); c.stamp('다시 켰다', `캄캄한 5초 · 오늘 ${n}번째`); c.toast('🌑 ' + pick(DARK, D, 1), 5200); setTimeout(done, 2400); }, 6000); }},
+    {id: 'len', icon: '📏', label: '종유석 재기', spot: [-6.3, -2], face: -2.2, run(c, done) {
+      const D = daily(c.now()); c.doAct(c.player, 'stretch'); S.tapeTo = 1; for (let i = 0; i < 6; i++) c.beep(2200, .03, i * .4, 'square', .025);
+      setTimeout(() => {
+        const n = c.count('len'); c.DB.meas = c.DB.meas || {}; c.DB.meas[c.dkey(c.now())] = D.len; c.save(); if (n === 1) c.stamp(D.len + 'cm', '오늘 잰 종유석');
+        c.dialog('종유석 재기', D.name + ' · 오늘 잰 한 개', `<p style="font-size:26px;margin:4px 0"><b>${D.len} cm</b></p>
+          <p style="font-size:13px;color:#7a6e5e;margin:0">1cm 자라는 데 50년쯤 걸린다고 어림하면, 이 종유석은 ${(D.len * 50).toLocaleString('ko-KR')}년쯤 걸려 자란 셈이에요.</p>
+          <p style="font-size:15px">「${pick(LEN, D, 2)}」</p>`, [['줄자 감기', () => { S.tapeTo = 0; done(); }, 'main']]); }, 2800); }},
+  ],
+  recExtra: c => { const m = c.DB.meas || {}, ks = Object.keys(m), sum = ks.reduce((a, k) => a + m[k], 0);
+    return `<p style="font-size:13px;color:#7a6e5e">다녀온 갈래 ${(c.DB.br || []).length}/${BR.length}곳 · 잰 종유석 ${ks.length}개(합쳐 ${(sum / 100).toFixed(1)}m)<br>박쥐 세기 맞힌 횟수 ${c.DB.batOk || 0}번</p>`; },
+  onEnter(c) { const D = daily(c.now()); c.DB.br = [...new Set([...(c.DB.br || []), D.name])]; c.save();
+    c.toast(`🔦 오늘은 「${D.name}」 — ${D.hint}`, 3600); },
+});
+</script></body></html>

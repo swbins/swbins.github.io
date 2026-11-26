@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>피라미드 안쪽</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 석관 옆 돌판에 새긴 한 줄 사실 — 날짜마다 하나씩 차례로
+const FACT = [
+  '기자의 대피라미드는 쿠푸 왕의 무덤으로 지었어요. 약 4,500년 전의 일이에요.',
+  '대피라미드의 원래 높이는 약 146m였어요. 윗부분이 닳아 지금은 약 138m예요.',
+  '고대 7대 불가사의 가운데 지금까지 남아 있는 건 기자의 대피라미드뿐이에요.',
+  '대피라미드는 약 230만 개의 돌덩이로 쌓았다고 알려져 있어요.',
+  '대피라미드의 네 면은 거의 정확하게 동서남북을 향하고 있어요.',
+  '대피라미드는 약 3,800년 동안 세상에서 가장 높은 건축물이었다고 해요.',
+  '피라미드 근처에서 일꾼들의 마을과 무덤이 발견돼서, 노예가 아니라 일을 맡은 일꾼이었다고 봐요.',
+  '고대 이집트 사람들은 파피루스라는 풀로 종이를 만들어 글을 썼어요.',
+  '1799년에 발견된 로제타석이 상형문자를 읽는 열쇠가 됐어요.',
+  '이집트 사람들은 나일강이 해마다 넘치는 때에 맞춰 농사를 지었어요.',
+  '이집트의 달력은 한 해를 365일로 나눴어요.',
+  '피라미드 안 통로는 좁고 낮아서, 허리를 숙이고 지나야 하는 곳이 많아요.',
+];
+// 놀이용으로 단순하게 그린 그림 기호 — [그림, 뜻, 글자 설명]
+const SYM = [
+  ['sun', '해', '동그라미 안에 점 하나'],
+  ['water', '물', '물결 세 줄'],
+  ['eye', '눈', '눈 모양 아래 한 줄'],
+  ['bird', '새', '부리 달린 작은 새'],
+  ['reed', '갈대', '곧은 줄기와 잎'],
+  ['house', '집', '아래에 틈이 난 네모'],
+];
+const DRAW = {
+  sun(g, x, y, s) { g.beginPath(); g.arc(x, y, s * .8, 0, 7); g.stroke(); g.beginPath(); g.arc(x, y, s * .18, 0, 7); g.fill(); },
+  water(g, x, y, s) { for (let i = -1; i <= 1; i++) { g.beginPath(); for (let k = 0; k <= 6; k++) { const px = x - s + k * s / 3, py = y + i * s * .5 + (k % 2 ? -1 : 1) * s * .14; k ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); } },
+  eye(g, x, y, s) { g.beginPath(); g.moveTo(x - s, y - s * .15); g.quadraticCurveTo(x, y - s * .95, x + s, y - s * .15); g.quadraticCurveTo(x, y + s * .6, x - s, y - s * .15); g.stroke();
+    g.beginPath(); g.arc(x, y - s * .2, s * .25, 0, 7); g.fill(); g.beginPath(); g.moveTo(x, y + s * .35); g.lineTo(x, y + s * .95); g.stroke(); },
+  bird(g, x, y, s) { g.beginPath(); g.ellipse(x - s * .1, y + s * .1, s * .6, s * .36, 0, 0, 7); g.stroke(); g.beginPath(); g.arc(x + s * .6, y - s * .35, s * .2, 0, 7); g.fill();
+    g.beginPath(); g.moveTo(x + s * .78, y - s * .35); g.lineTo(x + s * 1.05, y - s * .25); g.moveTo(x - s * .1, y + s * .45); g.lineTo(x - s * .1, y + s * .95);
+    g.moveTo(x - s * .65, y + s * .05); g.lineTo(x - s * 1, y - s * .25); g.stroke(); },
+  reed(g, x, y, s) { g.beginPath(); g.moveTo(x, y + s); g.lineTo(x, y - s); g.stroke(); g.beginPath(); g.moveTo(x, y - s * .1); g.quadraticCurveTo(x - s * .7, y - s * .2, x - s * .8, y - s * .8);
+    g.moveTo(x, y + s * .3); g.quadraticCurveTo(x + s * .7, y + s * .2, x + s * .8, y - s * .4); g.stroke(); },
+  house(g, x, y, s) { g.beginPath(); g.moveTo(x - s * .25, y + s * .7); g.lineTo(x - s * .8, y + s * .7); g.lineTo(x - s * .8, y - s * .7); g.lineTo(x + s * .8, y - s * .7); g.lineTo(x + s * .8, y + s * .7); g.lineTo(x + s * .25, y + s * .7); g.stroke(); },
+};
+function symCanvas(i, w, h, s, lw) { const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d');
+  g.strokeStyle = g.fillStyle = '#3a2a18'; g.lineWidth = lw; g.lineCap = g.lineJoin = 'round'; DRAW[SYM[i][0]](g, w / 2, h / 2, s); return c; }
+const symImg = i => symCanvas(i, 64, 64, 22, 4).toDataURL();
+function daily(d) { const dn = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5); return {dn, sym: dn % SYM.length, fact: dn % FACT.length}; }
+
+const S = {tt: 0, dim: 1, dimNow: 1, was: false};   // 손에 든 횃불 남은 시간 · 조용할 때 불빛 줄임
+
+start({
+  key: 'pyramid', title: '피라미드 안쪽', enter: '횃불 들고 들어가기', time: 'night', nickIcon: '🧭',
+  nick: [['조용히 걷는', '횃불 든', '먼지 털던', '호기심 많은', '모래 묻은', '발소리 낮춘'], ['탐험가', '횃불', '돌덩이', '벽화', '통로', '측량자']],
+  intro: '<p>모래빛 돌벽 사이로 횃불이 흔들리는 피라미드 안쪽.<br>벽의 기호를 읽고, 석관 앞에 잠깐 서 있다 가요.</p><p style="font-size:12px;color:#7a6e5e">그림 기호는 놀이용으로 단순하게 그렸어요</p>',
+  floor: {w: 26, d: 24, pattern: 'tile', c1: '#5e4e36', c2: '#675640', around: 0x0a0806},
+  bg: {night: 0x050406}, startPos: [0, 9], cam: {h: 10, back: 12},
+  playerLook: {coat: 0x7a6a3a, pants: 0x4a3f2a, hat: {type: 'cap', c: 0xa88a4a}, scarf: 0xe8dcc0},
+  build(c) {
+    const {box, cyl, ball, glowBall, sign, solid, fx, THREE, scene, npc} = c;
+    // 사암 블록 무늬 — 벽마다 길이에 맞춰 반복
+    const bc = document.createElement('canvas'); bc.width = bc.height = 256; { const g = bc.getContext('2d');
+      g.fillStyle = '#c4a56e'; g.fillRect(0, 0, 256, 256); g.strokeStyle = '#7e6238'; g.lineWidth = 4;
+      for (let r = 0; r < 2; r++) { g.strokeRect(-2 + (r ? 64 : 0), r * 128, 128, 128); g.strokeRect(126 + (r ? 64 : 0), r * 128, 128, 128); g.strokeRect(-130 + (r ? 64 : 0), r * 128, 128, 128); }
+      for (let i = 0; i < 160; i++) { g.fillStyle = Math.random() < .5 ? 'rgba(90,70,40,.18)' : 'rgba(240,215,160,.18)'; g.fillRect(Math.random() * 256, Math.random() * 256, 3, 3); } }
+    const base = new THREE.CanvasTexture(bc); base.colorSpace = THREE.SRGBColorSpace; base.wrapS = base.wrapT = THREE.RepeatWrapping;
+    function wall(w, h, d, x, z) { const t = base.clone(); t.needsUpdate = true; t.repeat.set(Math.max(w, d) / 3, h / 1.4);
+      const m = box(w, h, d, new THREE.MeshLambertMaterial({map: t, color: 0xd8c090}), x, h / 2, z); solid(x, z, w, d); return m; }
+    wall(26, 4.5, 0.5, 0, -11.75); wall(0.5, 2.4, 24, -12.75, 0); wall(0.5, 2.4, 24, 12.75, 0);
+    wall(10.5, 1.2, 0.5, -7.75, 11.75); wall(10.5, 1.2, 0.5, 7.75, 11.75);          // 입구 쪽 낮은 벽(가운데가 트임)
+    wall(11.5, 1.9, 2.4, -7.25, 3.2); wall(11.5, 1.9, 2.4, 7.25, 3.2);               // 좁은 통로를 만드는 두꺼운 벽
+    // 기둥 — 앞쪽 한 쌍은 온전, 안쪽 한 쌍은 부러진 그루터기
+    for (const s of [-1, 1]) { cyl(0.55, 0.65, 3, 0xc8ac78, s * 5.5, 1.5, -0.5, undefined, 12); box(1.5, 0.3, 1.5, 0xb89c68, s * 5.5, 3.15, -0.5); solid(s * 5.5, -0.5, 1.3, 1.3);
+      cyl(0.55, 0.65, 1.6, 0xc8ac78, s * 5.5, 0.8, -6.5, undefined, 12); solid(s * 5.5, -6.5, 1.3, 1.3);
+      cyl(0.5, 0.5, 0.6, 0xb89c68, s * 7.6, 0.3, -5.2, undefined, 12); }
+    // 석관 — 단 위에 돌 관 하나
+    box(5, 0.3, 3.4, 0x7a6a4a, 0, 0.15, -7); box(5.6, 0.14, 0.5, 0x6e5e40, 0, 0.07, -5.0); solid(0, -7, 5, 3.4);
+    box(2.4, 0.8, 1.2, 0x9a8a6a, 0, 0.7, -7); box(2.5, 0.3, 1.3, 0xb0a07c, 0, 1.25, -7); box(1.9, 0.06, 0.5, 0xc9a24a, 0, 1.43, -7);
+    for (const s of [-1, 1]) { cyl(0.18, 0.2, 0.2, 0x6e5e40, s * 2.0, 0.4, -5.4, undefined, 10); }
+    // 돌 안내판 — 오늘의 사실
+    const tab = box(1.8, 1.3, 0.3, 0x9a8a6a, 7, 0.75, -9.8); tab.rotation.x = -0.35; box(1.8, 0.2, 0.9, 0x7a6a4a, 7, 0.1, -9.8); solid(7, -9.8, 1.9, 1);
+    sign(['오늘의', '돌판'], 1.5, 1.0, '#9a8a6a', '#3a2a18', 7, 0.78, -9.62, 0, [34]).rotation.x = -0.35;
+    // 벽의 기호판 — 뒤 벽 셋, 옆 벽 넷. 어두운 곳에서 횃불을 받아야 보인다
+    function panel(x, y, z, ry, w, h, seed) { const cv = document.createElement('canvas'); cv.width = 512; cv.height = Math.round(512 * h / w); const g = cv.getContext('2d');
+      g.fillStyle = '#b5985e'; g.fillRect(0, 0, cv.width, cv.height); g.strokeStyle = '#6a5026'; g.lineWidth = 6; g.strokeRect(14, 14, cv.width - 28, cv.height - 28);
+      const cols = 3, rows = h > 2 ? 2 : 1;
+      for (let r = 0; r < rows; r++) for (let q = 0; q < cols; q++) { const i = (seed + r * 3 + q * 2) % SYM.length, dc = symCanvas(i, 120, 120, 40, 7);
+        g.drawImage(dc, 30 + q * (cv.width - 60) / cols + ((cv.width - 60) / cols - 120) / 2, 30 + r * (cv.height - 60) / rows + ((cv.height - 60) / rows - 120) / 2); }
+      const tx = new THREE.CanvasTexture(cv); tx.colorSpace = THREE.SRGBColorSpace;
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshLambertMaterial({map: tx})); m.position.set(x, y, z); m.rotation.y = ry; scene.add(m); }
+    panel(-9, 2.5, -11.48, 0, 3.6, 2.6, 0); panel(0, 2.8, -11.48, 0, 3.6, 2.6, 2); panel(9, 2.5, -11.48, 0, 3.6, 2.6, 4);
+    for (const [z, sd] of [[-7.5, 1], [0, 3]]) { panel(-12.48, 1.3, z, Math.PI / 2, 3.4, 1.4, sd); panel(12.48, 1.3, z, -Math.PI / 2, 3.4, 1.4, sd + 2); }
+    // 횃불 — 흔들리는 주황 불빛
+    const flames = [];
+    function torch(x, y, z, big = 1) { cyl(0.05, 0.07, 0.7 * big, 0x4a3322, x, y, z, undefined, 8); cyl(0.14 * big, 0.08, 0.18, 0x5a4a3a, x, y + 0.4 * big, z, undefined, 8);
+      const m = glowBall(0.17 * big, 0xffa640, x, y + 0.62 * big, z, 0); m.scale.y = 1.5;
+      const l = new THREE.PointLight(0xff9a48, 22 * big, 13); l.position.set(x, y + 0.9 * big, z); scene.add(l); flames.push({m, l, b: 22 * big, ph: Math.random() * 6}); }
+    torch(-4.6, 2.5, -11.2); torch(4.6, 2.5, -11.2); torch(-12.3, 1.5, -3.8); torch(12.3, 1.5, -3.8);
+    for (const s of [-1, 1]) { cyl(0.28, 0.4, 0.9, 0x6e5e40, s * 3.4, 0.45, 5.6, undefined, 10); torch(s * 3.4, 0.9, 5.6, 1.2); solid(s * 3.4, 5.6, 0.9, 0.9); }
+    const moon = new THREE.PointLight(0x9ab0ff, 12, 11); moon.position.set(0, 2, 12.6); scene.add(moon);   // 입구로 스며드는 달빛
+    // 입구 쪽 소품 — 항아리·돌덩이·모래 더미
+    for (const [x, z, r] of [[-9.5, 7.5, .5], [9.6, 8.2, .6], [-10.8, 5.6, .4], [10.4, 5.6, .45]]) { cyl(r * .6, r, r * 1.8, 0x8a4a2a, x, r * .9, z, undefined, 10); cyl(r * .5, r * .6, .12, 0x6a3a22, x, r * 1.84, z, undefined, 10); solid(x, z, r * 2, r * 2); }
+    for (const [x, z, w] of [[-8, 9.5, 1.1], [8.5, 9.8, .9], [-11.5, 10.5, 1]]) { box(w, w * .7, w, 0xb89c68, x, w * .35, z).rotation.y = x; solid(x, z, w, w); }
+    for (const [x, z, r] of [[-11, 8.5, 1.5], [11, 10.2, 1.3], [-6, 10.8, 1]]) { const m = ball(r, 0x8a7448, x, 0.1, z); m.scale.y = 0.3; }
+    // 발굴 짐 — 나무 상자와 줄
+    box(1.3, 0.8, 1, 0x6b4a2a, 9.8, 0.4, -1.5); box(1, 0.6, 0.9, 0x7a5a36, 9.9, 1.1, -1.6); solid(9.8, -1.5, 1.4, 1.1);
+    box(0.9, 0.7, 0.8, 0x6b4a2a, -10, 0.35, -9.5); solid(-10, -9.5, 1, 0.9);
+    // 떠다니는 먼지
+    const N = 110, dg = new THREE.BufferGeometry(), dp = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) { dp[i * 3] = (Math.random() - .5) * 22; dp[i * 3 + 1] = .3 + Math.random() * 3.2; dp[i * 3 + 2] = -11 + Math.random() * 14; }
+    dg.setAttribute('position', new THREE.BufferAttribute(dp, 3));
+    scene.add(new THREE.Points(dg, new THREE.PointsMaterial({color: 0xffd9a0, size: 2, sizeAttenuation: false, transparent: true, opacity: .45})));
+    // 손에 드는 횃불 — 평소엔 숨김
+    const ht = new THREE.Group(); ht.position.y = 0.1; ht.rotation.x = -0.9; c.hand.add(ht); ht.visible = false;
+    cyl(0.04, 0.05, 0.8, 0x4a3322, 0, 0.3, 0, ht, 8);
+    const hf = new THREE.Mesh(new THREE.SphereGeometry(0.13, 10, 8), new THREE.MeshBasicMaterial({color: 0xffa640})); hf.position.y = 0.78; hf.scale.y = 1.5; ht.add(hf);
+    const hl = new THREE.PointLight(0xffa04a, 0, 15); hl.position.y = 0.9; ht.add(hl);
+    fx.push((dt, t) => {
+      S.dimNow += (S.dim - S.dimNow) * Math.min(1, dt * 3);
+      for (const f of flames) { const k = .85 + .15 * Math.sin(t * 13 + f.ph) + .08 * Math.sin(t * 29 + f.ph * 2); f.l.intensity = f.b * k * S.dimNow; f.m.scale.set(1 + .12 * Math.sin(t * 17 + f.ph), 1.4 + .25 * k, 1); }
+      if (S.tt > 0) { S.tt -= dt; ht.visible = true; S.was = true; hl.intensity = (30 + 6 * Math.sin(t * 15) + 3 * Math.sin(t * 31)) * Math.min(1, S.tt); hf.scale.set(1 + .1 * Math.sin(t * 17), 1.4 + .2 * Math.sin(t * 23), 1); }
+      else { ht.visible = false; hl.intensity = 0; if (S.was) { S.was = false; c.toast('횃불이 잦아들었어요. 벽 횃불이 있으니 괜찮아요'); } }
+      const p = dg.attributes.position.array; for (let i = 0; i < N; i++) { p[i * 3 + 1] += Math.sin(t * .6 + i) * dt * .06; p[i * 3] += Math.cos(t * .4 + i * 1.7) * dt * .05; }
+      dg.attributes.position.needsUpdate = true;
+    });
+    // 사람들 — 벽화를 살피는 연구자, 입구 쪽을 오가는 사람
+    npc({coat: 0x8a6a3a, glasses: true, hat: {type: 'cap', c: 0x6b5a3a}}, [[-8.5, -9.8]], {face: Math.PI, idle: ['wave', 'stretch']});
+    npc({coat: 0x55606e, hairStyle: 'bob', hair: 0x2a2018, scarf: 0xc9472f}, [[-8, 8.6], [8, 8.6]], {speed: 1.3, wait: 4, idle: ['stretch']});
+  },
+  lamps: [],
+  onTime(p, c) {   // 어두운 실내 — 하늘빛을 눌러 횃불만 믿게
+    for (const o of c.scene.children) { if (o.isHemisphereLight) o.intensity = 0.3; if (o.isDirectionalLight) o.intensity = 0.1; }
+  },
+  acts: [
+    {id: 'torch', icon: '🔥', label: '횃불 들기', run(c, done) {
+      S.tt = 16; c.doAct(c.player, 'wave'); c.beep(180, .5, 0, 'sawtooth', .02); const n = c.count('torch');
+      c.toast(n === 1 ? '🔥 횃불을 쥐었어요. 주변이 환해져요' : `🔥 횃불 ${n}번째. 벽의 그림이 또렷해요`); setTimeout(done, 1000); }},
+    {id: 'glyph', icon: '🗿', label: '기호 맞추기', spot: [0, 1.4], face: Math.PI, run(c, done) {
+      const D = daily(c.now()), pool = [0, 1, 2, 3, 4, 5].filter(i => i !== D.sym).sort(() => Math.random() - .5), trio = [D.sym, pool[0], pool[1]];
+      const Lq = [...trio].sort(() => Math.random() - .5), Rq = [...trio].sort(() => Math.random() - .5);
+      const left = Lq.map(i => `<div class="gl" data-i="${i}" style="border:1.5px solid #2b2620;background:#fffaf0;border-radius:4px;padding:6px 4px;margin:6px 0;cursor:pointer;height:98px;box-sizing:border-box"><img src="${symImg(i)}" width="64" height="64" style="display:block;margin:0 auto"><small style="display:block;font-size:11px;color:#7a6e5e">${SYM[i][2]}</small></div>`).join('');
+      const right = Rq.map(i => `<button class="btn rr" data-i="${i}" style="display:block;width:100%;height:98px;margin:6px 0;font-size:20px">${SYM[i][1]}</button>`).join('');
+      c.play(`<h3>벽의 기호, 무슨 뜻?</h3><p style="font-size:13px;color:#7a6e5e">그림을 누르고, 알맞은 뜻을 눌러요. 오늘의 기호는 「${SYM[D.sym][1]}」예요. 25초 안에!</p>
+        <div style="display:flex;gap:12px"><div style="flex:1">${left}</div><div style="flex:1">${right}</div></div>
+        <div style="height:6px;background:#e0d4bc;border-radius:3px;overflow:hidden"><div id="bar" style="height:100%;width:100%;background:#c9472f;transition:width 25s linear"></div></div>
+        <p id="msg" style="min-height:22px;font-size:14px">맞는 짝을 찾아봐요</p><div class="row" style="justify-content:center"><button class="btn" id="qt">그만두기</button></div>`,
+        (el, close) => {
+          let dead = false, sel = null, solved = 0, miss = 0; const msg = el.querySelector('#msg');
+          const timer = setTimeout(() => { if (dead) return; dead = true; close(); c.toast('시간이 다 됐어요. 천천히 다시 읽어 봐요'); setTimeout(done, 600); }, 25000);
+          requestAnimationFrame(() => requestAnimationFrame(() => { const b = el.querySelector('#bar'); if (b) b.style.width = '0%'; }));
+          el.querySelector('#qt').onclick = () => { dead = true; clearTimeout(timer); close(); done(); };
+          for (const g of el.querySelectorAll('.gl')) g.onclick = () => { if (dead || g.dataset.done) return; sel = g.dataset.i;
+            for (const o of el.querySelectorAll('.gl')) o.style.boxShadow = o === g ? '0 0 0 3px #c9472f' : 'none'; c.beep(700, .04, 0, 'sine', .04); };
+          for (const r of el.querySelectorAll('.rr')) r.onclick = () => { if (dead || sel == null || r.dataset.done) return;
+            const g = el.querySelector(`.gl[data-i="${sel}"]`);
+            if (r.dataset.i === sel) { g.dataset.done = r.dataset.done = 1; g.style.opacity = r.style.opacity = .35; g.style.boxShadow = 'none'; sel = null; solved++; c.beep(880, .08); c.beep(1200, .1, .09); msg.textContent = '맞아요';
+              if (solved === 3) { dead = true; clearTimeout(timer);
+                setTimeout(() => { close(); c.count('glyph'); const got = new Set(c.DB.syms || []); trio.forEach(i => got.add(i)); c.DB.syms = [...got]; c.save(); c.doAct(c.player, 'cheer');
+                  c.stamp('해독', miss ? `틀린 ${miss}번` : '한 번에 다 맞혔어요'); setTimeout(done, 1500); }, 600); } }
+            else { miss++; sel = null; for (const o of el.querySelectorAll('.gl')) o.style.boxShadow = 'none'; c.beep(200, .15, 0, 'square', .04); msg.textContent = '아닌 것 같아요. 다시 골라 봐요'; } };
+        }); }},
+    {id: 'quiet', icon: '🤫', label: '조용히 서기', spot: [0, -4.4], face: Math.PI, run(c, done) {
+      S.dim = 0.45; c.doAct(c.player, 'crouch'); c.beep(110, 6, 0, 'sine', .015); c.toast('…', 1400);
+      setTimeout(() => c.toast('돌은 차갑고, 소리는 없어요.', 2200), 1500);
+      setTimeout(() => c.toast('횃불 타는 소리만 들려요.', 2200), 3800);
+      setTimeout(() => { S.dim = 1; const n = c.count('quiet'); c.stamp('고요', `오늘 ${n}번째`); setTimeout(done, 1300); }, 6200); }},
+    {id: 'fact', icon: '📜', label: '이집트 사실', spot: [7, -8.3], face: Math.PI, run(c, done) {
+      const d = c.now(), D = daily(d), first = !c.today().fact; c.beep(500, .06); c.beep(740, .08, .08); c.count('fact');
+      setTimeout(() => c.dialog('오늘의 이집트 사실', `${c.hm(d)} · ${c.visits()}번째 온 날`,
+        `<p style="font-size:16px">「${FACT[D.fact]}」</p><p style="font-size:13px;color:#7a6e5e">오늘의 기호: ${SYM[D.sym][1]} — ${SYM[D.sym][2]}</p>` + (first ? '' : '<p style="color:#7a6e5e;font-size:13px">오늘의 사실은 하루에 하나. 내일 또 와요.</p>'), [['잘 읽었어요', done, 'main']]), 600); }},
+  ],
+  recExtra: c => `<p style="font-size:13px;color:#7a6e5e">읽은 기호 ${(c.DB.syms || []).length}/${SYM.length}종: ${(c.DB.syms || []).map(i => SYM[i][1]).join(' · ') || '아직 없음'}</p>`,
+  onEnter(c) { c.toast(c.visits() > 1 ? `🧭 ${c.visits()}번째 방문. 오늘도 서늘해요` : '🧭 서늘하고 어두워요. 횃불이 길을 알려 줘요', 3000); },
+});
+</script></body></html>

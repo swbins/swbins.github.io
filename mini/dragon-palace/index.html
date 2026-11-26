@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>바닷속 용궁</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 옛이야기 「별주부전」(토끼전, 판소리로는 수궁가) 줄거리 — 날짜마다 한 장면씩 차례로
+const STORY = [
+  ['용왕님이 병들다', '바닷속 용왕님이 큰 병에 걸렸어요. 의원이 말하길, 토끼의 간을 먹어야 낫는다고 했어요. 토끼는 뭍에 사는데 말이죠.'],
+  ['뭍으로 갈 신하 찾기', '신하들이 모여 누가 뭍에 다녀올지 의논했어요. 별주부, 곧 자라가 나서겠다고 했어요. 「별주부」는 자라가 지닌 벼슬 이름이에요.'],
+  ['토끼를 만나다', '뭍에 오른 자라는 토끼를 찾아 말을 걸었어요. 「용궁은 먹을 것도 많고 벼슬도 얻는 곳이라오.」 토끼는 귀가 솔깃했어요.'],
+  ['자라 등에 타다', '토끼는 용궁이 궁금해서 자라 등에 올랐어요. 자라는 물결을 가르며 바다를 건넜어요.'],
+  ['용궁에 닿다', '용궁에 닿은 토끼는 곧 붙잡혔어요. 「네 간이 용왕님 병을 낫게 한다.」 토끼는 깜짝 놀랐지만 얼른 숨을 골랐어요.'],
+  ['토끼의 꾀', '토끼가 말했어요. 「제 간은 넣었다 뺐다 할 수 있어서, 오늘은 뭍의 바위틈에 꺼내 두고 왔습니다.」 용왕님도 그럴듯하다 싶었어요.'],
+  ['다시 뭍으로', '용왕님은 토끼의 말을 믿고, 자라에게 토끼를 태워 간을 가지러 다녀오게 했어요.'],
+  ['토끼가 달아나다', '뭍에 닿자 토끼는 풀숲으로 폴짝 뛰어갔어요. 「간을 어떻게 꺼내 두고 다니겠소?」 자라는 빈손으로 돌아가야 했어요. 이야기 끝은 전하는 판본마다 조금씩 달라요.'],
+];
+const KING = ['먼 길 왔구나. 편히 쉬었다 가거라.', '요즘 몸이 영 무겁구나. 그래도 손님은 반갑다.', '뭍에 간 신하가 돌아오길 기다리는 중이란다.', '물속 사람들은 서두르는 법이 없단다.', '진주는 좀 골랐느냐?', '고개 숙여 인사하니 기특하구나.'];
+const RIDE_END = ['🐢 자라 등에서 내려요. 뭍까지는 아직 멀어요', '🐢 한 바퀴 돌았어요. 자라는 느긋해요', '🐢 자라가 천천히 눈을 깜빡여요'];
+
+const dnum = d => Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
+const ST = {on: false, t: 0, fin: null, open: 0};
+
+// 진주 놀이용 조개 그림
+const clamSvg = item => {
+  const shell = '<path d="M5 25 Q20 37 35 25 Z" fill="#c4808e" stroke="#6b3f4a" stroke-width="1.5"/>';
+  const lid = '<path d="M5 25 Q20 4 35 25 Z" fill="#d79aa8" stroke="#6b3f4a" stroke-width="1.5"/><path d="M12 23 L16 12 M20 23 L20 8 M28 23 L24 12" stroke="#b9717f" stroke-width="1.2" fill="none"/>';
+  if (!item) return `<svg viewBox="0 0 40 40" width="46" height="46">${shell}${lid}</svg>`;
+  const it = item === 'p' ? '<circle cx="20" cy="21" r="6" fill="#fffdf6" stroke="#cfc6b4" stroke-width="1"/><circle cx="18" cy="19" r="1.8" fill="#fff"/>'
+    : '<polygon points="14,25 16,17 23,15 27,21 25,26" fill="#8a8f96" stroke="#5a5f66" stroke-width="1"/>';
+  return `<svg viewBox="0 0 40 40" width="46" height="46">${shell}${it}<g transform="translate(0,-9)">${lid}</g></svg>`;
+};
+
+start({
+  key: 'dragon-palace', title: '바닷속 용궁', enter: '물속으로 내려가기', time: 'day', nickIcon: '🐚',
+  nick: [['느긋한', '헤엄치는', '깊이 내려온', '물결 타는', '조개 곁의', '푸른'], ['해초', '진주', '산호', '물방울', '자라', '소라']],
+  intro: '<p>푸른 물속, 산호와 해초 사이로 붉은 기둥이 보여요.<br>자라 등에 타고, 옛이야기 한 토막 듣고 가요.</p>',
+  floor: {w: 30, d: 24, c1: '#d6c698', c2: '#c4b484', around: 0x3b86a4},
+  bg: {day: 0x2a7fb0}, startPos: [0, 8], cam: {h: 10, back: 12},
+  playerLook: {coat: 0x2f6f8a, pants: 0x3a3f4a, hair: 0x2a2018},
+  build(c) {
+    const {box, cyl, ball, glowBall, sign, solid, fx, npc, THREE, scene} = c;
+    const grp = (x, y, z, p) => { const g = new THREE.Group(); g.position.set(x, y, z); (p || scene).add(g); return g; };
+    const dn = dnum(c.now()), idx = dn % STORY.length;
+
+    /* 용궁 — 뒤쪽(-z): 단 · 붉은 기둥 · 푸른 기와 · 금빛 문 */
+    box(18, 0.3, 4, 0xd9cfc0, 0, 0.15, -10); solid(0, -10.1, 18, 3.8);
+    box(18, 6, 0.5, 0x4a8a9a, 0, 3, -11.7);
+    for (const s of [-1, 1]) box(1.5, 3.6, 0.2, 0xe8a93a, s * 0.78, 1.8, -11.4);
+    ball(0.1, 0x7a4a1a, -0.3, 1.8, -11.26); ball(0.1, 0x7a4a1a, 0.3, 1.8, -11.26);
+    for (const x of [-6.5, -3.2, 3.2, 6.5]) { cyl(0.45, 0.45, 6.2, 0xc9472f, x, 3.1, -9); cyl(0.65, 0.65, 0.3, 0xd9cfc0, x, 0.45, -9); cyl(0.6, 0.6, 0.25, 0xe8a93a, x, 6.1, -9); }
+    box(14.4, 0.6, 0.6, 0xc9472f, 0, 5.8, -9);
+    box(18, 0.5, 4.6, 0x2f6f6a, 0, 6.5, -9.8); box(19.5, 0.3, 2.4, 0x3f8a82, 0, 6.85, -9.9);
+    for (const s of [-1, 1]) { const e = box(1.6, 0.3, 4.6, 0x2f6f6a, s * 9.6, 6.75, -9.8); e.rotation.z = s * 0.4; }
+    sign(['용궁'], 3.2, 1.0, '#c9472f', '#f4ecdc', 0, 4.95, -8.65, 0, [60]);
+    // 용왕님 자리
+    box(3.2, 0.35, 2.2, 0xe8a93a, 0, 0.17, -7.3); box(1.7, 2.4, 0.3, 0xc9472f, 0, 1.55, -8.1); solid(0, -7.4, 3.2, 2.2);
+    c.king = npc({coat: 0xb8372a, pants: 0x7a2a22, hair: 0xdddddd, hairStyle: 'long', hat: {type: 'bandana', c: 0xe8a93a}, sash: 0xe8a93a}, [[0, -7.2]], {scale: 1.3, face: 0, idle: ['wave']});
+    c.king.o.position.y = 0.35;
+    npc({coat: 0x2f6f6a, pants: 0x2b2f3a, hat: {type: 'cap', c: 0xe8a93a}}, [[-3.3, -6.4]], {face: 0});
+    npc({coat: 0x2f6f6a, pants: 0x2b2f3a, hat: {type: 'cap', c: 0xe8a93a}}, [[3.3, -6.4]], {face: 0});
+    // 진주 등불
+    for (const x of [-4.8, 4.8]) { cyl(0.05, 0.05, 2.6, 0x8a7a5a, x, 1.3, -7.2); glowBall(0.32, 0xfff2c8, x, 2.8, -7.2, 7, 11); }
+
+    /* 산호 · 해초 · 불가사리 · 소라 */
+    const coral = (x, z, col, big = 1) => {
+      const g = grp(x, 0, z); const n = 4 + (Math.abs(x * 7 + z) | 0) % 3;
+      for (let i = 0; i < n; i++) { const h = (0.9 + (i % 3) * 0.45) * big, a = i / n * Math.PI * 2;
+        const b = cyl(0.07 * big, 0.2 * big, h, col, Math.cos(a) * 0.35, h / 2, Math.sin(a) * 0.35, g); b.rotation.z = Math.cos(a) * 0.3; b.rotation.x = Math.sin(a) * 0.3;
+        ball(0.13 * big, col, Math.cos(a) * (0.35 + h * 0.15), h + 0.04, Math.sin(a) * (0.35 + h * 0.15), g); }
+      solid(x, z, 1.4 * big, 1.4 * big); };
+    [[-12, -4, 0xe8648a], [-11, 4, 0xf08a3a], [-13, 8, 0xe8648a, 1.2], [12, -5, 0xf08a3a, 1.2], [11.5, 8, 0xd85a9a], [12.5, 2, 0xe8648a], [-9.5, -6.5, 0xd85a9a], [9.5, -6.8, 0xf08a3a], [-1, 10, 0xe8648a, 0.8]].forEach(a => coral(...a));
+    const weeds = [];
+    const weed = (x, z, n = 4, col = 0x2f8a4a) => { let p = grp(x, 0, z); const segs = [p];
+      for (let i = 0; i < n; i++) { box(0.14, 0.7, 0.1, col, 0, 0.35, 0, p); p = grp(0, 0.7, 0, p); segs.push(p); } weeds.push({segs, ph: x * 1.3 + z}); };
+    [[-8, -3], [-7.4, -2.6], [-8.6, 1], [-10, 9], [-9.4, 9.4], [8, 5.4], [8.6, 5.8], [10, -2], [10.6, -1.5], [10.2, -2.6], [-3, 9.5], [3.4, 10], [7, -4], [-6.4, -4.6], [0, 10.6], [5.5, 9.4]].forEach(a => weed(...a, 3 + (Math.abs(a[0]) | 0) % 3, a[0] % 2 ? 0x2f8a4a : 0x3a9a5a));
+    const star = (x, z, col = 0xf0883a) => { const g = grp(x, 0.06, z); g.rotation.y = x; for (let i = 0; i < 5; i++) { const b = box(0.7, 0.1, 0.2, col, Math.cos(i * 1.2566) * 0.3, 0, Math.sin(i * 1.2566) * 0.3, g); b.rotation.y = -i * 1.2566; } };
+    star(-1.5, 6.5); star(4.5, 7); star(-7, 6, 0xe8648a); star(9, 0.5, 0xe8648a);
+    for (const [x, z, col] of [[2.2, 6, 0xe8c0c8], [-9, 3, 0xf4e0b0], [3.2, -3.8, 0xe8c0c8]]) { const s = ball(0.3, col, x, 0.2, z); s.scale.set(1.1, 0.7, 0.9); s.rotation.y = x; }
+
+    /* 자라 — 등딱지·머리·지느러미 */
+    const T = grp(-5, 0.2, 4); T.rotation.y = Math.PI / 2; ST.T = T; solid(-5, 4, 3, 2.2);
+    ball(0.95, 0x4f8a52, 0, 0.65, 0, T).scale.set(1.1, 0.55, 1.25);
+    for (const [px, pz] of [[0, 0], [0.5, 0.5], [-0.5, 0.5], [0.5, -0.5], [-0.5, -0.5]]) ball(0.3, 0x79ac5f, px, 1.02 - (Math.abs(px) + Math.abs(pz)) * 0.3, pz, T).scale.set(1, 0.45, 1);
+    ball(0.9, 0xe6d3a0, 0, 0.42, 0, T).scale.set(1.05, 0.35, 1.2);
+    ball(0.22, 0x8dae5e, 0, 0.7, 1.1, T); ball(0.32, 0x8dae5e, 0, 0.78, 1.35, T);
+    for (const s of [-1, 1]) { ball(0.06, 0x111111, s * 0.14, 0.9, 1.6, T); }
+    const fl = [];
+    for (const s of [-1, 1]) { const g = grp(s * 0.95, 0.6, 0.5, T); box(0.95, 0.1, 0.45, 0x8dae5e, s * 0.47, 0, 0, g); fl.push([g, s]);
+      const r = grp(s * 0.7, 0.55, -0.85, T); box(0.5, 0.08, 0.3, 0x8dae5e, s * 0.25, 0, 0, r); fl.push([r, s * 0.5]); }
+    box(0.12, 0.08, 0.35, 0x8dae5e, 0, 0.5, -1.2, T);
+
+    /* 진주 조개 — 천천히 열렸다 닫혀요 */
+    const clam = grp(6.5, 0.45, 1.2), lid = grp(0, 0, 0, clam); solid(6.5, 2.1, 2, 2);
+    ball(0.95, 0xd8a0b0, 0, 0, 0.95, lid).scale.set(1, 0.4, 1);
+    for (let i = -2; i <= 2; i++) box(0.05, 0.05, 0.9, 0xb9717f, i * 0.28, 0.33 - Math.abs(i) * 0.05, 0.95, lid);
+    ball(0.95, 0xe8c0c8, 0, -0.1, 0.95, clam).scale.set(1, 0.4, 1);
+    const gem = glowBall(0.24, 0xfffdf4, 6.5, 0.72, 2.05, 0);
+
+    /* 옛이야기 할아버지 · 바위 · (뭍에서 온 손님) 토끼 */
+    c.teller = npc({coat: 0x6b5a4a, pants: 0x3a3f4a, hair: 0xdddddd, hairStyle: 'short', glasses: true}, [[3.5, -1.2]], {face: -Math.PI / 2, idle: ['wave']});
+    const rk = ball(0.9, 0x7a8a8a, 5.4, 0.35, -1.2); rk.scale.set(1.1, 0.7, 1); solid(5.4, -1.2, 2, 1.8);
+    const rab = grp(5.3, 0.95, -1.2); rab.rotation.y = -Math.PI / 2; rab.visible = idx >= 2;
+    ball(0.24, 0xe8e0d0, 0, 0.15, 0, rab).scale.set(0.9, 1, 1.15); ball(0.17, 0xe8e0d0, 0, 0.42, 0.22, rab);
+    for (const s of [-1, 1]) box(0.06, 0.4, 0.04, 0xe8e0d0, s * 0.07, 0.72, 0.2, rab); ball(0.07, 0xffffff, 0, 0.12, -0.28, rab);
+
+    /* 물고기 떼 · 물방울 */
+    const fish = [];
+    const school = (cx, cz, r, y, col, n, sp) => { for (let i = 0; i < n; i++) { const g = grp(cx, y, cz); ball(0.3, col, 0, 0, 0, g).scale.set(0.6, 0.8, 1.5); const tail = box(0.05, 0.4, 0.3, col, 0, 0, -0.5, g);
+      fish.push({g, tail, cx, cz, r: r + (i % 3) * 0.7, y: y + Math.sin(i * 2) * 0.5, a: i * 0.8, sp: sp * (i % 2 ? 1 : 1.1), ph: i}); g.scale.setScalar(0.55); } };
+    school(-3, 3, 4.5, 3.6, 0xf0883a, 5, 0.5); school(5, -2, 3.6, 2.6, 0xf4c93a, 4, -0.6); school(0, 6, 7, 4.6, 0xa8c8e8, 6, 0.4);
+    const NB = 140, bgm = new THREE.BufferGeometry(), bp = new Float32Array(NB * 3), bs = new Float32Array(NB);
+    for (let i = 0; i < NB; i++) { bp[i * 3] = (Math.random() - .5) * 30; bp[i * 3 + 1] = Math.random() * 12; bp[i * 3 + 2] = (Math.random() - .5) * 24; bs[i] = .4 + Math.random() * .8; }
+    bgm.setAttribute('position', new THREE.BufferAttribute(bp, 3));
+    scene.add(new THREE.Points(bgm, new THREE.PointsMaterial({color: 0xdff4ff, size: 4, sizeAttenuation: false, transparent: true, opacity: .55, depthWrite: false})));
+
+    /* 자라 타기 길 — 8초 동안 한 바퀴 */
+    const DUR = 8.5, ease = u => { u = Math.max(0, Math.min(1, u)); return u * u * (3 - 2 * u); };
+    const P = s => [-5 * Math.cos(Math.PI * 2 * s), 4 - 8 * Math.sin(Math.PI * s)];
+
+    fx.push((dt, t) => {
+      for (const w of weeds) w.segs.forEach((g, i) => { g.rotation.z = Math.sin(t * 1.2 + w.ph + i * 0.6) * 0.16; g.rotation.x = Math.cos(t * 0.9 + w.ph + i * 0.5) * 0.08; });
+      for (const f of fish) { f.a += f.sp * dt; const x = f.cx + Math.cos(f.a) * f.r, z = f.cz + Math.sin(f.a) * f.r * 0.7;
+        f.g.position.set(x, f.y + Math.sin(t + f.ph) * 0.2, z); const s = Math.sign(f.sp);
+        f.g.rotation.y = Math.atan2(-Math.sin(f.a) * f.r * s, Math.cos(f.a) * f.r * 0.7 * s); f.tail.rotation.y = Math.sin(t * 9 + f.ph) * 0.5; }
+      for (let i = 0; i < NB; i++) { let y = bp[i * 3 + 1] + bs[i] * dt * 1.2; if (y > 12) y = 0; bp[i * 3 + 1] = y; bp[i * 3] += Math.sin(t + i) * dt * 0.1; }
+      bgm.attributes.position.needsUpdate = true;
+      const op = Math.max(0, Math.sin(t * 0.8)); lid.rotation.x = -(0.06 + 0.7 * op * op); gem.material.color.setHex(op > 0.3 ? 0xffffff : 0xe6ddc8);
+      // 자라
+      let amp = 0.15, fq = 2;
+      if (ST.on) { ST.t += dt; const u = Math.min(1, ST.t / DUR), e = ease(u), [x, z] = P(e), [x2, z2] = P(ease(u + 0.012)), [x1, z1] = P(ease(u - 0.012));
+        T.position.set(x, 0.3 + 1.3 * Math.sin(Math.PI * e), z); const hd = Math.atan2(x2 - x1, z2 - z1); if (Math.hypot(x2 - x1, z2 - z1) > 1e-5) T.rotation.y = hd;
+        c.player.position.set(x, T.position.y + 1.0, z); c.player.rotation.y = T.rotation.y; amp = 0.4; fq = 4;
+        if (ST.t >= DUR) { ST.on = false; T.position.set(-5, 0.2, 4); T.rotation.y = Math.PI / 2; c.player.position.set(-2.4, 0, 4); c.player.rotation.y = -Math.PI / 2; const f = ST.fin; ST.fin = null; f && f(); } }
+      else T.position.y = 0.2 + Math.sin(t * 1.5) * 0.08;
+      for (const [g, s] of fl) g.rotation.z = s * Math.sin(t * fq) * amp;
+    });
+  },
+  onTime(p, c) {   // 틀이 하늘·빛을 되돌리니 물속 빛을 다시 입힌다
+    const h = c.scene.children.find(o => o.isHemisphereLight), s = c.scene.children.find(o => o.isDirectionalLight);
+    if (h) { h.color.setHex(0xbfe8ff); h.groundColor.setHex(0x2a5a78); h.intensity = 1.15; }
+    if (s) { s.color.setHex(0xcfeeff); s.intensity = 1.1; }
+    if (c.scene.fog) { c.scene.fog.near = 24; c.scene.fog.far = 80; }
+  },
+  acts: [
+    {id: 'ride', icon: '🐢', label: '거북 타기', spot: [-2.4, 4], face: -Math.PI / 2, run(c, done) {
+      const n = c.count('ride'); c.beep(300, .25, 0, 'sine', .06); c.toast(n === 1 ? '🐢 자라 등에 올라요. 꽉 잡아요' : '🐢 또 타요. 이번엔 어디로?', 2400);
+      ST.t = 0; ST.on = true;
+      ST.fin = () => { c.doAct(c.player, 'cheer'); c.beep(520, .1, 0, 'sine', .05); c.stamp('한 바퀴', `오늘 ${n}번째`); c.toast(RIDE_END[(dnum(c.now()) + n) % RIDE_END.length]); setTimeout(done, 1300); }; }},
+    {id: 'story', icon: '📜', label: '옛이야기', spot: [2, -0.8], face: -Math.PI / 2, run(c, done) {
+      const d = c.now(), i = dnum(d) % STORY.length, first = !c.today().story; c.count('story'); c.teller.talk = true; c.doAct(c.teller.o, 'wave'); c.beep(440, .08, 0, 'sine', .05);
+      const heard = new Set(c.DB.heard || []); heard.add(i); c.DB.heard = [...heard]; c.save();
+      setTimeout(() => { c.teller.talk = false; c.dialog('별주부 이야기 — ' + STORY[i][0], `${c.hm(d)} · 장면 ${i + 1}/${STORY.length} · ${c.visits()}번째 온 날`,
+        `<p style="font-size:16px">${STORY[i][1]}</p>` + (first ? '<p style="color:#7a6e5e;font-size:13px">옛이야기 「별주부전」(토끼전)의 줄거리예요.</p>' : '<p style="color:#7a6e5e;font-size:13px">장면은 하루에 하나. 내일은 다음 장면이에요.</p>'), [['잘 들었어요', done, 'main']]); }, 900); }},
+    {id: 'pearl', icon: '🦪', label: '진주 찾기', spot: [6.5, 4.5], face: Math.PI, run(c, done) {
+      c.play(`<style>.cl{width:62px;height:62px;border:1.5px solid #2b2620;border-radius:6px;background:#bfe0ee;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:inherit}.cl.ok{background:#bfe8c0}.cl.no{background:#f0c0b8}</style>
+        <h3>진주 고르기</h3><p style="font-size:13px;color:#7a6e5e">조개가 잠깐 열려요. 하얗게 빛나는 진주만 눌러요. 회색 돌은 안 돼요!</p>
+        <div id="row" style="display:flex;gap:8px;justify-content:center;margin:10px 0"></div>
+        <p id="msg" style="min-height:22px;font-size:14px"></p><div class="row" id="ro" style="justify-content:center"><button class="btn main" id="go">시작</button><button class="btn" id="qt">그만두기</button></div>`,
+        (el, close) => {
+          let dead = false; const row = el.querySelector('#row'), ro = el.querySelector('#ro'), msg = el.querySelector('#msg'), cls = [];
+          for (let k = 0; k < 4; k++) { const b = document.createElement('button'); b.className = 'cl'; b.innerHTML = clamSvg(null); row.appendChild(b); cls.push(b); }
+          el.querySelector('#qt').onclick = () => { dead = true; close(); done(); };
+          el.querySelector('#go').onclick = () => {
+            ro.innerHTML = ''; const seq = [...'pppppp', ...'ssss'].sort(() => Math.random() - .5);
+            let i = 0, got = 0, miss = 0, cur = null; const say = () => msg.textContent = `진주 ${got} · 잘못 눌렀어요 ${miss}`; say();
+            const flash = (b, k) => { b.classList.add(k); setTimeout(() => b.classList.remove(k), 260); };
+            cls.forEach((b, k) => b.onpointerdown = () => { if (dead) return;
+              if (cur && cur.k === k && cur.item === 'p' && !cur.hit) { cur.hit = true; got++; c.beep(1200, .06, 0, 'sine', .05); c.beep(1700, .08, .06, 'sine', .05); flash(b, 'ok'); }
+              else if (!(cur && cur.k === k && cur.hit)) { miss++; c.beep(180, .12, 0, 'square', .04); flash(b, 'no'); } say(); });
+            const finish = () => { if (dead) return; dead = true; c.count('pearl'); c.DB.pearls = (c.DB.pearls || 0) + got; c.DB.pearlBest = Math.max(c.DB.pearlBest || 0, got); c.save(); close();
+              if (got) { const pr = c.ball(0.11, 0xfaf6ee, 0, 0.1, 0, c.hand); setTimeout(() => c.hand.remove(pr), 2600); }
+              if (got >= 5) { c.doAct(c.player, 'cheer'); c.stamp('진주 ' + got + '알', miss ? '눈이 밝아요' : '하나도 안 틀렸어요'); } else c.toast(got ? `🦪 진주 ${got}알. 조개가 빨라요` : '🦪 이번엔 한 알도 못 골랐어요. 또 와요');
+              setTimeout(done, 1600); };
+            const step = () => { if (dead || !el.isConnected) return; if (i >= seq.length) { setTimeout(finish, 500); return; }
+              const k = Math.random() * 4 | 0, item = seq[i++], dur = Math.max(620, 1050 - i * 40); cur = {k, item, hit: false};
+              cls[k].innerHTML = clamSvg(item); c.beep(item === 'p' ? 900 : 300, .04, 0, 'sine', .03);
+              setTimeout(() => { if (dead) return; cls[k].innerHTML = clamSvg(null); cur = null; }, dur); setTimeout(step, dur + 550); };
+            setTimeout(step, 600);
+          }; }); }},
+    {id: 'king', icon: '🙇', label: '용왕 인사', spot: [0, -5.2], face: Math.PI, run(c, done) {
+      const d = c.now(), n = c.count('king'); c.king.talk = true; c.doAct(c.player, 'crouch'); c.beep(260, .3, 0, 'sine', .06);
+      setTimeout(() => { c.doAct(c.king.o, 'wave'); c.toast('용왕님: 「' + KING[(dnum(d) + n * 2) % KING.length] + '」', 3400); if (n === 1) c.stamp('문안', '오늘 첫 인사'); }, 900);
+      setTimeout(() => { c.king.talk = false; done(); }, 3600); }},
+  ],
+  recExtra: c => `<p style="font-size:13px;color:#7a6e5e">고른 진주 모두 ${c.DB.pearls || 0}알 · 한 번에 가장 많이 ${c.DB.pearlBest || 0}알<br>들은 이야기 장면 ${(c.DB.heard || []).length}/${STORY.length}</p>`,
+  onEnter(c) { c.toast(c.visits() > 1 ? `🐚 또 내려왔네요. ${c.visits()}번째` : '🐚 물속인데도 숨이 쉬어져요. 용궁이니까요', 3200); },
+});
+</script></body></html>

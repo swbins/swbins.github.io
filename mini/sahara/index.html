@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>사하라 사막 밤</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 낙타 곁에서 들려주는 한 줄 사실 — 날짜마다 하나씩 차례로
+const FACT = [
+  '사하라는 세계에서 가장 큰 더운 사막이에요. 대서양에서 홍해까지 아프리카 북부를 가로질러요.',
+  '사막은 구름과 습기가 적어서, 낮에 받은 열이 밤에 빠르게 빠져나가요. 그래서 밤 기온이 크게 떨어져요.',
+  '낙타의 혹에는 물이 아니라 지방이 들어 있어요. 먹을 게 없을 때 꺼내 써요.',
+  '사하라가 전부 모래는 아니에요. 모래 언덕은 일부이고, 자갈 평원과 바위산도 많아요.',
+  '몇천 년 전의 사하라에는 풀밭과 호수가 있었어요. 지금보다 훨씬 푸르렀어요.',
+  '단봉낙타는 혹이 하나, 쌍봉낙타는 둘이에요. 사하라 같은 더운 사막에서 일하는 건 주로 단봉낙타예요.',
+  '낙타는 속눈썹이 길고 겹이며, 콧구멍을 닫을 수 있어서 모래바람을 견뎌요.',
+  '모래 언덕은 바람에 밀려 아주 천천히 움직여요. 모래알이 한쪽에서 다른 쪽으로 옮겨 가요.',
+  '낙타는 물을 마실 때 한 번에 수십 리터를 마실 수 있어요.',
+  '오아시스는 땅속 물이 땅 위로 나오거나 얕게 있는 곳에 생겨요. 그래서 사막 한가운데에도 야자나무가 자라요.',
+  '사하라의 면적은 약 900만 제곱킬로미터로, 대략 미국 전체와 비슷한 크기예요.',
+  '사막은 비가 아주 적게 오는 곳을 말해요. 꼭 모래와 더위만 뜻하는 건 아니에요. 남극도 사막으로 꼽혀요.',
+];
+const CAMEL = [
+  '낙타가 천천히 씹어요. 뭘 씹는지는 모르겠어요.',
+  '낙타는 한 번 쳐다보고 다시 딴 데를 봐요. 서운하진 않아요.',
+  '낙타 옆은 따뜻해요. 모래는 이미 식었는데.',
+  '낙타가 코를 푸르르 불어요. 인사로 받을게요.',
+  '말이 없어서 편해요. 둘 다.',
+];
+const STARS = [
+  '별똥별은 별이 아니라, 대개 모래알만 한 우주 먼지가 공기와 부딪혀 타는 거예요.',
+  '건조하고 구름이 적고 불빛이 없는 사막은 별 보기 좋은 곳이에요.',
+  '지금 보는 별빛은 아주 오래 걸려 도착한 빛이에요.',
+  '밤하늘의 은하수는 우리 은하를 안쪽에서 본 모습이에요.',
+  '달이 밝은 날엔 희미한 별이 잘 안 보여요.',
+  '별똥별은 하늘 어디서든 지나가요. 소원은 짧게 빌어요.',
+];
+const OASIS = [
+  '오아시스 물은 대개 땅속에서 올라와요.',
+  '양동이 하나면 낙타한테는 한 입이에요.',
+  '대추야자는 오아시스의 대표 나무예요. 열매는 달고 오래 두고 먹을 수 있어요.',
+  '물 위에 별이 떠 있어요. 건져 보려다 말았어요.',
+  '물이 차가워서 손이 시원해요. 낮에 뜨거웠던 건 다 잊게 돼요.',
+  '한 통 길어다 부어요. 오늘 물 걱정이 한 통 줄었어요.',
+];
+const SYN = 29.530588853, S = {look: 0, water: 0, waterTo: 0, bright: 0, fireK: 1, ripple: null, setSky: null, rings: []};
+const DUNE = {x: 11.5, z: -4, rx: 5, rz: 7, h: 3};
+const hD = (x, z) => { const u = Math.hypot((x - DUNE.x) / DUNE.rx, (z - DUNE.z) / DUNE.rz); return u >= 1 ? 0 : DUNE.h * (0.5 + 0.5 * Math.cos(Math.PI * u)); };
+
+function moonName(a) {
+  return a < 1 || a >= 28.5 ? '달 없는 밤' : a < 6.5 ? '초승달' : a < 8.4 ? '상현달' : a < 13.4 ? '차오르는 달' : a < 16.1 ? '보름달' : a < 21 ? '기우는 달' : a < 23 ? '하현달' : '그믐달';
+}
+function daily(d) {   // 오늘 밤 하늘 — 날짜로만 정해진다 (달 나이는 2000-01-06 신월 기준 평균 주기로 계산)
+  const dn = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
+  const days = (Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), 12) - Date.UTC(2000, 0, 6, 18, 14)) / 864e5;
+  const age = ((days % SYN) + SYN) % SYN, p = age / SYN, k = (1 - Math.cos(2 * Math.PI * p)) / 2;
+  const met = Math.max(1, 2 + ((dn * 53 + 7) % 5) - (k > 0.85 ? 1 : 0));
+  return {dn, age, p, k, met, moon: moonName(age), fact: FACT[dn % FACT.length]};
+}
+function drawMoon(cv, p, k) {   // 달 모양 — 찼다 기우는 것을 그대로
+  const g = cv.getContext('2d'), W = cv.width, c = W / 2, R = W * 0.195;
+  const gl = g.createRadialGradient(c, c, R * 0.8, c, c, c); gl.addColorStop(0, `rgba(200,215,255,${0.1 + k * 0.28})`); gl.addColorStop(1, 'rgba(200,215,255,0)');
+  g.fillStyle = gl; g.fillRect(0, 0, W, W);
+  g.fillStyle = '#2a3150'; g.beginPath(); g.arc(c, c, R, 0, Math.PI * 2); g.fill();
+  const waxing = p < 0.5, e = Math.cos(p * 2 * Math.PI);
+  g.save(); g.translate(c, c); if (!waxing) g.scale(-1, 1);
+  g.fillStyle = '#f6f0d8'; g.beginPath(); g.arc(0, 0, R, -Math.PI / 2, Math.PI / 2, false);
+  if (e > 0) g.ellipse(0, 0, e * R, R, 0, Math.PI / 2, -Math.PI / 2, true); else g.ellipse(0, 0, -e * R, R, 0, Math.PI / 2, Math.PI * 1.5, false);
+  g.closePath(); g.fill();
+  if (k > 0.3) { g.fillStyle = 'rgba(150,140,110,.35)'; for (const [x, y, r] of [[0.35, -0.3, 0.2], [0.1, 0.35, 0.14], [0.55, 0.2, 0.1]]) { g.beginPath(); g.arc(x * R, y * R, r * R, 0, Math.PI * 2); g.fill(); } }
+  g.restore();
+}
+function meteor() {   // 별똥별 하나 — 화면 위쪽 하늘을 가로지른다
+  let sky = document.getElementById('msky');
+  if (!sky) { sky = document.createElement('div'); sky.id = 'msky'; sky.style.cssText = 'position:fixed;left:0;top:0;right:0;height:34%;overflow:hidden;pointer-events:none;z-index:4'; document.body.appendChild(sky); }
+  const W = innerWidth, H = innerHeight * 0.34, len = 80 + Math.random() * 60, ang = 16 + Math.random() * 16, x0 = W * (0.3 + Math.random() * 0.65), y0 = H * (0.08 + Math.random() * 0.4);
+  const dx = -(240 + Math.random() * 200), dy = -dx * Math.tan(ang * Math.PI / 180), r = 180 - ang, el = document.createElement('div');
+  el.style.cssText = `position:absolute;left:0;top:0;width:${len}px;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(255,255,255,0),#fff);box-shadow:0 0 6px 1px rgba(200,220,255,.7);transform-origin:0 50%;opacity:0`;
+  sky.appendChild(el);
+  el.animate([{transform: `translate(${x0}px,${y0}px) rotate(${r}deg)`, opacity: 0}, {opacity: 1, offset: 0.15}, {transform: `translate(${x0 + dx}px,${y0 + dy}px) rotate(${r}deg)`, opacity: 0}],
+    {duration: 900 + Math.random() * 400, easing: 'ease-in'}).onfinish = () => el.remove();
+}
+const tw = (dur, fn, end) => { const t0 = performance.now(); (function s() { const u = Math.min(1, (performance.now() - t0) / dur); fn(u); if (u < 1) requestAnimationFrame(s); else end && end(); })(); };
+
+start({
+  key: 'sahara', title: '사하라 사막 밤', enter: '모닥불 곁으로', time: 'night', nickIcon: '🐪',
+  nick: [['모래 털어낸', '잠 안 오는', '밤바람 맞는', '별 세다 만', '낙타 곁의', '모닥불 쬐는'], ['낙타', '모래언덕', '천막', '모닥불', '별똥별', '물주머니']],
+  intro: '<p>모래 언덕 사이 작은 야영지. 낙타 한 마리, 천막 둘, 모닥불 하나.<br>별 많은 밤, 잠깐 쉬었다 가요.</p>',
+  floor: {w: 52, d: 20, c1: '#b09a74', c2: '#c0aa82'},
+  bg: {night: 0x0b1226}, startPos: [0, 6], cam: {h: 10, back: 12},
+  playerLook: {coat: 0x2c4a7a, pants: 0x4a3f34, hair: 0x2a2018, hat: {type: 'bandana', c: 0xe8dcc0}, scarf: 0xc9a050},
+  build(c) {
+    const {box, cyl, ball, glowBall, solid, fx, THREE, scene, npc} = c;
+    const grp = (x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); scene.add(g); return g; };
+    const D = daily(c.now()), K = D.k;
+    // 바깥 모래(뒤쪽 하늘 벽 앞까지만) — 하늘을 가리지 않는다
+    { const gd = new THREE.Mesh(new THREE.PlaneGeometry(160, 70), new THREE.MeshLambertMaterial({color: 0xb09a74})); gd.rotation.x = -Math.PI / 2; gd.position.set(0, -0.02, -11.5 + 35); gd.receiveShadow = true; scene.add(gd); }
+
+    // ── 하늘 벽: 별·은하수·먼 모래 언덕 실루엣을 그린 큰 판(뒤쪽). 카메라가 내려다보니 윗부분은 별하늘이 된다
+    function rng(seed) { let a = seed; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+    function skyTex(bright) {
+      const W = 2048, H = 512, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d'), R = rng(77);
+      const gr = g.createLinearGradient(0, 0, 0, H); [[0, '#03050f'], [0.5, '#080f26'], [0.75, '#121c40'], [0.9, '#27325c'], [1, '#4a4666']].forEach(([o, col]) => gr.addColorStop(o, col)); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      g.save(); g.translate(1250, H * 0.8); g.rotate(-0.1); const mg = g.createLinearGradient(0, -90, 0, 90);
+      mg.addColorStop(0, 'rgba(170,185,255,0)'); mg.addColorStop(0.5, `rgba(185,195,255,${bright ? 0.2 : 0.1})`); mg.addColorStop(1, 'rgba(170,185,255,0)'); g.fillStyle = mg; g.fillRect(-1500, -90, 3000, 180); g.restore();
+      const dim = bright ? 1 - 0.25 * K : 1 - 0.5 * K, N = bright ? 2800 : 1900, cols = ['#ffffff', '#cfe0ff', '#ffe9c4', '#ffffff'];
+      for (let i = 0; i < 2800; i++) { const x = R() * W, y = H * (0.45 + 0.55 * R()), s = R() < 0.08 ? 3 : R() < 0.4 ? 2 : 1.5, a = (0.35 + 0.65 * R()) * dim, col = cols[R() * 4 | 0];
+        if (i >= N) continue; g.globalAlpha = a; g.fillStyle = col; g.fillRect(x, y, s, s); }
+      for (let i = 0; i < 26; i++) { const x = R() * W, y = H * (0.5 + 0.45 * R()), gl = g.createRadialGradient(x, y, 0, x, y, 9); gl.addColorStop(0, `rgba(255,255,255,${0.7 * dim})`); gl.addColorStop(1, 'rgba(255,255,255,0)'); g.globalAlpha = 1; g.fillStyle = gl; g.fillRect(x - 9, y - 9, 18, 18); }
+      g.globalAlpha = 1;
+      const dune = (base, amp, f1, f2, ph, col, rim) => { const trace = () => { g.beginPath(); for (let x = 0; x <= W; x += 8) { const y = H - base - amp * (0.6 * Math.sin(x * f1 + ph) + 0.4 * Math.sin(x * f2 + ph * 2)); x ? g.lineTo(x, y) : g.moveTo(x, y); } };
+        trace(); g.lineTo(W, H); g.lineTo(0, H); g.closePath(); g.fillStyle = col; g.fill(); if (rim) { trace(); g.strokeStyle = rim; g.lineWidth = 2; g.stroke(); } };
+      dune(52, 20, 0.006, 0.017, 1, '#1d2040', 'rgba(150,160,220,.25)'); dune(34, 16, 0.009, 0.023, 3, '#2c2a3a', 'rgba(190,170,150,.22)'); dune(14, 10, 0.012, 0.03, 5, '#4a3d2e', 'rgba(220,190,140,.25)');
+      const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+    }
+    const texN = skyTex(false), texB = skyTex(true);
+    const skyMat = new THREE.MeshBasicMaterial({map: texN, fog: false}), skyWall = new THREE.Mesh(new THREE.PlaneGeometry(100, 25), skyMat); skyWall.position.set(0, 12.5, -11.5); scene.add(skyWall);
+    S.setSky = () => { skyMat.map = S.bright ? texB : texN; skyMat.needsUpdate = true; };
+    // 반짝이는 별 몇 개 — 하늘 벽 앞에서 깜빡
+    const twk = [0, 1].map(gi => { const n = 70, a = new Float32Array(n * 3), r = rng(11 + gi);
+      for (let i = 0; i < n; i++) { a[i * 3] = (r() - 0.5) * 60; a[i * 3 + 1] = 2.7 + r() * 4.5; a[i * 3 + 2] = -11.3; }
+      const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(a, 3));
+      const pt = new THREE.Points(geo, new THREE.PointsMaterial({color: gi ? 0xcfe0ff : 0xffffff, size: 2.6, sizeAttenuation: false, transparent: true, opacity: 0.7, fog: false, depthWrite: false})); scene.add(pt); return pt; });
+    // 달 — 오늘 모양 그대로(하늘 벽 앞 작은 판)
+    { const cv = document.createElement('canvas'); cv.width = cv.height = 256; drawMoon(cv, D.p, K);
+      const tx = new THREE.CanvasTexture(cv); tx.colorSpace = THREE.SRGBColorSpace;
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(5.6, 5.6), new THREE.MeshBasicMaterial({map: tx, transparent: true, depthWrite: false, fog: false})); m.position.set(4.5, 3.9, -11.35); scene.add(m); }
+    // 달빛 — 달이 찬 만큼 환하다
+    const ml = new THREE.DirectionalLight(0x9fb4ff, 0.12 + 0.5 * K); ml.position.set(10, 18, 14); scene.add(ml);
+
+    // ── 앞쪽 모래 언덕: 미끄럼 타는 언덕(완만한 봉우리) + 옆 언덕들
+    { const geo = new THREE.PlaneGeometry(DUNE.rx * 2, DUNE.rz * 2, 40, 56); geo.rotateX(-Math.PI / 2); const p = geo.attributes.position;
+      for (let i = 0; i < p.count; i++) p.setY(i, hD(p.getX(i) + DUNE.x, p.getZ(i) + DUNE.z) + 0.01);
+      geo.computeVertexNormals(); const m = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({color: 0xa88f66})); m.position.set(DUNE.x, 0, DUNE.z); m.receiveShadow = true; scene.add(m); }
+    solid(DUNE.x, DUNE.z, 9, 13);
+    for (const [x, z, rx, rz, h] of [[-17, -6, 6, 5, 2.2], [-3, -10.2, 7, 2.2, 1.0], [20, 2, 5, 6, 1.8]]) { const m = ball(1, 0xa28a62, x, 0, z); m.scale.set(rx, h, rz); m.castShadow = false; }
+
+    // ── 천막 둘 — 네모 뿔 모양, 안에서 새는 불빛
+    const tentMat = [0xe6d9b8, 0xc98f5a];
+    function tent(x, z, r, h, ry, ci) {
+      const g = grp(x, 0, z); g.rotation.y = ry;
+      const body = new THREE.Mesh(new THREE.ConeGeometry(r, h, 4), new THREE.MeshLambertMaterial({color: tentMat[ci], emissive: 0x2a2014})); body.rotation.y = Math.PI / 4; body.position.y = h / 2; body.castShadow = body.receiveShadow = true; g.add(body);
+      const dr = new THREE.Mesh(new THREE.PlaneGeometry(r * 0.38, h * 0.5), new THREE.MeshBasicMaterial({color: 0xffb866})); dr.position.set(0, h * 0.27, r * 0.707 * (1 - 0.27) + 0.04); dr.rotation.x = -Math.atan(0.707 * r / h); g.add(dr);
+      for (const s of [-1, 1]) cyl(0.04, 0.04, 0.9, 0x5a3a22, s * r * 0.5, 0.45, r * 0.85, g);
+      solid(x, z, r * 1.3, r * 1.3); }
+    tent(-7, -6, 2.4, 2.4, 0.15, 0); tent(-3.2, -7.4, 1.9, 1.9, -0.2, 1);
+    const tl = new THREE.PointLight(0xffa050, 7, 9); tl.position.set(-6.8, 1.3, -4.6); scene.add(tl);
+
+    // ── 모닥불 (0,-2.5): 돌 둘레·장작·불꽃·불똥·흔들리는 불빛·앉는 통나무
+    const FX = 0, FZ = -2.5;
+    for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2, s = ball(0.24, 0x7a7068, FX + Math.cos(a) * 0.95, 0.14, FZ + Math.sin(a) * 0.95); s.scale.y = 0.7; }
+    for (const r of [0.5, -0.5]) { const l = cyl(0.11, 0.11, 1.3, 0x5a3a22, FX, 0.2, FZ); l.rotation.z = Math.PI / 2; l.rotation.y = r; }
+    solid(FX, FZ, 2, 2);
+    const fl = [[0xff6a1a, 0.45, 1.3], [0xffa828, 0.32, 1.0], [0xffe070, 0.2, 0.7]].map(([col, r, h]) => { const m = new THREE.Mesh(new THREE.ConeGeometry(r, h, 8), new THREE.MeshBasicMaterial({color: col, transparent: true, opacity: 0.92})); m.position.set(FX, 0.3 + h / 2, FZ); m.userData.h = h; scene.add(m); return m; });
+    const fLight = new THREE.PointLight(0xff9040, 26, 20); fLight.position.set(FX, 1.4, FZ); scene.add(fLight);
+    const sparks = Array.from({length: 8}, (_, i) => { const m = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 4), new THREE.MeshBasicMaterial({color: 0xffb050})); m.userData.t = i / 8 * 2; scene.add(m); return m; });
+    cyl(0.18, 0.18, 1.6, 0x6a4a2e, -2.1, 0.18, FZ + 0.2).rotation.x = Math.PI / 2; cyl(0.18, 0.18, 1.5, 0x6a4a2e, 1.2, 0.18, FZ + 2.1).rotation.z = Math.PI / 2;
+    glowBall(0.2, 0xffe070, FX, 0.5, FZ, 0);
+    fx.push((dt, t) => { const e = 1;
+      fl.forEach((m, i) => { const s = 1 + Math.sin(t * 11 + i * 2) * 0.1 + Math.sin(t * 17 + i) * 0.07; m.scale.set(e, s, e); m.position.y = 0.3 + m.userData.h * s / 2; });
+      fLight.intensity = 26 * S.fireK * (0.9 + Math.sin(t * 13) * 0.1 + Math.sin(t * 23) * 0.05);
+      sparks.forEach((m, i) => { m.userData.t += dt; const k = m.userData.t % 2; m.position.set(FX + Math.sin(i * 2 + k * 3) * 0.4, 0.8 + k * 1.3, FZ + Math.cos(i * 3 + k * 2) * 0.4); m.scale.setScalar(1 - k / 2.2); });
+      twk.forEach((p, i) => { p.material.opacity = 0.55 + 0.4 * Math.sin(t * (1.3 + i * 0.7) + i * 2); });
+      S.fireK += ((S.bright ? 0.45 : 1) - S.fireK) * Math.min(1, dt * 2); });
+
+    // ── 낙타 — 앉은 낙타(곁에서 쉬는 곳)와 선 낙타
+    const camels = [];
+    function camel(x, z, ry, sit) {
+      const g = grp(x, 0, z); g.rotation.y = ry; const FUR = 0xb98c56, LT = 0xd2ae7c, by = sit ? 0.72 : 1.55;
+      const body = ball(0.75, FUR, 0, by, 0, g); body.scale.set(0.85, 0.8, 1.55);
+      const hump = ball(0.42, FUR, 0, by + 0.62, -0.15, g); hump.scale.set(1, 1.15, 1.1);
+      box(1.3, 0.08, 1.0, 0xa8452f, 0, by + 0.5, 0.45, g); box(1.34, 0.09, 0.14, 0xe8d8b0, 0, by + 0.51, 0.45, g);
+      if (sit) for (const s of [-1, 1]) for (const zz of [-0.6, 0.55]) { const l = ball(0.3, FUR, s * 0.5, 0.2, zz, g); l.scale.set(0.5, 0.38, 1.2); }
+      else for (const s of [-1, 1]) for (const zz of [-0.72, 0.7]) cyl(0.13, 0.1, 1.15, FUR, s * 0.38, 0.58, zz, g, 8);
+      const neck = cyl(0.2, 0.27, 1.3, FUR, 0, by + 0.65, 1.3, g, 10); neck.rotation.x = 0.55;
+      const hg = new THREE.Group(); hg.position.set(0, by + 1.25, 1.7); g.add(hg);
+      const hd = ball(0.3, FUR, 0, 0, 0, hg); hd.scale.set(0.8, 0.85, 1.25); const sn = ball(0.2, LT, 0, -0.1, 0.4, hg); sn.scale.set(0.9, 0.8, 1);
+      const jaw = ball(0.12, LT, 0, -0.2, 0.42, hg);
+      for (const s of [-1, 1]) { ball(0.05, 0x14100c, s * 0.2, 0.08, 0.22, hg); ball(0.06, FUR, s * 0.2, 0.28, -0.1, hg).scale.set(0.7, 1.2, 0.7); }
+      const tail = new THREE.Group(); tail.position.set(0, by + 0.2, -1.2); g.add(tail); cyl(0.04, 0.03, 0.8, DKT, 0, -0.35, 0, tail, 6);
+      solid(x, z, 2.4, 2.4); const q = {g, body, hg, jaw, tail, by, ph: Math.random() * 6, sit}; camels.push(q); return q; }
+    const DKT = 0x7a5530;
+    const c1 = camel(-7, 0.9, Math.PI / 2, true); camel(-12, -3.4, 0.5, false);
+    fx.push((dt, t) => { S.look = Math.max(0, S.look - dt);
+      for (const q of camels) { q.body.scale.y = 0.8 + Math.sin(t * 1.6 + q.ph) * 0.015;
+        const lk = q === c1 && S.look > 0;
+        q.hg.rotation.x += ((lk ? 0.28 : Math.sin(t * 0.5 + q.ph) * 0.07) - q.hg.rotation.x) * Math.min(1, dt * 3);
+        q.hg.rotation.y += ((lk ? -0.7 : Math.sin(t * 0.37 + q.ph) * 0.25) - q.hg.rotation.y) * Math.min(1, dt * 3);
+        q.jaw.position.x = Math.sin(t * 5 + q.ph) * 0.05; q.tail.rotation.z = Math.sin(t * 1.2 + q.ph) * 0.25; } });
+
+    // ── 오아시스: 연못 + 야자나무 둘 + 갈대·돌
+    { const wm = new THREE.MeshLambertMaterial({color: 0x2a6a9a, emissive: 0x143a5c}); const pond = cyl(2.2, 2.2, 0.06, wm, 8.5, 0.03, 7); pond.castShadow = false; solid(8.5, 7, 4.4, 4.4);
+      for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2, s = ball(0.3 + (i % 3) * 0.08, 0x6a6258, 8.5 + Math.cos(a) * 2.35, 0.12, 7 + Math.sin(a) * 2.35); s.scale.y = 0.6; }
+      for (let i = 0; i < 9; i++) { const a = 3.4 + i * 0.28, h = 0.9 + (i % 3) * 0.3; cyl(0.025, 0.04, h, 0x4a7a3a, 8.5 + Math.cos(a) * 2.4, h / 2, 7 + Math.sin(a) * 2.4, undefined, 5); }
+      for (let i = 0; i < 7; i++) { const r = rng(5 + i); glowBall(0.045, 0xdfeaff, 8.5 + (r() - 0.5) * 3.2, 0.08, 7 + (r() - 0.5) * 2.6, 0); }
+      for (let i = 0; i < 3; i++) { const m = new THREE.Mesh(new THREE.TorusGeometry(1, 0.03, 6, 28), new THREE.MeshBasicMaterial({color: 0xdfeaff, transparent: true, opacity: 0})); m.rotation.x = Math.PI / 2; m.visible = false; scene.add(m); S.rings.push({m, t: -1}); }
+      S.ripple = (x, z) => { const r = S.rings.find(q => q.t < 0) || S.rings[0]; r.t = 0; r.m.position.set(x, 0.09, z); r.m.visible = true; };
+      fx.push(dt => { for (const r of S.rings) if (r.t >= 0) { r.t += dt; const s = 0.2 + r.t * 1.0; r.m.scale.set(s, s, s); r.m.material.opacity = 0.7 * Math.max(0, 1 - r.t / 1.4); if (r.t > 1.4) { r.t = -1; r.m.visible = false; } } }); }
+    const crowns = [];
+    function palm(x, z, h, lean) {
+      const g = grp(x, 0, z); const tr = cyl(0.14, 0.24, h, 0x7a5a3a, Math.sin(lean) * h / 2, h / 2, 0, g, 8); tr.rotation.z = -lean;
+      const cr = new THREE.Group(); cr.position.set(Math.sin(lean) * h, h, 0); g.add(cr);
+      for (let i = 0; i < 8; i++) { const pv = new THREE.Group(); pv.rotation.y = i * Math.PI / 4; cr.add(pv); const lp = new THREE.Group(); lp.rotation.x = 0.35 + (i % 2) * 0.25; pv.add(lp); box(0.45, 0.04, 2.1, i % 2 ? 0x3f7a3a : 0x4f8a42, 0, 0, 1.05, lp); }
+      ball(0.2, 0x5a3a22, 0.15, -0.1, 0.1, cr); ball(0.2, 0x5a3a22, -0.15, -0.1, -0.1, cr); solid(x, z, 0.8, 0.8); crowns.push(cr); }
+    palm(11.6, 5.6, 4.4, 0.12); palm(5.0, 8.6, 3.6, -0.15);
+    fx.push((dt, t) => crowns.forEach((cr, i) => { cr.rotation.z = Math.sin(t * 0.9 + i * 2) * 0.03; cr.rotation.x = Math.sin(t * 0.7 + i) * 0.03; }));
+
+    // ── 물통(물 길어다 붓는 곳) — 오늘 길은 만큼 물이 차오른다
+    { const TX = 4.6, TZ = 3.0; box(2.0, 0.08, 1.0, 0x6a4a2e, TX, 0.04, TZ);
+      box(2.0, 0.8, 0.09, 0x7a5a3a, TX, 0.4, TZ - 0.46); box(2.0, 0.8, 0.09, 0x7a5a3a, TX, 0.4, TZ + 0.46); box(0.09, 0.8, 1.0, 0x7a5a3a, TX - 0.96, 0.4, TZ); box(0.09, 0.8, 1.0, 0x7a5a3a, TX + 0.96, 0.4, TZ);
+      const wat = box(1.82, 1, 0.82, 0x3a78b0, TX, 0.4, TZ); wat.castShadow = false; solid(TX, TZ, 2.1, 1.1);
+      const lv0 = Math.min(1, (c.today().water || 0) / 6); S.water = S.waterTo = lv0;
+      const set = lv => { const h = 0.04 + 0.62 * lv; wat.scale.y = h; wat.position.y = 0.08 + h / 2; }; set(S.water);
+      fx.push(dt => { if (Math.abs(S.waterTo - S.water) > 0.002) { S.water += (S.waterTo - S.water) * Math.min(1, dt * 2.5); set(S.water); } }); }
+
+    // ── 별 보는 담요 + 마른 풀·돌·낙타 짐
+    box(1.7, 0.05, 3.0, 0xa8452f, 4, 0.03, -6.2); for (const dx of [-0.5, 0, 0.5]) box(0.12, 0.052, 3.0, 0xe8d8b0, 4 + dx, 0.032, -6.2);
+    for (const [x, z, r] of [[-1.5, 6.8, 0.35], [14, 8, 0.5], [-14, 6, 0.4], [-9.5, 6, 0.3], [2.5, -9, 0.45], [15, -9.5, 0.4]]) { const m = ball(r, 0x7a7266, x, 0.12, z); m.scale.y = 0.6; }
+    for (const [x, z] of [[-4.5, 4.8], [14.5, 2], [-14, 1.5], [1, 8.8]]) for (let i = 0; i < 5; i++) { const t = cyl(0.01, 0.035, 0.5, 0x8a7a44, x + (i - 2) * 0.08, 0.25, z + (i % 2) * 0.08, undefined, 4); t.rotation.z = (i - 2) * 0.22; }
+    for (const [x, z, ry] of [[-9.2, 3.6, 0.5], [-8.4, 3.9, 1.2]]) { box(0.7, 0.45, 0.45, 0x8a5a2a, x, 0.23, z).rotation.y = ry; }
+
+    // ── 사람 둘 — 불 옆에 한 명, 천막과 낙타 사이를 오가는 한 명
+    const look = {coat: 0x8a5a2a, pants: 0x4a3f34, hat: {type: 'bandana', c: 0x2f4a6a}, scarf: 0xe0d0a8};
+    npc(look, [[1.8, -1.4]], {face: -2.06, idle: ['sip', 'wave']});
+    npc({...look, coat: 0x3f6a5a, hairStyle: 'bob', hair: 0x2a2018, hat: {type: 'bandana', c: 0xc9a050}}, [[-3, -0.6], [-9.6, -1.4]], {speed: 1.3, idle: ['stretch']});
+
+    // 가끔 별똥별 하나 — 오늘 밤하늘 구경만(기록엔 안 남음)
+    setInterval(() => { if (document.visibilityState === 'visible' && Math.random() < 0.5) meteor(); }, 28000);
+  },
+  lamps: [],
+  onTime() { S.setSky && S.setSky(); },
+  acts: [
+    {id: 'camel', icon: '🐪', label: '낙타 곁', spot: [-5.2, 2.3], face: Math.PI, run(c, done) {
+      const D = daily(c.now()), n = c.count('camel'); c.doAct(c.player, 'crouch'); S.look = 4; c.beep(160, .5, 0, 'sine', .03);
+      setTimeout(() => c.dialog('낙타 곁에서', `${c.hm(c.now())} · 오늘 ${n}번째 쉼`,
+        `<p>${CAMEL[(n - 1) % CAMEL.length]}</p><p style="font-size:16px">「${D.fact}」</p>` + (n > 1 ? '<p style="color:#7a6e5e;font-size:13px">오늘의 한마디는 하루에 하나. 내일은 다른 이야기.</p>' : ''),
+        [['일어나기', () => { if (n === 3) c.stamp('낙타 단짝', '오늘 세 번째 쉼'); done(); }, 'main']]), 1300); }},
+    {id: 'slide', icon: '🏜', label: '언덕 미끄럼', spot: [11.5, 3.6], face: Math.PI, run(c, done) {
+      const P = c.player, board = c.box(0.55, 0.07, 1.5, 0x8a4a2a, 0, 0.04, 0.05, P), T = 18;
+      const place = (x, z) => P.position.set(x, hD(x, z) + 0.02, z);
+      const back = (z0, after) => { const x0 = P.position.x; P.rotation.z = 0; tw(900, u => place(x0 + (DUNE.x - x0) * u, z0 + (3.6 - z0) * u), () => { P.rotation.set(0, Math.PI, 0); P.position.set(DUNE.x, 0, 3.6); P.remove(board); after(); }); };
+      c.toast('🏜 언덕 위까지 올라가요. 판을 들고', 1800);
+      tw(1600, u => { place(DUNE.x, 3.6 - 6.6 * u); P.rotation.y = Math.PI; }, () => { P.rotation.y = 0; c.doAct(P, 'cheer');
+        c.play(`<h3>모래 언덕 미끄럼</h3>
+          <p style="font-size:13px;color:#7a6e5e;margin:2px 0 8px">판이 한쪽으로 기울지 않게 ◀ ▶ 로 잡아 주세요(방향키도 돼요). 18초만 버티면 끝!</p>
+          <div style="position:relative;height:40px;background:linear-gradient(90deg,#d98a6a 0 15%,#e8d49a 15% 33.5%,#8fc58a 33.5% 66.5%,#e8d49a 66.5% 85%,#d98a6a 85%);border:1.5px solid #2b2620;border-radius:6px;overflow:hidden"><div id="bd" style="position:absolute;top:10px;left:50%;width:46px;height:14px;margin-left:-23px;background:#8a4a2a;border:1.5px solid #2b2620;border-radius:7px"></div></div>
+          <div style="height:6px;background:#e0d4bc;border-radius:3px;margin:10px 0 4px"><div id="pg" style="height:100%;width:0;background:#c9472f;border-radius:3px"></div></div>
+          <p id="msg" style="min-height:22px;font-size:14px;margin:4px 0"></p><div class="row" id="ro" style="justify-content:center"><button class="btn main" id="go">출발</button><button class="btn" id="qt">그만두기</button></div>`,
+        (el, close) => {
+          el.style.alignItems = 'flex-start'; el.style.paddingTop = '64px';
+          const bd = el.querySelector('#bd'), pg = el.querySelector('#pg'), msg = el.querySelector('#msg'), ro = el.querySelector('#ro');
+          const end = () => { el.style.alignItems = ''; el.style.paddingTop = ''; close(); c.busy = true; };
+          let alive = false, dir = 0, x = 0, v = 0, w = 0, t = 0, green = 0, last = 0, fin = false;
+          const kd = e => { const k = e.key.toLowerCase(); if (k === 'arrowleft' || k === 'a') dir = -1; if (k === 'arrowright' || k === 'd') dir = 1; };
+          const ku = e => { const k = e.key.toLowerCase(); if ((k === 'arrowleft' || k === 'a') && dir < 0) dir = 0; if ((k === 'arrowright' || k === 'd') && dir > 0) dir = 0; };
+          addEventListener('keydown', kd); addEventListener('keyup', ku);
+          const leave = () => { removeEventListener('keydown', kd); removeEventListener('keyup', ku); };
+          const finish = (fell, z) => { if (fin) return; fin = true; alive = false; leave(); const n = c.count('slide'), sec = Math.min(T, t), best = Math.max(c.DB.slideBest || 0, sec); c.DB.slideBest = best; c.save();
+            ro.innerHTML = ''; if (fell) { c.doAct(P, 'crouch'); c.beep(150, .3, 0, 'sawtooth', .04); msg.innerHTML = `<b>엉덩방아!</b> ${sec.toFixed(1)}초 버텼어요<br><span style="font-size:12px;color:#7a6e5e">모래는 푹신해요</span>`; }
+            else { c.beep(880, .08); c.beep(1180, .1, .1); msg.innerHTML = `<b>끝까지 탔어요!</b> 한가운데 ${green.toFixed(1)}초`; }
+            setTimeout(() => { end(); const cur = P.position.z; back(Math.min(cur, 3.6), () => { if (!fell) { c.doAct(P, 'cheer'); c.stamp('쭈우욱', `한가운데 ${green.toFixed(1)}초`); } else c.toast(`🏜 ${sec.toFixed(1)}초. 최고 ${best.toFixed(1)}초`); setTimeout(done, fell ? 600 : 1300); }); }, 1700); };
+          const hold = (id, d) => { const b = el.querySelector(id); b.onpointerdown = e => { e.preventDefault(); dir = d; }; for (const ev of ['onpointerup', 'onpointerleave', 'onpointercancel']) b[ev] = () => { if (dir === d) dir = 0; }; };
+          const frame = ts => { if (!alive) return; const dt = Math.min(0.05, (ts - last) / 1000 || 0.016); last = ts; t += dt;
+            const gs = 1.3 * (1 + 0.6 * t / T); w += -1.5 * w * dt + (Math.random() - 0.5) * gs * Math.sqrt(dt) * 3.4;
+            v += (w + 1.3 * x + dir * 4.5) * dt; v *= 1 - dt; x += v * dt; if (Math.abs(x) < 0.35) green += dt;
+            bd.style.left = (50 + Math.max(-1, Math.min(1, x)) * 47) + '%'; bd.style.transform = `rotate(${x * 14}deg)`; pg.style.width = Math.min(100, t / T * 100) + '%';
+            const z = -3 + 5.6 * Math.min(1, t / T), px = DUNE.x + x * 1.2; place(px, z); P.rotation.z = x * 0.5;
+            if (Math.abs(x) > 1) { finish(true, z); return; } if (t >= T) { finish(false, z); return; } requestAnimationFrame(frame); };
+          el.querySelector('#qt').onclick = () => { fin = true; leave(); end(); back(P.position.z, () => setTimeout(done, 300)); };
+          el.querySelector('#go').onclick = () => { ro.innerHTML = `<button class="btn" id="bl" style="width:110px;height:54px;font-size:22px;touch-action:none;user-select:none">◀</button><button class="btn" id="br" style="width:110px;height:54px;font-size:22px;touch-action:none;user-select:none">▶</button>`;
+            hold('#bl', -1); hold('#br', 1); msg.textContent = '쭈우욱 내려가는 중…'; alive = true; last = performance.now(); P.rotation.z = 0; requestAnimationFrame(frame); };
+        }); }); }},
+    {id: 'star', icon: '🌠', label: '별 보기', spot: [4, -3.6], face: Math.PI, run(c, done) {
+      const D = daily(c.now()), P = c.player, day = c.today(), seen = day.met || 0, left = D.met - seen, n = c.count('star');
+      const shadow = P.children.find(o => o.geometry && o.geometry.type === 'CircleGeometry');
+      c.goTo(4, -7.0, () => tw(800, u => { P.rotation.x = u * Math.PI / 2; P.position.y = u * 0.6; }, () => {
+        if (shadow) shadow.visible = false; S.bright = 1; S.setSky(); c.toast('🌠 누워서 하늘을 봐요. 눈이 어둠에 익는 중', 2400);
+        const batch = Math.min(left, 2 + (Math.random() * 2 | 0));
+        for (let i = 0; i < batch; i++) setTimeout(() => { meteor(); c.beep(1900, .05, 0, 'sine', .02); }, 1600 + i * 2400 + Math.random() * 900);
+        setTimeout(() => {
+          if (batch) { day.met = seen + batch; c.DB.meteors = (c.DB.meteors || 0) + batch; c.save(); }
+          S.bright = 0; S.setSky();
+          tw(800, u => { P.rotation.x = (1 - u) * Math.PI / 2; P.position.y = (1 - u) * 0.6; }, () => {
+            P.rotation.x = 0; P.position.y = 0; if (shadow) shadow.visible = true;
+            if (batch) { c.doAct(P, 'cheer'); c.toast(`🌠 별똥별 ${batch}개 — ${STARS[n % STARS.length]}`, 4200); if ((day.met || 0) >= D.met) c.stamp('다 봤다', `오늘 밤 별똥별 ${D.met}개`); else if (n === 1) c.stamp('소원 하나', '짧게 빌었어요'); }
+            else c.toast(`🌠 오늘 밤 별똥별은 다 지나갔나 봐요. 별만 실컷 봤어요. ${STARS[n % STARS.length]}`, 4200);
+            setTimeout(done, 1200); }); }, 1600 + Math.max(batch, 1) * 2400 + 800);
+      })); }},
+    {id: 'water', icon: '🪣', label: '물 긷기', spot: [8.5, 4.1], face: 0, run(c, done) {
+      const n = c.count('water'), bk = new c.THREE.Group(); c.cyl(0.11, 0.08, 0.2, 0x7a5a3a, 0, 0.12, 0, bk); c.cyl(0.095, 0.095, 0.01, 0x3a78b0, 0, 0.225, 0, bk);
+      c.player.rotation.y = 0; c.doAct(c.player, 'crouch'); c.beep(260, .3, 0, 'sine', .04); S.ripple(8.5, 5.5);
+      setTimeout(() => { c.hand.add(bk); c.toast('🪣 ' + OASIS[(n - 1) % OASIS.length], 3200);
+        c.goTo(6.2, 3.0, () => { c.player.rotation.y = -Math.PI / 2; c.doAct(c.player, 'throw'); c.beep(420, .25, 0, 'sine', .04);
+          setTimeout(() => { c.hand.remove(bk); S.waterTo = Math.min(1, n / 6);
+            if (n === 6) c.stamp('물통 가득', '오늘 여섯 통'); else if (n < 6) c.toast(`💧 ${n}통째 — 물통이 ${Math.round(S.waterTo * 100)}% 찼어요`); else c.toast('💧 이미 가득이에요. 낙타가 한 모금 해요');
+            setTimeout(done, 900); }, 700); }); }, 1000); }},
+  ],
+  recExtra: c => { const D = daily(c.now()), seen = c.today().met || 0, w = c.today().water || 0;
+    return `<p style="font-size:13px;color:#7a6e5e">오늘 밤하늘: ${D.moon} · 본 별똥별 ${seen}/${D.met}개<br>물통 ${Math.min(6, w)}/6 · 언덕 최고 ${(c.DB.slideBest || 0).toFixed(1)}초 · 지금까지 별똥별 ${c.DB.meteors || 0}개</p><p style="font-size:13px">${D.fact}</p>`; },
+  onEnter(c) { const D = daily(c.now()); c.toast(`🌙 오늘 밤하늘: ${D.moon} · 별똥별 ${D.met}개`, 3200); },
+});
+</script></body></html>

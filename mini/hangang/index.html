@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>한강 돗자리</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start, THREE} from '../mini.js';
+
+const seedOf = d => d.getFullYear() * 372 + (d.getMonth() + 1) * 31 + d.getDate();
+const pick = (a, seed, k) => a[(seed * k + k) % a.length];
+const pad2 = n => String(n).padStart(2, '0');
+const fmt = m => Math.floor(m / 60) + ':' + pad2(m % 60);
+// 해 지는 시각 — 서울 기준으로 대충(겨울 17:15 ~ 여름 19:55)
+const sunsetMin = d => { const doy = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5);
+  return Math.round(18 * 60 + 34 + 80 * Math.sin(2 * Math.PI * (doy - 80) / 365)); };
+const WIND = ['잔잔', '살랑', '산들', '제법 센', '거센'];
+const windLevel = d => (seedOf(d) * 7 + 3) % 5 + 1;
+const SHIPS = ['가온 달빛호', '새벽 물결호', '여의 바람호', '한결 나루호', '노을 하나호', '은빛 두리호', '구름 나래호', '잔물결 이음호', '별똥 소리호', '느린 오리호', '저녁 반짝호', '강바람 모음호'];
+const shipOf = d => pick(SHIPS, seedOf(d), 5);
+const MENU = ['후라이드', '양념', '간장', '반반', '마늘', '파닭', '순살'];
+const TOP = ['계란', '치즈', '김치', '참치캔', '소시지', '대파'];
+const BRIDGE = [[0xffd27a, '노란빛'], [0x7ad2ff, '하늘빛'], [0xff8ac8, '분홍빛'], [0xa0ff9a, '연두빛'], [0xc8a0ff, '보랏빛']];
+const MONO = ['해는 매일 지는데 매일 처음 보는 것처럼 본다.', '강물이 주황색이다. 치킨 생각이 난다.', '저 건물 불은 누가 켜 놓았을까.', '오늘 뭐 했더라. 아무튼 해는 졌다.',
+  '다리 불빛이 하나 둘 켜진다. 나도 켜야 하나.', '바람이 시원하다. 내일 일은 내일 생각하기로 한다.', '옆 돗자리 사람들도 같이 보고 있다. 말은 안 한다.', '사진 찍으려다 그냥 본다.',
+  '오리가 지나간다. 방향은 아무도 모른다.', '집에 가는 길이 멀다는 생각은 잠깐 접는다.'];
+const CHK = ['치킨무는 두 봉지. 오늘은 운이 좋다.', '콜라가 미지근하다. 괜찮다.', '뼈를 모아 둘 곳이 없다. 봉지에 넣는다.', '양념이 손가락에 묻었다. 휴지는 있다.', '한 조각만 먹으려 했다.'];
+const S = {};
+
+start({
+  key: 'hangang', title: '한강 돗자리', enter: '돗자리 깔기', nickIcon: '🧺',
+  nick: [['돗자리 깔린', '치킨 기다리는', '바람 맞는', '연 날리는', '노을 보러 온', '라면 불은'], ['돗자리', '치킨무', '한강', '연줄', '자전거', '파라솔']],
+  intro: '<p>한강 잔디 위에 돗자리 하나.<br>치킨 오는 동안 바람 맞다 가요.</p>',
+  floor: {w: 30, d: 20, c1: '#5f8f4c', c2: '#6fa056', around: 0x2c4a2c},
+  bg: {day: 0x9cc8ee, evening: 0x8a5a68, night: 0x0b1226},
+  startPos: [0, 7], cam: {h: 9, back: 11},
+  playerLook: {coat: 0xd8c8a0, pants: 0x3a4a6a, hair: 0x2a2018},
+  build(c) {
+    const {box, cyl, glowBall, sign, npc, solid, fx, night, THREE, scene} = c;
+    const R = Math.random, d = c.now(), seed = seedOf(d), lvl = windLevel(d);
+    const lit = (m) => { night.push(m); return m; };
+    // 강 — 뒤쪽. 낮·노을·밤에 색이 바뀐다
+    S.river = new THREE.Mesh(new THREE.PlaneGeometry(200, 14), new THREE.MeshBasicMaterial({color: 0x5b9ccc}));
+    S.river.rotation.x = -Math.PI / 2; S.river.position.set(0, 0.015, -17); scene.add(S.river);
+    box(32, 0.25, 0.4, 0x8a8478, 0, 0.12, -10.1); box(120, 0.3, 0.6, 0x6a6a68, 0, 0.15, -24.2);
+    S.spark = []; for (let i = 0; i < 40; i++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(0.5 + R() * 0.6, 0.07), new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: .4}));
+      m.rotation.x = -Math.PI / 2; m.position.set(-26 + R() * 52, 0.03, -10.8 - R() * 12.5); m.userData.p = R() * 6; scene.add(m); S.spark.push(m); }
+    fx.push((dt, t) => S.spark.forEach(m => { m.position.x += 0.3 * dt; if (m.position.x > 26) m.position.x = -26; m.material.opacity = Math.max(0, Math.sin(t * 1.6 + m.userData.p)) * 0.5; }));
+    for (let i = 0; i < 14; i++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 5), new THREE.MeshBasicMaterial({color: 0xffd98a, transparent: true, opacity: .3}));
+      m.rotation.x = -Math.PI / 2; m.position.set(-28 + R() * 56, 0.03, -18.5); scene.add(m); lit(m); }
+    // 해 — 노을 때만, 건너편 낮은 곳에 반쯤 걸린다
+    S.sun = new THREE.Mesh(new THREE.SphereGeometry(3.2, 20, 14), new THREE.MeshBasicMaterial({color: 0xff9a4a})); S.sun.position.set(-6, 0.5, -36); scene.add(S.sun);
+    // 건너편 빌딩 — 불 켜진 창은 노을·밤에만
+    let bx = -34; while (bx < 34) { const w = 2.2 + R() * 1.6, h = 4 + R() * 6;
+      if (!(bx + w / 2 > -12 && bx - w / 2 < 0)) { box(w, h, 3, [0x8a94a4, 0x7a8494, 0x98a0ae][R() * 3 | 0], bx, h / 2, -27.5).castShadow = false;
+        const cv = document.createElement('canvas'); cv.width = 64; cv.height = 128; const g = cv.getContext('2d');
+        for (let r = 0; r < 14; r++) for (let q = 0; q < 5; q++) if (R() > .5) { g.fillStyle = ['#ffd98a', '#fff2c0', '#ffc070'][R() * 3 | 0]; g.fillRect(4 + q * 12, 4 + r * 9, 7, 5); }
+        const tx = new THREE.CanvasTexture(cv); tx.colorSpace = THREE.SRGBColorSpace;
+        const pm = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({map: tx, transparent: true})); pm.position.set(bx, h / 2, -25.98); scene.add(pm); lit(pm); }
+      bx += w + 0.5 + R() * 0.6; }
+    // 다리 — 줄 조명 색은 날마다
+    const bc = pick(BRIDGE, seed, 3)[0];
+    box(76, 0.35, 1.3, 0x55596a, 0, 2, -20.5).castShadow = false;
+    for (const px of [-30, -18, -6, 6, 18, 30]) box(0.7, 2.2, 0.9, 0x4a4e5c, px, 0.9, -20.5).castShadow = false;
+    for (const tx of [-18, 18]) box(0.45, 4.4, 0.45, 0x66697a, tx, 2.2, -20.5).castShadow = false;
+    for (const z of [-20, -21]) for (let x = -34; x <= 34; x += 1.4) { const ax = Math.abs(x), y = ax <= 18 ? 2.5 + 1.8 * (x / 18) ** 2 : 4.3 - (ax - 18) / 16 * 2;
+      lit(glowBall(0.1, bc, x, y, z, 0)); }
+    for (let x = -34; x <= 34; x += 2) lit(glowBall(0.08, 0xffffff, x, 2.25, -20.5 + (x % 4 ? 0.6 : -0.6), 0));
+    // 유람선 — 날마다 이름이 다르다
+    const ship = new THREE.Group(); scene.add(ship); ship.position.set(-14 + seed % 24, 0.1, -15.5);
+    box(7.5, 0.9, 2.1, 0xf4f4f0, 0, 0.55, 0, ship); box(7.5, 0.12, 2.14, 0x2f6fb0, 0, 0.2, 0, ship);
+    box(5.6, 0.9, 1.7, 0xe8ecef, -0.4, 1.45, 0, ship); box(3, 0.7, 1.4, 0xdfe5e8, -0.8, 2.2, 0, ship);
+    box(5.2, 0.3, 0.02, 0x4a6a8a, -0.4, 1.5, 0.86, ship); lit(box(5.2, 0.3, 0.03, 0xfff0b0, -0.4, 1.5, 0.87, ship));
+    const sg = sign([shipOf(d)], 3.4, 0.6, '#2f6fb0', '#fff8ec', 0, 0.6, 1.08, 0, [56]); ship.add(sg); sg.position.set(0, 0.6, 1.08);
+    fx.push(dt => { ship.position.x += 0.8 * dt; if (ship.position.x > 36) ship.position.x = -36; });
+    // 산책길 + 난간 + 가로등
+    box(30, 0.03, 1.6, 0xa89a88, 0, 0.02, -8.6).castShadow = false; box(30, 0.06, 0.06, 0x888888, 0, 0.7, -9.85);
+    for (let x = -14; x <= 14; x += 3) box(0.1, 0.7, 0.1, 0x777777, x, 0.35, -9.85);
+    for (const x of [-12, -4, 4, 12]) { cyl(0.05, 0.05, 3.6, 0x555555, x, 1.8, -7.3, undefined, 6); lit(glowBall(0.22, 0xffe0a0, x, 3.7, -7.3, 0)); }
+    // 돗자리 — 가운데, 위에 먹을 것
+    box(6, 0.05, 3.8, 0xd65a5a, 0, 0.03, 3.5).castShadow = false;
+    for (let i = 0; i < 6; i++) box(0.4, 0.06, 3.8, 0xf4ecdc, -2.5 + i, 0.04, 3.5).castShadow = false;
+    for (const z of [2.5, 4.5]) box(6, 0.06, 0.3, 0xf4ecdc, 0, 0.045, z).castShadow = false;
+    box(0.9, 0.5, 0.6, 0x3a6ab0, -2.4, 0.3, 2.3); box(0.5, 0.35, 0.3, 0x333333, 2.4, 0.2, 2.2);
+    for (const [x, z] of [[-1.5, 2.2], [-1.2, 2.4], [1.6, 2.4]]) cyl(0.07, 0.07, 0.2, [0xd65a5a, 0x4a7ab0, 0xe0b040][(x * 7 | 0) & 1], x, 0.15, z, undefined, 8);
+    for (const [x, z] of [[-3, 1.6], [3, 1.6], [-3, 5.4], [3, 5.4]]) cyl(0.12, 0.14, 0.12, 0x8a8478, x, 0.1, z, undefined, 8);
+    // 편의점 + 라면 기계 둘 + 파라솔 — 오른쪽
+    box(4, 3.6, 6, 0xeceff1, 12.5, 1.8, -4); box(4.3, 0.4, 6.3, 0x2f6fb0, 12.5, 3.7, -4); solid(12.5, -4, 4, 6);
+    sign(['편의점', '24시'], 5.4, 1.1, '#2f9a5a', '#fff8ec', 10.47, 3.1, -4, -Math.PI / 2, [60, 30]);
+    box(0.05, 2.2, 1.2, 0xdff4ff, 10.47, 1.1, -6.2); box(0.05, 1.2, 1.4, 0xfff2c0, 10.47, 1.8, -1.8);
+    glowBall(0.15, 0xfff4d0, 9.8, 3.4, -4, 8, 10);
+    [[-3.2, 0xf4f4f0], [-4.7, 0xc9472f]].forEach(([z, col]) => { box(0.9, 2, 1.2, col, 10, 1, z); solid(10, z, 0.9, 1.2);
+      box(0.05, 0.9, 0.8, 0x222222, 9.52, 1.3, z); glowBall(0.06, 0x66ff88, 9.5, 1.8, z + 0.3, 0);
+      sign(['라면'], 1, 0.4, '#c9472f', '#fff8ec', 9.5, 2.25, z, -Math.PI / 2, [34]); });
+    cyl(0.05, 0.05, 3, 0x888888, 6.5, 1.5, -6.2, undefined, 6); cyl(0.05, 1.5, 0.7, 0x2f9a5a, 6.5, 3.0, -6.2, undefined, 12);
+    cyl(0.7, 0.7, 0.08, 0xf4ecdc, 6.5, 1, -6.2); solid(6.5, -6.2, 2.2, 2.2);
+    for (const a of [0, Math.PI]) cyl(0.3, 0.3, 0.5, 0x3a6ab0, 6.5 + Math.cos(a) * 1.3, 0.25, -6.2, undefined, 10);
+    // 다른 돗자리 손님들
+    box(4, 0.05, 3, 0x4a7ab0, -9, 0.03, -1.5).castShadow = false; box(4, 0.06, 0.3, 0xf4ecdc, -9, 0.04, -1.5).castShadow = false;
+    npc({coat: 0xd6a05a, hairStyle: 'long', hair: 0x2a2018}, [[-9.9, -1.6]], {face: Math.PI / 2, idle: ['sip', 'wave']});
+    npc({coat: 0x55606e, glasses: true}, [[-8.2, -1.4]], {face: -Math.PI / 2, idle: ['sip', 'stretch']});
+    box(3.4, 0.05, 2.6, 0x6aa070, -10.5, 0.03, 5.5).castShadow = false;
+    npc({coat: 0xd8a050, camera: true, hairStyle: 'bun', hair: 0x3a2a1a}, [[-10.5, 5.5]], {face: Math.PI, idle: ['wave', 'stretch']});
+    box(3, 0.05, 2.4, 0xe0b040, 7.5, 0.03, 1.5).castShadow = false;
+    npc({coat: 0x44506a, hat: {type: 'cap', c: 0x444444}}, [[7.5, 1.5]], {face: Math.PI, idle: ['sip']});
+    npc({coat: 0xc9472f, pants: 0x2b2f3a}, [[-13, -7.9], [13, -7.9]], {speed: 3, wait: 1});   // 달리는 사람
+    // 자전거 둘 — 산책길
+    function mkBike(coat, body, z, dir, x0, v) {
+      const g = new THREE.Group(); scene.add(g);
+      for (const zz of [-0.55, 0.55]) { const w = new THREE.Mesh(new THREE.TorusGeometry(0.33, 0.05, 6, 16), new THREE.MeshLambertMaterial({color: 0x222222})); w.rotation.y = Math.PI / 2; w.position.set(0, 0.35, zz); g.add(w); }
+      box(0.06, 0.06, 1.1, body, 0, 0.55, 0, g); box(0.5, 0.05, 0.05, 0x333333, 0, 0.95, 0.55, g);
+      const r = c.person({coat, hat: {type: 'cap', c: coat}, pants: 0x2b2f3a}, 1.0); g.add(r); r.position.set(0, 0.3, -0.05);
+      g.position.set(x0, 0, z); g.rotation.y = dir > 0 ? Math.PI / 2 : -Math.PI / 2;
+      fx.push(dt => { g.position.x += dir * v * dt; if (dir > 0 && g.position.x > 22) g.position.x = -22 - R() * 15; if (dir < 0 && g.position.x < -22) g.position.x = 22 + R() * 15; });
+    }
+    mkBike(0x2f9a5a, 0xd65a5a, -8.95, 1, -8, 3.4); mkBike(0xe0a030, 0x4a7ab0, -8.25, -1, 10, 2.6);
+    // 바람 — 풀잎이 오른쪽으로 날린다(세기는 날마다)
+    const leaves = []; for (let i = 0; i < 16; i++) { const m = box(0.12, 0.03, 0.08, [0x8ab050, 0xd9c060, 0x6a9a48][i % 3], -15 + R() * 30, 0.4 + R() * 2, -7 + R() * 14); m.castShadow = false; m.userData.p = R() * 6; leaves.push(m); }
+    fx.push((dt, t) => leaves.forEach(m => { m.position.x += (0.6 + lvl * 0.9) * dt; m.position.y += Math.sin(t * 2 + m.userData.p) * 0.01; m.rotation.y += dt * 2; if (m.position.x > 15) m.position.x = -15; }));
+    // 치킨 기사 — 평소엔 숨어 있다
+    S.dv = npc({coat: 0x1f6f55, hat: {type: 'cap', c: 0x1f6f55}, pants: 0x2b2f3a}, [[-11, 9.3]], {face: 0}); S.dv.o.visible = false;
+    fx.push(() => { const v = S.dv; if (v.watch && Math.hypot(v.o.position.x - v.watch.to[0], v.o.position.z - v.watch.to[1]) < 0.3) { const f = v.watch.fn; v.watch = null; f(); } });
+    // 연 — 놀이 때만 나타난다
+    const kite = new THREE.Group(); scene.add(kite); kite.visible = false;
+    box(0.9, 0.9, 0.03, 0xd65a3a, 0, 0, 0, kite).rotation.z = Math.PI / 4;
+    for (let i = 0; i < 5; i++) box(0.12, 0.12, 0.03, i % 2 ? 0xf4ecdc : 0xd65a3a, 0, -0.8 - i * 0.3, 0, kite);
+    const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+    const line = new THREE.Line(lg, new THREE.LineBasicMaterial({color: 0xf4ecdc})); line.frustumCulled = false; line.visible = false; scene.add(line);
+    S.kite = {g: kite, line, on: false, h: 0};
+    fx.push((dt, t) => { const k = S.kite; if (!k.on) return; const p = c.player.position;
+      kite.position.set(p.x - 0.5 + Math.sin(t * 1.3) * 0.8, 3 + k.h * 0.045, p.z - 3.5 - k.h * 0.02); kite.rotation.z = Math.sin(t * 1.7) * 0.2;
+      const a = line.geometry.attributes.position; a.setXYZ(0, p.x + 0.3, 1.0, p.z - 0.1); a.setXYZ(1, kite.position.x, kite.position.y, kite.position.z); a.needsUpdate = true; });
+  },
+  lamps: [[-8, 2], [8, 3], [0, -6]],
+  onTime(p) {
+    if (!S.river) return;
+    S.river.material.color.setHex({day: 0x5b9ccc, evening: 0xb86a55, night: 0x14213f}[p]);
+    S.spark.forEach(m => m.material.color.setHex({day: 0xffffff, evening: 0xffd0a0, night: 0x9ab4e8}[p]));
+    S.sun.visible = p === 'evening';
+  },
+  acts: [
+    {id: 'chicken', icon: '🍗', label: '치킨', spot: [1.4, 4.2], face: Math.PI, run(c, done) {
+      const d = c.now(), menu = pick(MENU, seedOf(d), 3), dv = S.dv, p = c.player.position, from = [-11, 9.3], to = [p.x + 1.3, p.z + 1.3];
+      c.player.rotation.y = Math.atan2(to[0] - p.x, to[1] - p.z); c.beep(880, .08); c.beep(1100, .08, .1);
+      dv.o.position.set(from[0], 0, from[1]); dv.o.visible = true; dv.path = [from, to]; dv.seg = 0; dv.wait = 0; dv.face = null;
+      c.toast('📱 배달 앱: 「기사님이 근처예요」', 2400);
+      let moved = false; const arrive = () => { if (moved) return; moved = true; dv.path = [to]; dv.face = Math.atan2(p.x - to[0], p.z - to[1]);
+        c.doAct(dv.o, 'wave'); c.toast('배달 기사: 「치킨 나왔습니다. 맛있게 드세요」', 2200);
+        const bag = new c.THREE.Group(); c.box(0.4, 0.25, 0.3, 0xd65a3a, 0, 0, 0, bag); c.box(0.3, 0.05, 0.22, 0xf4ecdc, 0, 0.14, 0, bag); setTimeout(() => c.hand.add(bag), 900);
+        setTimeout(() => { dv.path = [to, from]; dv.seg = 0; dv.wait = 0; dv.face = null; dv.watch = {to: from, fn: () => { dv.o.visible = false; dv.path = [from]; dv.face = 0; }}; }, 1800);
+        setTimeout(() => c.doAct(c.player, 'sip'), 2000); setTimeout(() => c.doAct(c.player, 'sip'), 3500);
+        setTimeout(() => { c.hand.remove(bag); const n = c.count('chicken'); c.stamp('냠', n === 1 ? `오늘의 치킨 · ${menu}` : `오늘 ${n}번째 치킨`);
+          c.toast(n > 3 ? `🍗 ${n}마리째… 오늘은 그만 먹기로 한다` : '🍗 ' + CHK[(seedOf(d) + n) % CHK.length], 3000); done(); }, 5200); };
+      dv.watch = {to, fn: arrive}; setTimeout(arrive, 16000); }},
+    {id: 'kite', icon: '🪁', label: '연', spot: [-1.6, 4.0], face: Math.PI, run(c, done) {
+      const d = c.now(), lvl = windLevel(d), base = 0.22 + lvl * 0.1, ph = seedOf(d) % 7, k = S.kite, LIMIT = 25;
+      c.play(`<h3>연 날리기</h3><p style="font-size:13px;margin:4px 0">바람 세기에 줄을 맞춰요. ${LIMIT}초 동안 연을 높이 띄워 둬요.</p>
+        <div style="position:relative;height:90px;background:#bfe0f4;border:1.5px solid #2b2620;border-radius:4px;margin:8px 0;overflow:hidden"><span id="kt" style="position:absolute;left:46%;font-size:28px">🪁</span></div>
+        <div style="font-size:12px;text-align:left">바람 <span style="color:#7a6e5e">(${lvl}단계 ${WIND[lvl - 1]})</span></div>
+        <div style="height:10px;background:#e4d9c2;border:1.5px solid #2b2620;border-radius:4px;margin:2px 0 6px"><div id="wd" style="height:100%;background:#4a7ab0"></div></div>
+        <div style="font-size:12px;text-align:left">줄 <span style="color:#7a6e5e">(초록 띠 안에 맞춰요)</span></div>
+        <div style="position:relative;height:10px;background:#e4d9c2;border:1.5px solid #2b2620;border-radius:4px;margin:2px 0 6px"><div id="bd" style="position:absolute;top:0;height:100%;background:rgba(106,160,112,.55)"></div><div id="ln" style="position:relative;height:100%;background:#c9472f"></div></div>
+        <div style="height:6px;background:#e4d9c2;border-radius:3px;margin:6px 0"><div id="tm" style="height:100%;width:100%;background:#7a6e5e"></div></div>
+        <p id="msg" style="font-size:14px;min-height:22px;margin:4px 0"></p>
+        <div class="row" style="justify-content:center;user-select:none;touch-action:none"><button class="btn" id="rw" style="width:90px">감기</button><button class="btn main" id="ou" style="width:90px">풀기</button><button class="btn" id="gu">그만</button></div>`,
+        (el, close) => {
+          const $ = s => el.querySelector(s); let L = 0.5, H = 35, dir = 0, air = 0, t = 0, over = false;
+          k.on = true; k.g.visible = true; k.line.visible = true; k.h = H;
+          const hold = (b, v) => { const off = () => { if (dir === v) dir = 0; }; b.onpointerdown = e => { e.preventDefault(); dir = v; }; b.onpointerup = off; b.onpointerleave = off; b.onpointercancel = off; };
+          hold($('#rw'), -1); hold($('#ou'), 1);
+          const end = () => { over = true; clearInterval(tick); k.on = false; k.g.visible = false; k.line.visible = false; };
+          const tick = setInterval(() => {
+            if (over) return; t += 0.05;
+            const w = Math.max(0.08, Math.min(0.95, base + Math.sin(t * 1.1 + ph) * 0.26 + Math.sin(t * 2.7 + ph * 2) * 0.1));
+            L = Math.max(0, Math.min(1, L + dir * 0.5 * 0.05)); const m = L - w, inb = Math.abs(m) < 0.14;
+            H = inb ? Math.min(100, H + 22 * 0.05) : Math.max(0, H - (14 + 40 * (Math.abs(m) - 0.14)) * 0.05);
+            if (H >= 45) air += 0.05; k.h = H;
+            $('#wd').style.width = w * 100 + '%'; $('#ln').style.width = L * 100 + '%'; $('#bd').style.left = Math.max(0, w - 0.14) * 100 + '%'; $('#bd').style.width = Math.min(0.28, 1 - Math.max(0, w - 0.14)) * 100 + '%';
+            $('#kt').style.bottom = H * 0.7 + '%'; $('#tm').style.width = (1 - t / LIMIT) * 100 + '%';
+            $('#msg').textContent = inb ? '좋아요. 연이 바람을 탄다' : m > 0 ? '줄이 처졌다 — 감아요' : '줄이 팽팽하다 — 풀어요';
+            if (t >= LIMIT || (H <= 0 && t > 1)) { end(); const a = +air.toFixed(1); c.count('kite'); if (!c.DB.kiteBest || a > c.DB.kiteBest) { c.DB.kiteBest = a; c.save(); }
+              $('#msg').textContent = H <= 0 ? `연이 떨어졌다 — ${a}초 떠 있었다` : `연이 하늘에 ${a}초 떠 있었다`;
+              setTimeout(() => { close(); c.stamp(a >= 18 ? '둥실' : a >= 9 ? '팔랑' : '털썩', a >= 9 ? `${a}초 떠 있었다` : '바람이 오늘 좀 그렇다'); done(); }, 1400); }
+          }, 50);
+          $('#gu').onclick = () => { if (over) return; end(); close(); done(); };
+        }); }},
+    {id: 'sunset', icon: '🌇', label: '노을', spot: [0.2, 3.4], face: Math.PI, run(c, done) {
+      const d = c.now(), sm = sunsetMin(d), cur = d.getHours() * 60 + d.getMinutes(), left = sm - cur, key = c.dkey(d);
+      c.doAct(c.player, 'crouch'); c.count('sunset'); const sd = new Set(c.DB.sunDays || []); sd.add(key); c.DB.sunDays = [...sd]; c.save();
+      c.toast(`🌇 오늘 해는 ${fmt(sm)} 즈음 진다`, 2400);
+      setTimeout(() => c.toast(left > 120 ? '아직 한참 남았다. 일단 앉아 본다' : left > 20 ? '조금 있으면 하늘이 물든다' : left > -30 ? '지금이 제일 좋은 때다' : '해는 졌다. 이제 강 위 불빛 시간', 2600), 2600);
+      setTimeout(() => c.toast('「' + pick(MONO, seedOf(d), 7) + '」', 2800), 5400);
+      setTimeout(() => { c.stamp('노을', `${fmt(sm)} 즈음`); done(); }, 8200); }},
+    {id: 'ramen', icon: '🍜', label: '라면', spot: [8.7, -3.2], face: Math.PI / 2, run(c, done) {
+      const d = c.now(), top = pick(TOP, seedOf(d), 3), cup = new c.THREE.Group();
+      c.cyl(0.16, 0.11, 0.26, 0xe8e0d0, 0, 0, 0, cup); c.cyl(0.162, 0.112, 0.1, 0xc9472f, 0, 0.02, 0, cup); c.hand.add(cup);
+      c.toast('🍜 컵을 기계에 놓는다', 1500); c.beep(500, .1);
+      setTimeout(() => { c.toast('뜨거운 물이 나온다. 선 아래까지', 1500); c.beep(300, .8, 0, 'sine', .06); }, 1500);
+      setTimeout(() => c.toast(`오늘의 토핑: ${top}`, 1400), 3000);
+      setTimeout(() => c.toast('3분 기다리는 중… 강만 본다', 1500), 4400);
+      setTimeout(() => { c.toast('젓가락으로 한 번 휘젓는다', 1300); c.doAct(c.player, 'sip'); }, 5900);
+      setTimeout(() => c.doAct(c.player, 'sip'), 7300);
+      setTimeout(() => { c.hand.remove(cup); const n = c.count('ramen'); c.stamp('후루룩', n === 1 ? '한강에선 이 맛' : `오늘 ${n}번째 라면`); done(); }, 8600); }},
+  ],
+  recExtra: c => `<p style="font-size:13px;color:#7a6e5e">노을 본 날 ${(c.DB.sunDays || []).length}일${c.DB.kiteBest ? ` · 연 최고 ${c.DB.kiteBest}초` : ''}</p>`,
+  onEnter(c) { const d = c.now(), l = windLevel(d), s = `바람 ${l}단계(${WIND[l - 1]}) · 강에는 「${shipOf(d)}」`;
+    c.toast(c.visits() > 1 ? `🧺 또 왔네요. ${c.visits()}번째 — ${s}` : `🧺 돗자리 깔기 좋은 자리다. ${s}`, 3800); },
+});
+</script></body></html>

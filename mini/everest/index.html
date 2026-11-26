@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>에베레스트 베이스캠프</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 망원경으로 들려주는 한 줄 사실 — 날짜마다 하나씩 차례로
+const FACT = [
+  '에베레스트의 높이는 8,848.86m예요. 2020년에 네팔과 중국이 함께 다시 재서 발표했어요.',
+  '1953년 5월 29일, 뉴질랜드의 에드먼드 힐러리와 셰르파 텐징 노르가이가 처음 정상에 올랐어요.',
+  '네팔에선 사가르마타, 티베트에선 초모랑마라고 불러요. 모두 에베레스트를 가리키는 이름이에요.',
+  '네팔 쪽 남쪽 베이스캠프는 해발 5,300m대에 있어요.',
+  '1975년 일본의 다베이 준코가 여성으로는 처음 정상에 올랐어요.',
+  '1977년 고상돈 대원이 한국인 처음으로 에베레스트 정상에 섰어요.',
+  '1978년 라인홀트 메스너와 페터 하벨러가 산소통 없이 처음 정상에 올랐어요.',
+  '해발 8,000m 위는 산소가 너무 적어 「죽음의 지대」라고 불러요.',
+  '정상 근처 바위에서 바다 생물 화석이 나와요. 이 땅이 아주 먼 옛날엔 바다 밑이었다는 뜻이에요.',
+  '셰르파는 원래 네팔 동쪽 히말라야에 사는 한 민족의 이름이에요. 등반을 돕는 사람을 가리키는 말로도 써요.',
+  '오색 깃발 룽타에 적은 기도는 바람이 멀리 실어 간다고 믿어요.',
+  '히말라야는 인도 땅덩어리가 유라시아와 부딪히며 솟아오른 산맥이에요.',
+];
+// 숨 고르기 뒤에 한 줄 — 높은 곳 이야기
+const ALT = [
+  '5,300m쯤에선 공기 속 산소 비율은 그대로(약 21%)인데, 기압이 낮아 한 번에 마시는 산소는 평지의 절반쯤이에요.',
+  '그래서 베이스캠프에서 며칠씩 머물며 몸을 높이에 길들여요. 이걸 고소 적응이라고 해요.',
+  '해발 8,000m 위는 산소가 아주 적어서 「죽음의 지대」라고 불러요.',
+];
+const FL = [['파랑', '하늘'], ['하양', '바람'], ['빨강', '불'], ['초록', '물'], ['노랑', '땅']];
+const FLC = [0x2a63c4, 0xf4f4f0, 0xd23a2e, 0x2f9e4a, 0xf1c40f];
+const S = {mine: [], flags: [], sherpa: null, mask: null};
+const MI = '−';
+function daily(d) {   // 오늘의 정상 날씨(놀이 속 값) — 날짜로만 정해진다
+  const dn = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
+  const t = -20 - ((dn * 37 + 11) % 19), w = 8 + ((dn * 53 + 7) % 25), v = Math.pow(w * 3.6, 0.16);
+  return {dn, t, w, chill: Math.round(13.12 + 0.6215 * t - 11.37 * v + 0.3965 * t * v)};
+}
+
+start({
+  key: 'everest', title: '에베레스트 베이스캠프', enter: '베이스캠프로 걸어 들어가기', time: 'day', nickIcon: '🏔',
+  nick: [['숨이 가쁜', '털모자 쓴', '고소 적응 중인', '차 한 잔 하는', '깃발 거는', '바람 맞는'], ['셰르파', '야크', '돌탑', '텐트', '산소통', '룽타']],
+  intro: '<p>돌과 눈 사이에 노랑·주황 텐트가 늘어선 곳.<br>숨 한 번 고르고, 버터차 한 잔 마시고, 깃발 하나 걸고 가요.</p>',
+  floor: {w: 30, d: 26, c1: '#9b968c', c2: '#f1f4f7', around: '#b3b0a8'},
+  bg: {day: 0xa8cbe8}, startPos: [0, 7], cam: {h: 9.5, back: 12.5},
+  playerLook: {coat: 0x2f5fa8, pants: 0x2b2f3a, hat: {type: 'beanie', c: 0xd9562b}, scarf: 0xf4ecdc, goggles: true},
+  build(c) {
+    const {box, cyl, ball, sign, solid, fx, THREE, scene, npc} = c;
+    const grp = (x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); scene.add(g); return g; };
+    const flat = col => new THREE.MeshLambertMaterial({color: col, flatShading: true});
+    const D = daily(c.now());
+
+    // 먼 산 — 가운데 거대한 하얀 봉우리와 양옆 능선(카메라에 낮게라도 걸리게 가깝고 넓게)
+    const peak = (x, z, r, h, col, seg = 5, y0 = -1) => { const m = new THREE.Mesh(new THREE.ConeGeometry(r, h, seg), flat(col)); m.position.set(x, h / 2 + y0, z); scene.add(m); return m; };
+    peak(4, -34, 24, 10, 0x6f6a63, 6);            // 바위 치마
+    peak(4, -34, 20, 17, 0xf3f7fb, 6);            // 하얀 봉우리
+    peak(-23, -22, 12, 10, 0xe6edf4, 5);
+    peak(25, -21, 12, 9, 0xe9eff5, 5);
+    peak(-14, -42, 17, 14, 0xdde7f1, 5);
+    peak(24, -44, 18, 13, 0xdbe5f0, 5);
+    peak(-40, -36, 18, 12, 0xd6e1ee, 5);
+    // 정상에서 바람에 날리는 눈 깃(오늘 바람만큼 길게)
+    const plume = [], pn = 2 + Math.floor(D.w / 6);
+    for (let i = 0; i < pn; i++) { const m = ball(0.7 + i * 0.3, new THREE.MeshLambertMaterial({color: 0xffffff, transparent: true, opacity: 0.7}), 5.2 + i * 1.5, 15.8 - i * 0.05, -34); m.castShadow = false; plume.push(m); }
+
+    // 돌과 눈 — 바닥 군데군데
+    [[-8, 6, .5], [-3, 10, .4], [4, 9, .55], [9, 10.5, .45], [-14, -1, .6], [14, 1, .5], [-2, -8, .45], [3, -8.5, .5], [-9, -1.5, .35], [2.5, 3, .3], [-6, 4, .35], [11, -6.5, .4]]
+      .forEach(([x, z, r], i) => { const m = ball(r, [0x8a857c, 0x7b766d, 0x98928a][i % 3], x, r * 0.35, z); m.scale.y = 0.65; m.rotation.y = i; });
+    [[-4, 8, 1.6], [5, 5, 1.3], [-9, 0, 1.8], [8, -6.5, 1.5], [1, -3.5, 1.4], [13, 8, 1.7], [-13, -8, 1.5]]
+      .forEach(([x, z, r]) => { const m = cyl(r, r, 0.06, 0xf4f8fb, x, 0.03, z, undefined, 18); m.castShadow = false; });
+
+    // 텐트 — 세모기둥. rot 0 이면 긴 쪽이 z, PI/2 이면 x
+    function tent(x, z, col, rot = 0, len = 3, r = 1) {
+      const g = grp(x, 0, z); g.rotation.y = rot;
+      cyl(r, r, len, flat(col), 0, r * 0.5, 0, g, 3).rotation.x = -Math.PI / 2;
+      box(r * 0.7, r * 0.8, 0.05, 0x3a2f28, 0, r * 0.4, len / 2 + 0.01, g);
+      const w = r * 1.75; rot ? solid(x, z, len, w) : solid(x, z, w, len);
+    }
+    tent(-11.5, -9.5, 0xe8732a); tent(-6.5, -10, 0xf2b81c); tent(6.5, -10, 0xe8732a); tent(11.5, -9.5, 0xf2b81c);
+    tent(0.5, -11, 0xf2b81c, 0, 4.6, 1.5);
+    tent(13, -2.5, 0xe8732a, Math.PI / 2); tent(-12.8, 9, 0xe8732a); tent(12.8, 9.5, 0xf2b81c);
+
+    // 돌탑 — 평평한 돌을 쌓아 올리고 꼭대기에 깃대
+    [[.95, .4, 0x8a857c, 0, 0], [.8, 1.26, 0x9a948a, .08, -.05], [.65, 1.96, 0x7d786f, -.06, .04], [.5, 2.5, 0x8f8a80, .04, .02], [.36, 2.88, 0xa29c92, 0, 0]]
+      .forEach(([r, y, col, dx, dz]) => { const m = ball(r, col, dx, y, -6 + dz); m.scale.y = 0.55; });
+    cyl(0.05, 0.06, 1.5, 0x6b5a4a, 0, 3.75, -6); solid(0, -6, 1.9, 1.9);
+    // 작은 돌탑 둘
+    for (const [x, z] of [[3.6, -1.6], [-2.6, -0.8]]) [[.4, .15], [.3, .38], [.2, .56]].forEach(([r, y], i) => { const m = ball(r, [0x8a857c, 0x9a948a, 0x7d786f][i], x, y, z); m.scale.y = 0.6; });
+    // 이름판 — 뒤쪽
+    box(0.12, 1.7, 0.12, 0x6b5a4a, -5.5, 0.85, -6.45); box(0.12, 1.7, 0.12, 0x6b5a4a, -1.5, 0.85, -6.45);
+    sign(['에베레스트 베이스캠프', '해발 약 5,300m대'], 4.4, 1, '#f4ecdc', '#2b2620', -3.5, 1.8, -6.38, 0, [36, 24]);
+
+    // 오색 기도 깃발 줄(룽타) — a,b = [x,y,z]. 줄 위에 파랑·하양·빨강·초록·노랑 순서로 매단다
+    function fline(a, b, n, sag, vis = n) {
+      const dx = b[0] - a[0], dz = b[2] - a[2], L = Math.hypot(dx, dz), g = grp((a[0] + b[0]) / 2, 0, (a[2] + b[2]) / 2);
+      g.rotation.y = Math.atan2(-dz, dx);
+      const yAt = u => a[1] + (b[1] - a[1]) * u - sag * Math.sin(Math.PI * u), SEG = 12;
+      for (let i = 0; i < SEG; i++) { const x0 = (i / SEG - 0.5) * L, x1 = ((i + 1) / SEG - 0.5) * L, y0 = yAt(i / SEG), y1 = yAt((i + 1) / SEG);
+        const m = box(Math.hypot(x1 - x0, y1 - y0) + 0.02, 0.035, 0.035, 0x6b5a4a, (x0 + x1) / 2, (y0 + y1) / 2, 0, g); m.rotation.z = Math.atan2(y1 - y0, x1 - x0); }
+      const slots = [], fw = Math.min(0.55, L / n * 0.92);
+      for (let i = 0; i < n; i++) { const u = (i + 0.5) / n, piv = new THREE.Group(); piv.position.set((u - 0.5) * L, yAt(u), 0); g.add(piv);
+        box(fw, 0.42, 0.02, FLC[i % 5], 0, -0.24, 0, piv); piv.visible = i < vis;
+        const f = {piv, ph: Math.random() * 6}; S.flags.push(f); slots.push(f); }
+      return slots;
+    }
+    const pole = (x, z, h) => { cyl(0.06, 0.08, h, 0x6b5a4a, x, h / 2, z); ball(0.3, 0x8a857c, x, 0.1, z).scale.y = 0.5; solid(x, z, 0.5, 0.5); };
+    const top = [0, 4.2, -6];
+    pole(-10, -4, 3.6); pole(10, -4, 3.6); pole(10, 6.5, 3.2); pole(-10, 6.5, 3.2);
+    fline(top, [-10, 3.4, -4], 14, 0.45); fline(top, [10, 3.4, -4], 14, 0.45); fline([10, 3.4, -4], [10, 3.0, 6.5], 14, 0.4);
+    // 내가 거는 줄 — 걸 때마다 깃발이 늘어난다(두 벌까지)
+    S.mine = fline([-10, 3.4, -4], [-10, 3.0, 6.5], 10, 0.4, Math.min(10, 5 * (c.DB.total.flag || 0)));
+
+    // 셰르파 차 탁자 — 버터차
+    box(1.6, 0.8, 0.8, 0x7a5c3a, -6, 0.4, -3.6); box(1.7, 0.06, 0.9, 0x5a4430, -6, 0.82, -3.6); solid(-6, -3.6, 1.7, 0.9);
+    cyl(0.2, 0.26, 0.45, 0xb8bcc2, -6.4, 1.08, -3.6); cyl(0.04, 0.04, 0.2, 0x555b63, -6.4, 1.4, -3.6);
+    for (const x of [-5.7, -5.45, -5.2]) cyl(0.08, 0.06, 0.12, 0xe8e0d0, x, 0.91, -3.45);
+
+    // 산소통 걸이
+    box(2, 0.1, 1, 0x555b63, 8.6, 0.05, 0.5); box(1.9, 0.06, 0.08, 0x555b63, 8.6, 1.0, 0.5);
+    for (let i = 0; i < 5; i++) cyl(0.17, 0.17, 1.2, i === 0 ? 0x3a6ea8 : 0xc8d0d8, 7.9 + i * 0.35, 0.7, 0.5);
+    sign(['산소'], 1.2, 0.5, '#f4ecdc', '#2b2620', 8.6, 1.95, 0.3, 0, [34]); solid(8.6, 0.5, 2.2, 1.2);
+
+    // 망원경 — 정상 쪽으로
+    for (let i = 0; i < 3; i++) { const a = i * Math.PI * 2 / 3; cyl(0.03, 0.03, 1.2, 0x555b63, 6 + Math.cos(a) * 0.25, 0.6, -3.5 + Math.sin(a) * 0.25); }
+    cyl(0.09, 0.07, 0.9, 0x2b3a5a, 6, 1.35, -3.6).rotation.x = -1.12; solid(6, -3.5, 0.8, 0.8);
+
+    // 야크 — 풀 뜯듯 고개를 까딱
+    const heads = [];
+    function yak(x, z, ry) {
+      const g = grp(x, 0, z); g.rotation.y = ry; const dk = 0x3b2f27, sk = 0x2c231d;
+      box(1.7, 0.95, 0.85, dk, 0, 1.0, 0, g); box(1.7, 0.45, 0.95, sk, 0, 0.62, 0, g);
+      for (const [sx, sz] of [[-.6, -.28], [-.6, .28], [.6, -.28], [.6, .28]]) box(0.2, 0.5, 0.2, sk, sx, 0.25, sz, g);
+      const h = new THREE.Group(); h.position.set(1.0, 1.1, 0); g.add(h);
+      box(0.5, 0.45, 0.45, dk, 0.25, -0.1, 0, h); box(0.18, 0.18, 0.34, 0x6b5a4a, 0.55, -0.25, 0, h);
+      for (const s of [-1, 1]) box(0.07, 0.4, 0.07, 0xe8e0cc, 0.1, 0.25, s * 0.24, h).rotation.x = s * 0.5;
+      heads.push({h, ph: Math.random() * 6}); solid(x, z, 3, 1.1);
+    }
+    yak(12.2, 3.8, Math.PI); yak(-12.6, -4.2, 0);
+
+    // 매 프레임 — 깃발·눈 깃·야크
+    const lean = 0.12 + D.w / 32 * 0.5;
+    fx.push((dt, t) => {
+      for (const f of S.flags) { f.piv.rotation.x = lean * 0.9 + Math.sin(t * 3.2 + f.ph) * (0.07 + lean * 0.25); f.piv.rotation.y = Math.sin(t * 4.1 + f.ph * 1.7) * (0.12 + lean * 0.3); }
+      plume.forEach((m, i) => m.scale.setScalar(1 + 0.08 * Math.sin(t * 1.5 + i)));
+      for (const q of heads) q.h.rotation.z = -0.12 + Math.sin(t * 0.9 + q.ph) * 0.14;
+    });
+
+    // 산소 마스크 — 평소엔 숨겨 두고 숨 고르기 때만 쓴다
+    const mask = new THREE.Group(); mask.visible = false; c.player.userData.head.add(mask);
+    box(0.34, 0.22, 0.14, 0x2f3b36, 0, -0.12, 0.5, mask); cyl(0.025, 0.025, 0.6, 0x2b2b2b, 0.12, -0.42, 0.42, mask).rotation.x = 0.5;
+    S.mask = mask;
+
+    // 셰르파 — 차 탁자 옆 하나, 텐트 앞을 오가는 하나
+    const look = {coat: 0xb83a2a, pants: 0x2b2f3a, hat: {type: 'beanie', c: 0x2f6f6a}};
+    S.sherpa = npc(look, [[-7.3, -3.4]], {face: 1.2, idle: ['wave', 'sip']}).o;
+    npc({...look, coat: 0x2f6f6a, hat: {type: 'beanie', c: 0xe8732a}}, [[-8.5, -7.6], [8.5, -7.6]], {speed: 1.4, idle: ['stretch']});
+  },
+  lamps: [],
+  acts: [
+    {id: 'breath', icon: '🫁', label: '숨 고르기', spot: [6.6, 1.2], face: 2.0, run(c, done) {
+      S.mask.visible = true; c.doAct(c.player, 'crouch');
+      c.play(`<h3>숨 고르기</h3>
+        <p style="font-size:13px;color:#7a6e5e">동그라미가 가장 커졌을 때 「쉬이」를 눌러요. 다섯 번.</p>
+        <div style="height:150px;display:flex;align-items:center;justify-content:center"><div id="ring" style="width:120px;height:120px;border-radius:50%;background:#cfe3f1;border:3px solid #2b2620;transform:scale(.5)"></div></div>
+        <p id="msg" style="min-height:22px;font-size:14px"></p><div class="row" id="ro" style="justify-content:center"><button class="btn main" id="go">시작</button><button class="btn" id="qt">그만두기</button></div>`,
+        (el, close) => {
+          let dead = false, raf = 0; const ring = el.querySelector('#ring'), ro = el.querySelector('#ro'), msg = el.querySelector('#msg'), T = 2.4, N = 5;
+          const quit = () => { dead = true; cancelAnimationFrame(raf); S.mask.visible = false; close(); done(); };
+          el.querySelector('#qt').onclick = quit;
+          el.querySelector('#go').onclick = () => {
+            ro.innerHTML = '<button class="btn main" id="hit" style="min-width:150px;height:44px">쉬이</button>';
+            const t0 = performance.now() + 700, got = new Array(N).fill(null);
+            const finish = () => {
+              dead = true; cancelAnimationFrame(raf); S.mask.visible = false;
+              const hits = got.filter(d => d != null && d < 0.3).length; c.count('breath');
+              c.DB.breathBest = Math.max(c.DB.breathBest || 0, hits); c.save(); close();
+              if (hits >= 4) { c.doAct(c.player, 'cheer'); c.stamp('숨이 트였다', `${hits}/5 · 해발 5,300m대에서`); }
+              else c.toast(`🫁 ${hits}/5 — 천천히요. 여긴 공기가 얇아요`, 3000);
+              setTimeout(() => c.toast('🫁 ' + ALT[(c.today().breath - 1) % ALT.length], 4200), hits >= 4 ? 2200 : 3200);
+              setTimeout(done, hits >= 4 ? 2400 : 1500);
+            };
+            ro.querySelector('#hit').onclick = () => {
+              const t = (performance.now() - t0) / 1000, k = Math.round((t - T / 2) / T); if (t < 0 || k < 0 || k >= N || got[k] != null) return;
+              got[k] = Math.abs(t - (k * T + T / 2)); const ok = got[k] < 0.3;
+              ring.style.borderColor = ok ? '#2f9e4a' : '#c9472f'; setTimeout(() => ring.style.borderColor = '#2b2620', 250); c.beep(ok ? 660 : 220, .08, 0, 'sine', .05);
+            };
+            const frame = () => {
+              if (dead || !el.isConnected) return; const t = (performance.now() - t0) / 1000;
+              if (t >= N * T) { finish(); return; }
+              ring.style.transform = `scale(${t < 0 ? 0.5 : 0.5 + 0.5 * (0.5 - 0.5 * Math.cos(2 * Math.PI * t / T))})`;
+              msg.textContent = t < 0 ? '준비…' : (t % T) < T / 2 ? '들이쉬고…' : '내쉬고…';
+              raf = requestAnimationFrame(frame);
+            };
+            raf = requestAnimationFrame(frame);
+          };
+        }); }},
+    {id: 'tea', icon: '🍵', label: '버터차', spot: [-5, -2.2], face: -0.65, run(c, done) {
+      const cup = new c.THREE.Group(); c.cyl(0.09, 0.07, 0.16, 0xe8e0d0, 0, 0.08, 0, cup); c.cyl(0.075, 0.075, 0.02, 0xd9b25a, 0, 0.16, 0, cup); c.hand.add(cup);
+      S.sherpa && c.doAct(S.sherpa, 'wave'); c.doAct(c.player, 'sip'); c.beep(330, .15, 0, 'sine', .08);
+      const n = c.count('tea');
+      setTimeout(() => { c.hand.remove(cup);
+        if (n === 3) c.stamp('세 잔째', '셰르파가 한 잔 더 따라 줬어요');
+        else c.toast(n === 1 ? '🍵 버터차예요. 차에 야크 버터와 소금을 넣어요. 짭짤해서 처음엔 놀라요' : n === 2 ? '🍵 두 잔째 — 어느새 입에 맞아요' : `🍵 ${n}잔째… 주전자가 비어 가요`, 3200);
+        setTimeout(done, 900); }, 2300); }},
+    {id: 'flag', icon: '🚩', label: '깃발 걸기', spot: [-8.6, 2], face: -Math.PI / 2, run(c, done) {
+      const base = 5 * Math.min(c.DB.total.flag || 0, 1); let i = 0;
+      c.toast('🚩 파랑, 하양, 빨강, 초록, 노랑 순서로 걸어요', 1500);
+      const step = () => {
+        if (i >= 5) { const n = c.count('flag'); c.doAct(c.player, 'cheer'); c.stamp('다섯 빛깔', `오늘 ${n}번째 줄`);
+          setTimeout(() => c.toast('🚩 바람이 기도를 멀리 실어 간다고 해요', 3000), 1200); setTimeout(done, 1800); return; }
+        const f = S.mine[base + i]; if (f) f.piv.visible = true;
+        c.doAct(c.player, 'throw'); c.beep(500 + i * 90, .05, 0, 'sine', .04); c.toast(`🚩 ${FL[i][0]} — ${FL[i][1]}`, 1100); i++; setTimeout(step, 1000);
+      };
+      setTimeout(step, 1500); }},
+    {id: 'view', icon: '🔭', label: '정상 날씨', spot: [6, -2.2], face: Math.PI, run(c, done) {
+      const d = c.now(), D = daily(d), first = !c.today().view; c.doAct(c.player, 'crouch'); c.beep(1500, .05); c.count('view');
+      const verdict = D.w >= 24 ? '정상 쪽이 몹시 사나워요. 오늘은 베이스캠프에서 구경만 해요.' : D.w >= 16 ? '바람이 센 편이에요. 서두르지 말아요.' : '비교적 잔잔한 날이에요. 이런 날을 기다리는 거죠.';
+      setTimeout(() => c.dialog('오늘의 정상 날씨', `${c.hm(d)} · ${c.visits()}번째 온 날`,
+        `<p style="font-size:28px;margin:4px 0"><b>${MI}${-D.t}°C</b></p><p style="font-size:13px;color:#7a6e5e;margin:0">바람 초속 ${D.w}m · 체감 ${MI}${-D.chill}°C</p>
+         <p style="font-size:15px">${verdict}</p><p style="font-size:16px">「${FACT[D.dn % FACT.length]}」</p>
+         <p style="color:#7a6e5e;font-size:12px">실제 관측값이 아니라 이 놀이 속 오늘의 날씨예요.${first ? '' : ' 하루에 하나, 내일 또 와요.'}</p>`, [['내려오기', done, 'main']]), 1000); }},
+  ],
+  recExtra: c => `<p style="font-size:13px;color:#7a6e5e">걸어 둔 깃발 ${c.DB.total.flag || 0}줄 · 숨 고르기 최고 ${c.DB.breathBest || 0}/5<br>오늘 정상 바람 초속 ${daily(c.now()).w}m</p>`,
+  onEnter(c) { c.toast(c.visits() > 1 ? `🏔 ${c.visits()}번째 날. 오늘도 공기가 얇아요` : '🏔 해발 5,300m대. 천천히 걸어요', 3000); },
+});
+</script></body></html>

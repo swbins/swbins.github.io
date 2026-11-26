@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>밤 비행기 창가 자리</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 창밖 — [무엇이 보이나, 창 색, 한 줄]
+const VIEW = [['도시 불빛', 0x2a2240, '아래로 도시가 금가루처럼 흩어져 있어요. 저기도 누가 아직 안 자요'], ['구름 바다', 0x3a4868, '달빛에 구름이 솜이불처럼 깔렸어요'],
+  ['오로라', 0x1a4a3a, '북쪽 하늘에 초록 커튼이 흔들려요. 기장님이 방송으로 알려 줬어요'], ['번개 구름', 0x3a3050, '멀리 구름 속에서 번쩍 — 소리는 안 들려요'],
+  ['별', 0x0a0f24, '불 꺼진 창에 이마를 대면 별이 땅에서 볼 때보다 훨씬 많아요'], ['새벽 띠', 0x5a3a3a, '수평선 끝이 붉게 갈라져요. 곧 아침이에요'], ['바다 위 달', 0x1a2a4a, '달이 바다에 긴 길을 냈어요']];
+const DREAM = ['구름 위를 걷는 꿈','어릴 적 살던 집 마당 꿈','도착하자마자 길을 잃는 꿈','기내식이 끝없이 나오는 꿈','창밖에서 고래가 같이 나는 꿈'];
+const seed = c => { const d = c.now(); return d.getFullYear() * 400 + (d.getMonth() + 1) * 32 + d.getDate(); };
+
+start({
+  key: 'night-flight', title: '밤 비행기 창가 자리', enter: '탑승권 내밀기', time: 'night', nickIcon: '✈️',
+  nick: [['창가 자리','잠 못 드는','담요 덮은','열두 시간째','기내식 기다리는','설레는'],['승객','안대','담요','날개','구름','좌석벨트']],
+  intro: '<p>불 꺼진 밤 비행기, 창가 자리.<br>창밖 구경하고, 기내식 고르고, 흔들리면 벨트를 매요.</p>',
+  floor: {w: 9, d: 26, c1: '#3a3f55', c2: '#434862', around: 0x05070f},
+  bg: {night: 0x05070f},
+  startPos: [0, 9], cam: {h: 8, back: 9},
+  playerLook: {coat: 0x4a5a6a, pants: 0x33363f, hair: 0x2a2018},
+  build(c) {
+    const {box, cyl, ball, sign, solid, npc, fx, THREE, scene} = c;
+    // 동체 벽(낮게) — 둥근 천장은 카메라를 가리니 생략
+    for (const s of [-1, 1]) { box(0.3, 2.6, 26, 0xe6e2dc, s * 4.35, 1.3, 0); box(0.6, 0.3, 26, 0xcfc8be, s * 4.0, 2.7, 0); }
+    box(9, 3, 0.3, 0xcfc8be, 0, 1.5, -12.9); sign(['🔔', '좌석벨트'], 1.2, 0.6, '#2b2620', '#5a5a5a', 0, 2.5, -12.72, 0, [30, 24]);
+    c.belt = box(1.3, 0.7, 0.04, new THREE.MeshBasicMaterial({color: 0x333333, transparent: true, opacity: .4}), 0, 2.5, -12.74);
+    // 앞쪽 커튼(주방 칸)
+    for (const x of [-2.6, 2.6]) box(2.6, 2.4, 0.05, 0x2f3a5a, x, 1.2, -11.8);
+    // 좌석 줄 + 창
+    c.wins = []; const seatC = 0x2f4a7a;
+    for (let r = 0; r < 8; r++) { const z = -9.6 + r * 2.4;
+      for (const s of [-1, 1]) { for (const x of [1.6, 2.7]) { box(0.95, 0.5, 0.9, seatC, s * x, 0.45, z); box(0.95, 1.1, 0.2, seatC, s * x, 1.05, z + 0.5); box(0.6, 0.2, 0.05, 0xd9d4cc, s * x, 1.5, z + 0.61); }
+        solid(s * 2.15, z + 0.15, 2.1, 1.1);
+        const wm = new THREE.MeshBasicMaterial({color: 0x0a0f24}); const w = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 0.8), wm); w.position.set(s * 4.19, 1.6, z); w.rotation.y = -s * Math.PI / 2; scene.add(w); c.wins.push(wm); } }
+    // 머리 위 작은 독서등
+    for (let r = 0; r < 8; r += 3) c.glowBall(0.07, 0xffe2a0, -2.2, 2.75, -9.6 + r * 2.4, 0);
+    // 내 자리(왼쪽 창가 다섯째 줄)에 담요
+    c.mySeat = {x: -2.7, z: -9.6 + 4 * 2.4}; c.blanket = box(0.9, 0.08, 0.7, 0xc9472f, c.mySeat.x, 0.74, c.mySeat.z); c.blanket.visible = false;
+    // 승객들(앉아 있게 살짝 내림) — 등이 보인다
+    const looks = [{coat: 0x6b5a4a, hairStyle: 'bob'}, {coat: 0x3a4a3a, glasses: true}, {coat: 0xd9c29a, hairStyle: 'bun'}, {coat: 0x44506a, hat: {type: 'beanie', c: 0x777777}}, {coat: 0x7a3a3a, hairStyle: 'long'}, {coat: 0x55606e}];
+    c.pax = [[-1.6, 0], [1.6, 1], [2.7, 3], [-1.6, 6], [1.6, 5], [2.7, 7]].map(([x, r], i) => { const n = npc(looks[i], [[x, -9.6 + r * 2.4 + 0.1]], {face: Math.PI, scale: 1.0}); n.o.position.y = -0.35; return n; });
+    // 승무원 — 통로를 천천히
+    c.crew = npc({coat: 0x2b3a5a, hairStyle: 'bun', hair: 0x141414, scarf: 0xc9472f}, [[0, -10.6], [0, 8.4]], {wait: 6, speed: 1.1, idle: ['wave']});
+    // 흔들림 — c.shake 초 동안 장면 전체가 살짝 기운다
+    c.shake = 0; fx.push((dt, t) => { if (c.shake > 0) { c.shake -= dt; scene.rotation.z = Math.sin(t * 17) * 0.012; scene.position.y = Math.sin(t * 23) * 0.06; } else { scene.rotation.z = 0; scene.position.y = 0; } });
+  },
+  lamps: [[0, -6], [0, 4]],
+  acts: [
+    {id: 'window', icon: '🪟', label: '창밖', spot: [-0.55, 0.1], face: -Math.PI / 2, run(c, done) {
+      c.player.rotation.y = -Math.PI / 2; const n = c.count('window'), [what, col, line] = VIEW[(seed(c) + n - 1) % VIEW.length];
+      c.wins.forEach(m => m.color.setHex(col));
+      setTimeout(() => { c.dialog('창밖 — ' + what, `${c.hm(c.now())} · 고도 1만 1천 m`, `<p style="font-size:16px">${line}</p>` + (n > 1 ? `<p style="color:#7a6e5e;font-size:13px">오늘 ${n}번째로 내다봤어요</p>` : ''), [['창 덮개 내리기', done, 'main']]); }, 800); }},
+    {id: 'meal', icon: '🍱', label: '기내식', spot: [0, -3.2], face: Math.PI, run(c, done) {
+      c.crew.path = [[0, -4.6]]; c.crew.face = 0; c.crew.o.position.set(0, 0, -4.6);
+      const pick = m => { const n = c.count('meal'); c.doAct(c.player, 'sip');
+        c.toast(m === 0 ? '🍱 비빔밥 — 고추장 튜브를 짜는 게 제일 재밌어요' : '🍱 닭고기 덮밥 — 작은 빵에 버터가 딱딱해요', 3000);
+        c.crew.path = [[0, -10.6], [0, 8.4]]; c.crew.seg = 0; setTimeout(done, 1600); };
+      c.doAct(c.crew.o, 'wave');
+      setTimeout(() => c.dialog('기내식', '승무원: 「두 가지 있어요」', '<p>비빔밥, 아니면 닭고기 덮밥?</p>', [['비빔밥', () => pick(0), 'main'], ['닭고기', () => pick(1)]]), 700); }},
+    {id: 'bump', icon: '🔔', label: '흔들림', run(c, done) {
+      c.play(`<h3>난기류</h3><p style="font-size:13px;color:#7a6e5e">좌석벨트 불이 켜지면 바로 「딸깍」 — 세 번</p>
+        <div id="lp" style="width:90px;height:60px;margin:14px auto;border:2px solid #2b2620;border-radius:6px;background:#3a3a3a;display:flex;align-items:center;justify-content:center;font-size:28px">🔔</div>
+        <p id="msg" style="min-height:24px"></p><div class="row" style="justify-content:center"><button class="btn main" id="go">딸깍</button></div>`,
+        (el, close) => {
+          const lp = el.querySelector('#lp'), msg = el.querySelector('#msg'); let lit = 0, round = 0, sum = 0, h;
+          const arm = () => { h = setTimeout(() => { lit = performance.now(); lp.style.background = '#f2c14e'; c.belt.material.color.setHex(0xffd27a); c.belt.material.opacity = 1; c.beep(1046, .1, 0, 'sine', .07); c.shake = 1.6; }, 900 + Math.random() * 1600); };
+          arm();
+          el.querySelector('#go').onclick = () => {
+            if (!lit) { clearTimeout(h); msg.textContent = '아직요 — 불이 안 켜졌어요'; c.beep(250, .1); arm(); return; }
+            const ms = Math.round(performance.now() - lit); sum += ms; round++; lit = 0; lp.style.background = '#3a3a3a'; c.belt.material.color.setHex(0x333333); c.belt.material.opacity = .4;
+            c.beep(600, .05); c.beep(400, .05, .06); msg.textContent = `${ms}ms — ${ms < 350 ? '빠르다' : ms < 600 ? '괜찮아요' : '조금 늦었어요'}`;
+            if (round < 3) return arm();
+            const avg = Math.round(sum / 3), n = c.count('bump'); if (!c.DB.fast || avg < c.DB.fast) { c.DB.fast = avg; c.save(); }
+            setTimeout(() => { close(); c.stamp(avg < 400 ? '딸깍!' : '휴…', `평균 ${avg}ms · 최고 ${c.DB.fast}ms`); c.pax.forEach(p => c.doAct(p.o, 'wave')); done(); }, 800);
+          };
+        });
+    }},
+    {id: 'sleep', icon: '😴', label: '담요', spot: [-0.55, 0.1], face: -Math.PI / 2, run(c, done) {
+      c.player.rotation.y = -Math.PI / 2; c.doAct(c.player, 'crouch'); c.blanket.visible = true; const n = c.count('sleep');
+      c.toast(n === 1 ? '😴 담요 덮고 눈 감아요. 엔진 소리가 자장가 같아요' : `😴 깜박 졸다 깼어요 — ${DREAM[(seed(c) + n) % DREAM.length]}`, 3200);
+      [0, .6, 1.2].forEach(w => c.beep(90, .5, w, 'sine', .03)); setTimeout(done, 2600); }},
+  ],
+  recExtra: c => `<p style="font-size:13px;color:#7a6e5e">벨트 반응 최고 ${c.DB.fast ? c.DB.fast + 'ms' : '아직 없음'}</p>`,
+  onEnter(c) { c.toast('✈️ 「손님, 창가 자리는 이쪽이에요」', 3000); },
+});
+</script></body></html>

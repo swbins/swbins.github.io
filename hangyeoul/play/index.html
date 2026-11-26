@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>한겨울 사진관 웹 체험판 — 제1화 눈 내린 산장, 사라진 그림</title>
+<title>한겨울 사진관 사건 수첩 — 제1화 눈 내린 산장, 사라진 그림</title>
 <meta name="description" content="폭설에 갇힌 산장, 잠깐 사이 사라진 화가의 새 그림. 사진관 탐정 한겨울과 고양이 도토리가 되어 단서를 모으고, 용의자 여덟을 심문하고, 범인을 지목하는 10분짜리 추리 게임. 진행은 자동 저장.">
 <link rel="canonical" href="https://swbins.github.io/hangyeoul/play/">
 <meta property="og:type" content="website">
@@ -402,7 +402,7 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
           <button type="button" class="main" id="b-new">사건 시작</button>
           <button type="button" id="b-snd2">효과음 켜기</button>
         </div>
-        <p class="fine">하던 데까지는 이 브라우저가 기억한다. 웹은 <b>1화 체험판</b> — 나머지 스무 편은 <a href="../">무료 앱</a>에. 사람도 장소도 다 지어낸 이야기다.</p>
+        <p class="fine">하던 데까지는 이 브라우저가 기억한다. 사람도 장소도 다 지어낸 이야기다.</p>
       </div>
     </section>
 
@@ -484,9 +484,9 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
       </ol>
         <div class="btns">
           <button type="button" class="btn ghost" id="b-again">처음부터 다시</button>
-          <a class="btn ghost" href="../">앱 소개</a>
+          <a class="btn ghost" href="../list/">사건 목록</a>
         </div>
-        <p class="next"><a class="btn" href="https://github.com/swbins/hangyeoul/releases/latest" data-goatcounter-click="trial-download" data-goatcounter-title="체험판 끝 → 앱 받기">제2화부터는 앱에서 — 무료로 받기</a></p><p class="small" style="margin:8px 0 0;font-size:13px;color:var(--sub)">Windows 10/11 · 시즌 1 열 사건 + 번외편 열 편 + 시즌 2 첫 사건. 웹과 앱은 저장이 따로라 앱에서는 1화부터 다시 시작해요.</p>
+        <p class="next"><a class="btn" href="2/">다음 사건 — 제2화 「불꽃 축제와 사진 속 알리바이」</a></p>
       <p class="applink">추리 끝, 다시 일하러 갈 시간이라면 — 매일 손으로 반복하는 일은 <a href="../../taskhand/">Taskhand</a> 에게 한 번 보여 주면 다음부터 혼자 합니다(무료).</p>
       </div>
     </section>
@@ -701,7 +701,7 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
 
   /* ── 추리 문제 ── */
   var STEPS = [
-    { q: '그림을 가져간 범인은?', sub: '한 사람을 고르세요.', type: 'who', answer: 'oh',
+    { q: '그림을 가져간 범인은?', sub: '한 사람을 고르세요.', type: 'who', answer: atob('b2g='),
       wrong: {
         yoon: '화백님은 20:30부터 22:50까지 통화 중이었어요(통화 기록). 게다가 보험은 공개 전 작품을 보장하지 않아요. 자작극으로 얻을 게 없습니다.',
         seo: '서지후는 「큰 캔버스」라고 생각하고 있어요. 그림을 본 적 없는 사람의 말이죠. 그리고 거실에선 작업실 쪽이 보이지도 않아요.',
@@ -711,11 +711,11 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
         manbok: '만복 씨는 10시 20분까지 지하 보일러실에서 수리 기사와 영상 통화 중이었어요.',
         wooram: '우람 씨는 10시부터 20분 동안 샤워실에 있었어요. 보일러 계기판에 온수가 내내 돌았죠.'
       } },
-    { q: '오태석이 그림을 봤다는 증거는?', sub: '수첩에서 단서를 하나 고르세요.', type: 'clue', answer: ['ohword'],
+    { q: '오태석이 그림을 봤다는 증거는?', sub: '수첩에서 단서를 하나 고르세요.', type: 'clue', answer: [atob('b2h3b3Jk')],
       tip: '그림이 덮여 있었다는 걸 떠올려 보세요. 그런데 누가 그림의 크기를 말했죠?' },
-    { q: '「9시부터 잤다」는 거짓말을 깨는 단서는?', sub: '수첩에서 단서를 하나 고르세요.', type: 'clue', answer: ['shoes'],
+    { q: '「9시부터 잤다」는 거짓말을 깨는 단서는?', sub: '수첩에서 단서를 하나 고르세요.', type: 'clue', answer: [atob('c2hvZXM=')],
       tip: '복도가 젖은 채 비어 있던 10분이 있었어요. 그 복도를 지나가면 무엇이 남을까요?' },
-    { q: '사라진 그림은 지금 어디에?', sub: '하나를 고르세요.', type: 'where', answer: 'bag',
+    { q: '사라진 그림은 지금 어디에?', sub: '하나를 고르세요.', type: 'where', answer: atob('YmFn'),
       opts: { snow: ['마당 눈 속에 묻었다', '마당엔 아홉 시 이후 발자국이 하나도 없어요.'],
               book: ['서지후의 평론집 사이', '서지후는 그림 크기조차 몰랐어요.'],
               bag: ['오태석의 빈 액자 가방 안', ''],
@@ -815,7 +815,7 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
     { id: 'easel', type: 'lock', title: '이젤 받침대 자국', sub: '자를 대고 그림 너비 재기', need: ['p_studio'], clues: ['easel'],
       img: 'img/pz1-easel.webp',
       q: '받침대 먼지 위에 깨끗한 네모 자국. 자를 대 보니 자국 양 끝이 눈금에 닿았다. 사라진 그림의 가로 너비는 몇 cm 일까?',
-      answer: '25', okText: '수첩에 적기', no: '숫자는 비슷한데… 자리를 바꿔 볼까?',
+      answer: atob('MjU='), okText: '수첩에 적기', no: '숫자는 비슷한데… 자리를 바꿔 볼까?',
       hints: [['cat', '(도토리가 빨간 점선 두 줄을 앞발로 톡톡 친다.) 점선이 닿은 눈금부터 읽어 봐.'],
               ['cat', '왼쪽 점선은 12, 오른쪽 점선은 37 이야. 냐.'],
               ['cat', '37 빼기 12 — 너비는 25cm. 손바닥 두 개만 해.']],
@@ -1623,7 +1623,7 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
       var stars = Math.max(1, 5 - st.miss/*pz*/ - pzPen()/*/pz*/); sfx(stars === 5 ? 'five' : 'solve');
       $('e-stars').textContent = '★★★★★'.slice(0, stars) + '☆☆☆☆☆'.slice(0, 5 - stars);
       $('e-rank').textContent = ['', '탐정 조수 — 실수 N번. ' + EP.pet + '가 많이 도와줬네요.', '견습 탐정 — 실수 N번.', '탐정 — 실수 N번, 제법이에요.', '일류 탐정 — 실수 한 번, 거의 완벽해요.', '명탐정 — 한 번도 틀리지 않았어요.'][stars].replace('N', st.miss)/*pz*/ + pzNote()/*/pz*/;/*pz*/ pzRank(stars);/*/pz*/
-      /*side*/ (function () { var el = $('e-side'); if (!el) return; if (stars === 5) { try { localStorage.setItem('swbins-side-1', '1'); } catch (e) {} el.innerHTML = '<a class="btn" href="../#get" style="text-decoration:none;display:inline-block">★ 번외편 「사라진 아침 빵」 — 앱에서 열려요</a>'; } else { el.innerHTML = '<p style="margin:0;color:var(--muted);font-size:14px">별 다섯 개(헛짚음 없이 · 퍼즐 힌트는 한 번까지)로 풀면 번외편 「사라진 아침 빵」이 열려요. 「처음부터 다시」로 다시 도전!</p>'; } })(); /*/side*/
+      /*side*/ (function () { var el = $('e-side'); if (!el) return; if (stars === 5) { try { localStorage.setItem('swbins-side-1', '1'); } catch (e) {} el.innerHTML = '<a class="btn" href="side/1/" style="text-decoration:none;display:inline-block">★ 번외편 열림 — 「사라진 아침 빵」</a>'; } else { el.innerHTML = '<p style="margin:0;color:var(--muted);font-size:14px">별 다섯 개(헛짚음 없이 · 퍼즐 힌트는 한 번까지)로 풀면 번외편 「사라진 아침 빵」이 열려요. 「처음부터 다시」로 다시 도전!</p>'; } })(); /*/side*/
       if (typeof EP_PIECE !== 'undefined') (function () {
         var el = $('e-piece'); if (!el) return;
         var pc = {}; try { pc = JSON.parse(localStorage.getItem('swbins-s2-pieces') || '{}') || {}; } catch (e) { pc = {}; }

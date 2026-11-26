@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>몽글숲 — 오늘 숨은 몽글이 찾기</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#1d2a1f;font-family:"Pretendard","Malgun Gothic",sans-serif;color:#2b2620}
+  canvas{display:block;touch-action:none}
+  .hud{position:fixed;left:12px;top:12px;right:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;z-index:5}
+  .chip{background:#f4ecdc;border:1.5px solid #2b2620;border-radius:4px;padding:6px 10px;font-size:13px;box-shadow:2px 2px 0 #2b2620}
+  .btn{background:#f4ecdc;border:1.5px solid #2b2620;border-radius:4px;padding:8px 14px;font-size:14px;cursor:pointer;box-shadow:2px 2px 0 #2b2620;font-family:inherit;color:#2b2620}
+  .btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 #2b2620}
+  .btn.main{background:#3f7a4a;color:#fff8ec}
+  #act{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);display:none;z-index:5;font-size:16px;padding:12px 22px;white-space:nowrap}
+  #acts{position:fixed;left:12px;bottom:28px;display:flex;flex-direction:column;gap:8px;z-index:5}
+  #acts .btn{width:46px;height:46px;padding:0;font-size:20px;border-radius:50%}
+  #toast{position:fixed;left:50%;top:64px;transform:translateX(-50%);background:#2b2620;color:#f4ecdc;padding:8px 14px;border-radius:4px;font-size:14px;opacity:0;transition:opacity .3s;z-index:6;pointer-events:none;max-width:86vw;text-align:center}
+  .panel{position:fixed;inset:0;background:rgba(10,18,12,.55);display:none;align-items:center;justify-content:center;z-index:10}
+  .card{background:#f4ecdc;border:2px solid #2b2620;box-shadow:4px 4px 0 #2b2620;border-radius:6px;max-width:460px;width:88vw;max-height:82vh;overflow:auto;padding:18px 18px 14px;box-sizing:border-box}
+  .card h3{margin:0 0 4px;font-size:18px}
+  .card .who{font-size:12px;color:#7a6e5e;margin-bottom:10px}
+  .card p{line-height:1.6;margin:6px 0;font-size:15px}
+  .card .row{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+  #intro .card{text-align:center}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .mon{border:1.5px solid #2b2620;border-radius:4px;background:#fffaf0;padding:6px 4px;text-align:center;font-size:12px;cursor:pointer}
+  .mon img{width:100%;aspect-ratio:1;display:block}
+  .mon b{display:block;font-size:13px}
+  .mon.no{opacity:.55;cursor:default}
+  .mon.no img{filter:brightness(0) opacity(.35)}
+  .mon.pet{outline:3px solid #3f7a4a}
+  .stars{color:#c9872f;letter-spacing:-1px}
+  #game canvas{width:260px;height:260px;margin:4px auto;display:block;touch-action:manipulation}
+  .today{font-size:13px;color:#5a4f42;border-top:1px dashed #b3a58c;margin-top:10px;padding-top:8px}
+</style>
+</head>
+<body>
+<div class="hud">
+  <span class="chip" id="nick"></span>
+  <span class="chip" id="crowd" style="display:none"></span>
+  <button class="btn" id="bookBtn">몽글 수첩 <span id="cnt">0</span>/12</button>
+  <a class="btn" href="../" style="text-decoration:none">↩ 목록</a>
+</div>
+<button class="btn main" id="act"></button>
+<div id="acts"><button class="btn" data-act="wave" title="손 흔들기">👋</button><button class="btn" data-act="cheer" title="만세">🙌</button></div>
+<div id="toast"></div>
+
+<div class="panel" id="intro" style="display:flex"><div class="card">
+  <h3>몽글숲</h3>
+  <div class="who" id="introW"></div>
+  <p>숲 곳곳에 몽글이들이 숨어 있어요.<br>다가가서 열매를 건네면 친구가 돼요.</p>
+  <p class="today" id="introToday"></p>
+  <p style="color:#7a6e5e;font-size:13px">바닥을 누르거나 방향키·WASD 로 걷기<br>몽글이는 날마다 바뀌고, 모두 같은 자리에 나와요<br>밤(저녁 7시~아침 6시)에만 나오는 친구도 있어요<br>다른 사람 옆에서 🔁 교환 — 서로 친구를 소개해요(하루 3마리까지)</p>
+  <div class="row" style="justify-content:center"><button class="btn main" id="start">숲으로 들어가기</button></div>
+</div></div>
+
+<div class="panel" id="dlg"><div class="card">
+  <h3 id="dlgT"></h3><div class="who" id="dlgW"></div>
+  <div id="dlgB"></div>
+  <div class="row" id="dlgR"></div>
+</div></div>
+
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {makeChibi, animateChibi, doAct} from '../chibi.js';
+
+const Q=new URLSearchParams(location.search),$=id=>document.getElementById(id);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+
+/* ── 몽글이 12종 (오리지널) ─────────────────────────
+   r = 드묾(1 흔함 · 2 드묾 · 3 아주 드묾), z = 사는 곳, night = 밤에만 */
+const MONS=[
+  {n:'포실',k:'눈뭉치',r:1,z:'snow',c:0xf4f6fa,b:0xdfe6f0,ear:'round',tail:'fluff',d:'눈밭에서 굴러다니다 몸이 커졌다. 따뜻한 손에 오래 있으면 조금 작아진다.'},
+  {n:'모스랑',k:'이끼',r:1,z:'forest',c:0x6f9a4a,b:0xb8cf8a,ear:'leaf',tail:'leaf',d:'나무 그늘에서 낮잠을 잔다. 등에 작은 새싹이 하나씩 자란다.'},
+  {n:'또롱',k:'물방울',r:1,z:'pond',c:0x7fb8e0,b:0xcfe6f6,ear:'none',tail:'thin',shape:'drop',d:'연못가에서 톡톡 뛴다. 비 오는 날엔 친구가 갑자기 많아진다.'},
+  {n:'도르르',k:'도토리',r:1,z:'forest',c:0xa8743f,b:0xe0c08a,ear:'round',tail:'thin',extra:'acorn',d:'모자를 절대 벗지 않는다. 떨어질 땐 데굴데굴 굴러서 간다.'},
+  {n:'단단이',k:'조약돌',r:1,z:'rocks',c:0x8d9096,b:0xb9bcc2,ear:'none',tail:'none',shape:'flat',d:'돌무더기 사이에 끼어 있으면 아무도 못 찾는다. 열매를 받으면 눈을 뜬다.'},
+  {n:'휘휘',k:'바람',r:2,z:'meadow',c:0xbfe6d8,b:0xeaf7f1,ear:'long',tail:'fluff',d:'긴 귀로 바람을 잡아 둥실 떠오른다. 착지는 늘 서툴다.'},
+  {n:'봉오리',k:'꽃',r:2,z:'meadow',c:0xf2a6bc,b:0xfde3ea,ear:'petal',tail:'leaf',d:'해가 뜨면 머리의 꽃잎이 활짝 핀다. 칭찬을 들어도 핀다.'},
+  {n:'깜빡이',k:'불씨',r:2,z:'camp',c:0xf08a3c,b:0xfbd38a,ear:'cone',tail:'flame',d:'모닥불 옆을 좋아한다. 졸리면 꼬리 불이 깜빡깜빡한다.'},
+  {n:'송송',k:'버섯',r:2,z:'forest',c:0xf1e3c8,b:0xfff6e4,ear:'none',tail:'none',extra:'cap',d:'비 온 다음 날 숲에서 쏙 올라온다. 모자 점은 셀 때마다 개수가 다르다.'},
+  {n:'뭉게',k:'구름',r:3,z:'meadow',c:0xe6e0f4,b:0xffffff,ear:'round',tail:'fluff',extra:'cloud',float:1,d:'풀밭 위를 낮게 떠다닌다. 보기 드물어서 만나면 그날은 운이 좋다고 한다.'},
+  {n:'달콩',k:'밤하늘',r:3,z:'pond',c:0x2f3d6e,b:0x55649a,ear:'long',tail:'thin',extra:'stars',night:1,d:'밤에만 연못에 비친 별을 주우러 나온다. 몸의 점은 그날 주운 별이다.'},
+  {n:'반짝',k:'반딧불',r:3,z:'forest',c:0xf2dc5a,b:0xfff3a8,ear:'none',tail:'none',extra:'antenna',float:1,night:1,d:'어두운 숲에서 꼬리 끝이 빛난다. 손뼉을 치면 깜짝 놀라 더 밝아진다.'},
+];
+const ZONES={snow:[[-30,-28],9],forest:[[-6,-34],14],pond:[[26,4],8],rocks:[[-32,14],7],meadow:[[12,26],12],camp:[[0,6],4]};
+
+/* ── 날마다 같은 숲 — 한국 날짜로 씨앗을 만들어 모두에게 같은 몽글이·같은 자리 ── */
+const kstNow=()=>new Date(Date.now()+9*3600e3);
+const dayKey=Q.get('day')||kstNow().toISOString().slice(0,10);
+const HOUR=Q.has('hour')?+Q.get('hour'):kstNow().getUTCHours()+kstNow().getUTCMinutes()/60;
+const NIGHT=HOUR>=19||HOUR<6;
+function rng(seed){let a=0;for(const ch of seed)a=Math.imul(a^ch.charCodeAt(0),2654435761)>>>0;return()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const R=rng('mong'+dayKey);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=R()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
+const byR=r=>MONS.map((m,i)=>i).filter(i=>MONS[i].r===r);
+// 오늘: 흔함 4 · 드묾 2 · 아주 드묾 1 (밤 친구가 뽑히면 밤에만 보임)
+const TODAY=[...shuffle(byR(1)).slice(0,4),...shuffle(byR(2)).slice(0,2),shuffle(byR(3))[0]];
+const RARE=TODAY[6];
+const SPAWNS=[];
+for(const id of TODAY){const m=MONS[id],[[zx,zz],zr]=ZONES[m.z],k=m.r===1?3:m.r===2?2:1;
+  for(let i=0;i<k;i++){const a=R()*Math.PI*2,d=R()*zr;SPAWNS.push({id,home:[zx+Math.cos(a)*d,zz+Math.sin(a)*d]});}}
+
+/* ── 기록 ── */
+const book=LS.get('mong-book',{});               // {id:{n:만난 횟수,first:'날짜'}}
+let petId=LS.get('mong-pet',null);
+const ADJ=['포근한','졸린','느긋한','두근두근','바스락','조용한','신난','꼼꼼한'],NOUN=['솔방울','도시락','돗자리','장화','바구니','손전등','모자','열매'];
+const nick=LS.get('mong-nick',null)||ADJ[Math.random()*ADJ.length|0]+' '+NOUN[Math.random()*NOUN.length|0];LS.set('mong-nick',nick);
+const LOOK=LS.get('mong-look',null)||(()=>{const p=a=>a[Math.random()*a.length|0];
+  const l={coat:p([0x3f7a4a,0x7a5a3a,0xc9872f,0x4a5a7a,0x9a4a4a,0x5a7a7a]),scarf:p([0xf2c14e,0xe07a5f,0x81b29a,0xf4f1de,0x3d405b]),hair:p([0x2a2018,0x141414,0x5a3a20,0x8a6a40]),pants:p([0x3a3f4a,0x4a3a2a,0x2b2b2b])};
+  LS.set('mong-look',l);return l;})();
+$('nick').textContent='🧺 '+nick;
+// 받침 있으면 a(이·과), 없으면 b(가·와)
+const jo=(w,a,b)=>{const c=w.charCodeAt(w.length-1)-0xAC00;return w+(c>=0&&c<11172&&c%28?a:b);};
+const stars=r=>'<span class="stars">'+'★'.repeat(r)+'☆'.repeat(3-r)+'</span>';
+const todayNames=TODAY.map(i=>MONS[i].n+(MONS[i].night?'(밤)':''));
+$('introW').textContent=dayKey.replace(/^(\d+)-(\d+)-(\d+)$/,(_,y,m,d)=>`${+m}월 ${+d}일`)+'의 숲 · '+(NIGHT?'밤':'낮');
+$('introToday').innerHTML=`오늘 나온 몽글이 <b>${TODAY.length}종</b> — 그중 아주 드문 친구: <b>${book[RARE]?MONS[RARE].n:'???'}</b> ${stars(3)}${MONS[RARE].night&&!NIGHT?'<br>(이 친구는 밤에만 나와요)':''}`;
+
+/* ── 장면 ── */
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);
+renderer.shadowMap.enabled=true;document.body.appendChild(renderer.domElement);
+const scene=new THREE.Scene(),SKY=NIGHT?0x101a2a:0xbfe0f0;scene.background=new THREE.Color(SKY);scene.fog=new THREE.Fog(SKY,35,95);
+const camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.1,200);
+scene.add(new THREE.HemisphereLight(NIGHT?0x6a7fb0:0xfff4dc,NIGHT?0x1a2a1a:0x5a7a4a,NIGHT?0.75:1.1));
+const sun=new THREE.DirectionalLight(NIGHT?0xb0c4ff:0xfff0d0,NIGHT?0.45:1.1);sun.position.set(-25,40,15);sun.castShadow=true;
+Object.assign(sun.shadow.camera,{left:-60,right:60,top:60,bottom:-60});sun.shadow.mapSize.set(2048,2048);scene.add(sun);
+const L=c=>new THREE.MeshLambertMaterial({color:c});
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(140,140),L(NIGHT?0x2f4a30:0x7fae5a));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+function patch(x,z,r,c,y=0.012){const m=new THREE.Mesh(new THREE.CircleGeometry(r,32),L(c));m.rotation.x=-Math.PI/2;m.position.set(x,y,z);m.receiveShadow=true;scene.add(m);return m;}
+patch(-30,-28,11,0xf1f4f8);                        // 눈밭
+const pond=patch(26,4,8,NIGHT?0x2a4a7a:0x5aa0d0,0.02);pond.material=new THREE.MeshPhongMaterial({color:NIGHT?0x2a4a7a:0x5aa0d0,shininess:90});
+patch(12,26,13,NIGHT?0x3a5a32:0x9cc46a);           // 풀밭
+patch(0,6,4.5,0x8a7a5a);                           // 모닥불 자리
+const path=new THREE.Mesh(new THREE.PlaneGeometry(4,80),L(NIGHT?0x4a4a3a:0xcdb88a));path.rotation.x=-Math.PI/2;path.position.set(0,0.011,0);scene.add(path);
+
+const solids=[];   // [x,z,반지름]
+function tree(x,z,s=1){const g=new THREE.Group();
+  const tr=new THREE.Mesh(new THREE.CylinderGeometry(0.25*s,0.35*s,1.6*s,8),L(0x6b4a2e));tr.position.y=0.8*s;tr.castShadow=true;g.add(tr);
+  for(let i=0;i<3;i++){const c=new THREE.Mesh(new THREE.ConeGeometry((1.8-i*0.45)*s,1.8*s,9),L(NIGHT?0x2a4a2a:[0x3f7a3a,0x4a8a42,0x56994a][i]));c.position.y=(1.8+i*1.0)*s;c.castShadow=true;g.add(c);}
+  g.position.set(x,0,z);scene.add(g);solids.push([x,z,0.7*s]);}
+function rock(x,z,s){const m=new THREE.Mesh(new THREE.DodecahedronGeometry(s,0),L(0x8a8c90));m.position.set(x,s*0.5,z);m.rotation.set(R(),R(),R());m.castShadow=true;scene.add(m);solids.push([x,z,s*0.9]);}
+{const TR=rng('mong-map');   // 지형은 날마다 같게
+ for(let i=0;i<70;i++){const a=TR()*Math.PI*2,d=44+TR()*14;tree(Math.cos(a)*d,Math.sin(a)*d,1+TR()*0.6);}          // 숲 가장자리
+ for(let i=0;i<16;i++){tree(-6+(TR()-.5)*30,-34+(TR()-.5)*16,0.8+TR()*0.5);}                                     // 북쪽 숲
+ for(let i=0;i<7;i++)rock(-32+(TR()-.5)*12,14+(TR()-.5)*10,0.6+TR()*0.9);                                          // 돌무더기
+ for(let i=0;i<40;i++){const a=TR()*Math.PI*2,d=TR()*12,f=new THREE.Mesh(new THREE.SphereGeometry(0.14,6,5),L([0xf2a6bc,0xf2dc5a,0xffffff,0xc9a6f2][i%4]));
+   f.position.set(12+Math.cos(a)*d,0.18,26+Math.sin(a)*d);scene.add(f);}}                                          // 꽃
+// 모닥불
+const fire=new THREE.Group();fire.position.set(0,0,6);scene.add(fire);solids.push([0,6,0.9]);
+for(let i=0;i<5;i++){const lg=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,1.4,6),L(0x5a3a22));lg.rotation.z=Math.PI/2;lg.rotation.y=i*Math.PI/5*2;lg.position.y=0.15;fire.add(lg);}
+const flame=new THREE.Mesh(new THREE.ConeGeometry(0.45,1.1,8),new THREE.MeshBasicMaterial({color:0xffa040}));flame.position.y=0.7;fire.add(flame);
+const fireLight=new THREE.PointLight(0xffa050,NIGHT?30:8,14);fireLight.position.y=1.4;fire.add(fireLight);
+// 밤엔 반딧불 가루
+const DUST=NIGHT?160:0,dustGeo=new THREE.BufferGeometry(),dp=new Float32Array(DUST*3);
+for(let i=0;i<DUST;i++){dp[i*3]=(Math.random()-.5)*90;dp[i*3+1]=0.5+Math.random()*3;dp[i*3+2]=(Math.random()-.5)*90;}
+dustGeo.setAttribute('position',new THREE.BufferAttribute(dp,3));if(DUST)scene.add(new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0xfff09a,size:3,sizeAttenuation:false})));
+
+function label(text,scale=0.45){const c=document.createElement('canvas'),g=c.getContext('2d');g.font='bold 44px Malgun Gothic, sans-serif';const w=g.measureText(text).width+40;
+  c.width=w;c.height=72;g.fillStyle='#f4ecdc';g.fillRect(0,0,w,72);g.strokeStyle='#2b2620';g.lineWidth=5;g.strokeRect(2,2,w-4,68);
+  g.fillStyle='#2b2620';g.font='bold 44px Malgun Gothic, sans-serif';g.textBaseline='middle';g.fillText(text,20,38);
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false}));s.scale.set(w/72*scale,scale,1);s.renderOrder=10;return s;}
+
+/* ── 몽글이 만들기 — 그림 파일 없이 도형으로 ── */
+function makeMon(id){
+  const m=MONS[id],g=new THREE.Group(),root=new THREE.Group();g.add(root);
+  const M=c=>{const col=new THREE.Color(c);return new THREE.MeshLambertMaterial({color:col,emissive:col.clone().multiplyScalar(m.extra==='antenna'&&c===m.b?0.6:0.15)});};
+  const fur=M(m.c),belly=M(m.b),ink=new THREE.MeshBasicMaterial({color:0x1b1714});
+  const add=(geo,mat,x,y,z,p=root)=>{const o=new THREE.Mesh(geo,mat);o.position.set(x,y,z);o.castShadow=true;p.add(o);return o;};
+  const body=add(new THREE.SphereGeometry(0.42,18,14),fur,0,0.42,0);
+  if(m.shape==='drop'){body.scale.set(1,1.05,1);add(new THREE.ConeGeometry(0.3,0.42,16),fur,0,0.92,0);}
+  else if(m.shape==='flat')body.scale.set(1.2,0.72,1.05);
+  else body.scale.set(1,0.95,1);
+  add(new THREE.SphereGeometry(0.3,14,10),belly,0,0.36,0.17).scale.set(1,0.9,0.55);
+  for(const x of [-1,1]){add(new THREE.SphereGeometry(0.055,8,6),ink,x*0.15,0.52,0.38);
+    const bl=add(new THREE.CircleGeometry(0.06,10),new THREE.MeshBasicMaterial({color:0xf29a9a,transparent:true,opacity:.7}),x*0.25,0.43,0.36);bl.rotation.y=x*0.5;
+    add(new THREE.SphereGeometry(0.09,8,6),fur,x*0.2,0.07,0.12).scale.set(1,0.6,1.3);}            // 발
+  const ears=[];const top=m.shape==='flat'?0.7:0.78;
+  for(const x of [-1,1]){let e=null;
+    if(m.ear==='round')e=add(new THREE.SphereGeometry(0.12,10,8),fur,x*0.24,top,0);
+    if(m.ear==='cone'){e=add(new THREE.ConeGeometry(0.11,0.26,6),fur,x*0.22,top+0.06,0);e.rotation.z=-x*0.3;}
+    if(m.ear==='long'){e=add(new THREE.CapsuleGeometry(0.07,0.42,4,8),fur,x*0.16,top+0.24,-0.02);e.rotation.z=-x*0.25;}
+    if(m.ear==='leaf'||m.ear==='petal'){e=add(new THREE.SphereGeometry(0.14,10,8),M(m.ear==='petal'?0xf7c8d6:0x8fc06a),x*0.18,top+0.08,0);e.scale.set(0.55,1.2,0.25);e.rotation.z=-x*0.5;}
+    if(e)ears.push(e);}
+  if(m.ear==='petal')for(let i=0;i<5;i++){const a=i/5*Math.PI*2,p=add(new THREE.SphereGeometry(0.1,8,6),M(0xf7c8d6),Math.cos(a)*0.13,top+0.12,Math.sin(a)*0.13);p.scale.set(1,0.4,1);}
+  const tail=new THREE.Group();tail.position.set(0,0.32,-0.38);root.add(tail);
+  if(m.tail==='fluff')add(new THREE.SphereGeometry(0.15,10,8),belly,0,0,-0.04,tail);
+  if(m.tail==='thin'){const t=add(new THREE.CapsuleGeometry(0.04,0.32,4,6),fur,0,0.14,-0.08,tail);t.rotation.x=-0.7;}
+  if(m.tail==='leaf'){const t=add(new THREE.SphereGeometry(0.15,10,8),M(0x8fc06a),0,0.12,-0.08,tail);t.scale.set(0.5,1.3,0.25);t.rotation.x=-0.6;}
+  if(m.tail==='flame'){const t=add(new THREE.ConeGeometry(0.12,0.38,8),new THREE.MeshBasicMaterial({color:0xffb040}),0,0.2,-0.06,tail);t.rotation.x=-0.5;g.userData.flame=t;}
+  if(m.extra==='acorn'){add(new THREE.SphereGeometry(0.4,16,10,0,Math.PI*2,0,Math.PI*0.42),M(0x6b4a2e),0,0.6,0);add(new THREE.CylinderGeometry(0.03,0.03,0.12,6),M(0x4a3020),0,1.0,0);}
+  if(m.extra==='cap'){add(new THREE.SphereGeometry(0.5,18,10,0,Math.PI*2,0,Math.PI*0.5),M(0xd04a3a),0,0.62,0).scale.set(1,0.75,1);
+    for(let i=0;i<6;i++){const a=i/6*Math.PI*2;add(new THREE.SphereGeometry(0.06,8,6),M(0xffffff),Math.cos(a)*0.3,0.86,Math.sin(a)*0.3);}}
+  if(m.extra==='cloud')for(let i=0;i<5;i++){const a=i/5*Math.PI*2;add(new THREE.SphereGeometry(0.2,10,8),belly,Math.cos(a)*0.38,0.35,Math.sin(a)*0.38);}
+  if(m.extra==='stars')for(let i=0;i<7;i++){const a=i*2.4,y=0.3+((i*37)%5)/10;add(new THREE.SphereGeometry(0.03,6,4),new THREE.MeshBasicMaterial({color:0xfff2a0}),Math.cos(a)*0.41*Math.cos(y-0.42),y,Math.sin(a)*0.41);}
+  if(m.extra==='antenna')for(const x of [-1,1]){const a=add(new THREE.CylinderGeometry(0.015,0.015,0.3,5),ink,x*0.1,0.92,0);a.rotation.z=-x*0.3;
+    add(new THREE.SphereGeometry(0.05,8,6),new THREE.MeshBasicMaterial({color:0xfff2a0}),x*0.15,1.06,0);}
+  if(m.extra==='antenna'||m.tail==='flame'){const pl=new THREE.PointLight(m.tail==='flame'?0xffa040:0xfff2a0,NIGHT?6:2,4);pl.position.y=0.6;g.add(pl);}
+  const sh=new THREE.Mesh(new THREE.CircleGeometry(0.4,16),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.15}));sh.rotation.x=-Math.PI/2;sh.position.y=0.02;g.add(sh);
+  g.userData={root,tail,ears,id,ph:Math.random()*6,hop:0,float:m.float?0.6:0};
+  return g;
+}
+function animateMon(g,t,dt,walk){const u=g.userData;
+  u.tail.rotation.y=Math.sin(t*(walk?9:3)+u.ph)*0.5;
+  if(u.hop>0){u.hop-=dt;u.root.position.y=u.float+Math.abs(Math.sin(u.hop*12))*0.45;}
+  else u.root.position.y=u.float+(walk?Math.abs(Math.sin(t*10+u.ph))*0.12:Math.sin(t*2+u.ph)*0.03)+(u.float?Math.sin(t*1.5+u.ph)*0.15:0);
+  u.root.scale.y=1+Math.sin(t*2.4+u.ph)*0.025;
+  for(const e of u.ears)e.rotation.x=Math.sin(t*3+u.ph)*0.12;
+  if(g.userData.flame)g.userData.flame.scale.y=1+Math.sin(t*14)*0.2;}
+
+/* ── 사람 ── */
+function person(look,name){const g=makeChibi(look);g.scale.setScalar(1.25);
+  const sh=new THREE.Mesh(new THREE.CircleGeometry(0.5,20),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.15}));sh.rotation.x=-Math.PI/2;sh.position.y=0.02;g.add(sh);
+  if(name){const l=label(name,0.42);l.position.y=2.55;g.add(l);}scene.add(g);return g;}
+const player=person(LOOK);player.position.set(0,0,14);
+const lantern=new THREE.PointLight(0xffe0b0,NIGHT?12:0,10);scene.add(lantern);
+
+/* ── 숲에 나온 몽글이들 ── */
+for(const s of SPAWNS){const m=MONS[s.id];s.obj=makeMon(s.id);s.obj.scale.setScalar(1.3);s.obj.position.set(s.home[0],0,s.home[1]);s.obj.rotation.y=R()*6;
+  s.goal=null;s.wait=R()*3;s.away=0;s.visible=!m.night||NIGHT;s.obj.visible=s.visible;scene.add(s.obj);}
+// 데리고 다니는 몽글이
+let pet=null;function setPet(id){if(pet){scene.remove(pet);pet=null;}petId=id;LS.set('mong-pet',id);
+  if(id!=null){pet=makeMon(id);pet.scale.setScalar(1);pet.position.copy(player.position).add(new THREE.Vector3(1,0,1));scene.add(pet);}
+  if(liveReady)liveReHi();}
+let liveReady=false;
+
+/* ── 조작 ── */
+const keys={};let target=null,near=null,nearP=null,busy=false;
+addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if((e.key===' '||e.key==='Enter')&&!busy&&(near||nearP)&&$('dlg').style.display!=='flex')interact();});
+addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
+const ray=new THREE.Raycaster(),mv=new THREE.Vector2();
+renderer.domElement.addEventListener('pointerdown',e=>{if(busy)return;mv.set(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1);ray.setFromCamera(mv,camera);
+  const h=ray.intersectObject(ground)[0];if(h)target=h.point.clone();});
+function blocked(x,z){if(Math.hypot(x,z)>52)return true;if(Math.hypot(x-26,z-4)<7.4)return true;for(const [sx,sz,r] of solids)if(Math.hypot(x-sx,z-sz)<r+0.35)return true;return false;}
+function turnTo(g,ang,k){let d=ang-g.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));g.rotation.y+=d*k;}
+function toast(t,ms=2600){$('toast').textContent=t;$('toast').style.opacity=1;clearTimeout(toast.h);toast.h=setTimeout(()=>$('toast').style.opacity=0,ms);}
+function dialog(title,who,html,buttons){$('dlgT').textContent=title;$('dlgW').textContent=who;$('dlgB').innerHTML=html;$('dlgR').innerHTML='';
+  for(const [txt,fn,cls] of buttons){const b=document.createElement('button');b.className='btn'+(cls?' '+cls:'');b.textContent=txt;b.onclick=()=>{$('dlg').style.display='none';busy=false;fn&&fn();};$('dlgR').appendChild(b);}
+  $('dlg').style.display='flex';busy=true;}
+$('start').onclick=()=>{$('intro').style.display='none';toast(NIGHT?'🌙 밤의 숲 — 반짝이는 친구를 찾아봐요':'🍓 열매를 들고 몽글이를 찾아봐요',3200);};
+if(Q.has('play'))$('intro').style.display='none';
+document.querySelectorAll('#acts [data-act]').forEach(b=>b.onclick=()=>{doAct(player,b.dataset.act);liveSend({t:'a',k:b.dataset.act});
+  if(pet)pet.userData.hop=0.8;for(const s of SPAWNS)if(s.visible&&s.obj.position.distanceTo(player.position)<6)s.obj.userData.hop=0.6;});
+$('act').onclick=()=>interact();
+
+/* ── 친구 되기 — 줄어드는 고리가 가운데 고리에 겹칠 때 누르기 ── */
+function interact(){if(!near&&nearP&&!busy){tradeStart(nearP);return;}
+  if(!near||busy)return;const s=near,m=MONS[s.id],known=!!book[s.id];
+  target=null;turnTo(player,Math.atan2(s.obj.position.x-player.position.x,s.obj.position.z-player.position.z),1);
+  const need=m.r,speed=[0,1.6,1.15,0.85][m.r];let hits=0,miss=0,t0=performance.now(),done=false,flash=0,flashOk=false;
+  dialog(known?m.n:'???',(known?m.k+' · ':'')+'드묾 '+'★'.repeat(m.r),`<div id="game"><canvas width="520" height="520"></canvas></div><p style="text-align:center;font-size:14px" id="gmsg">고리가 초록 칸에 겹칠 때 누르기 · ${need}번 성공하면 친구</p>`,[['그만두기',()=>{done=true;}]]);
+  const cv=$('dlgB').querySelector('canvas'),cx=cv.getContext('2d');
+  const thumb=monThumb(s.id);
+  function draw(){if(done)return;const T=((performance.now()-t0)/1000)%speed/speed,r=230*(1-T)+20;
+    cx.clearRect(0,0,520,520);cx.fillStyle='#fffaf0';cx.fillRect(0,0,520,520);
+    if(thumb.complete)cx.drawImage(thumb,130,120,260,260);
+    cx.lineWidth=26;cx.strokeStyle='rgba(63,122,74,.35)';cx.beginPath();cx.arc(260,260,118,0,Math.PI*2);cx.stroke();
+    cx.lineWidth=8;cx.strokeStyle=flash>0?(flashOk?'#3f7a4a':'#c9472f'):'#2b2620';cx.beginPath();cx.arc(260,260,r,0,Math.PI*2);cx.stroke();
+    cx.fillStyle='#2b2620';cx.font='bold 34px Malgun Gothic';cx.textAlign='center';cx.fillText('🍓'.repeat(hits)+'·'.repeat(need-hits),260,500);
+    cx.fillText('✕'.repeat(miss),260,50);if(flash>0)flash--;requestAnimationFrame(draw);}
+  draw();
+  const press=e=>{if(done)return;e&&e.preventDefault&&e.preventDefault();const T=((performance.now()-t0)/1000)%speed/speed,r=230*(1-T)+20;
+    const ok=Math.abs(r-118)<(Q.has('win')?999:20);   // ?win=1 시험용: 늘 성공
+    flash=12;flashOk=ok;if(ok){hits++;beep(880+hits*220);}else{miss++;beep(220,.2);}
+    t0=performance.now()-Math.random()*speed*400;   // 다음 고리는 조금 다른 자리에서
+    if(hits>=need)finish(true);else if(miss>=3)finish(false);};
+  cv.addEventListener('pointerdown',press);
+  const kh=e=>{if(e.key===' '||e.key==='Enter'){e.stopPropagation();press(e);}};addEventListener('keydown',kh,true);
+  function finish(ok){done=true;removeEventListener('keydown',kh,true);$('dlg').style.display='none';busy=false;
+    if(!ok){s.away=4;toast('💨 '+jo(known?m.n:'몽글이','이','가')+' 수풀로 숨었어요. 조금 뒤에 다시 와요');return;}
+    const first=!book[s.id];book[s.id]={n:(book[s.id]?.n||0)+1,first:book[s.id]?.first||dayKey};LS.set('mong-book',book);
+    s.obj.userData.hop=1.2;doAct(player,'cheer');beep(1320);beep(1760,.12,.13);liveSend({t:'a',k:'f'+s.id});refreshCnt();
+    setTimeout(()=>dialog(first?'새 친구! '+m.n:jo(m.n,'과','와')+' 또 만났어요',m.k+' · 드묾 '+'★'.repeat(m.r),
+      `<img src="${monThumb(s.id).src}" style="width:160px;display:block;margin:0 auto"><p>${m.d}</p><p style="font-size:13px;color:#7a6e5e">만난 횟수 ${book[s.id].n}번${first?' · 몽글 수첩에 적었어요':''}</p>`,
+      [['같이 다니기',()=>setPet(s.id),'main'],['숲으로',null]]),700);
+    s.away=60;}   // 1분 동안 이 자리엔 안 보임(다른 친구 찾으러)
+}
+let actx;function beep(f=880,len=.1,when=0){try{actx=actx||new AudioContext();const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=f;o.type='triangle';g.gain.value=.06;
+  o.connect(g).connect(actx.destination);o.start(actx.currentTime+when);o.stop(actx.currentTime+when+len);}catch(e){}}
+
+/* ── 몽글 수첩 — 작은 그림은 따로 그려 둔다 ── */
+let thumbR=null,thumbS=null,thumbC=null;const thumbs={};
+function monThumb(id){if(thumbs[id])return thumbs[id];
+  if(!thumbR){thumbR=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});thumbR.setSize(200,200);
+    thumbS=new THREE.Scene();thumbS.add(new THREE.HemisphereLight(0xffffff,0x8a8a7a,1.3));const dl=new THREE.DirectionalLight(0xffffff,0.7);dl.position.set(2,3,4);thumbS.add(dl);
+    thumbC=new THREE.PerspectiveCamera(30,1,0.1,20);thumbC.position.set(0.8,1.1,2.7);thumbC.lookAt(0,0.68,0);}
+  const g=makeMon(id);g.rotation.y=0.35;thumbS.add(g);thumbR.render(thumbS,thumbC);thumbS.remove(g);
+  const img=new Image();img.src=thumbR.domElement.toDataURL('image/png');thumbs[id]=img;return img;}
+function refreshCnt(){$('cnt').textContent=Object.keys(book).length;}
+refreshCnt();
+$('bookBtn').onclick=()=>{
+  const cells=MONS.map((m,i)=>{const k=book[i],today=TODAY.includes(i);
+    return `<div class="mon${k?'':' no'}${petId===i?' pet':''}" data-i="${i}"><img src="${monThumb(i).src}" alt=""><b>${k?m.n:'???'}</b>${stars(m.r)}${today?'<br><small>오늘 숲에 있어요</small>':''}</div>`;}).join('');
+  dialog('몽글 수첩',`친구 ${Object.keys(book).length}/12 · 눌러서 같이 다닐 친구 고르기`,`<div class="grid">${cells}</div><p class="today">오늘 숲: ${todayNames.join(' · ')}</p>`,
+    [['혼자 다니기',()=>setPet(null)],['닫기',null,'main']]);
+  $('dlgB').querySelectorAll('.mon').forEach(el=>el.onclick=()=>{const i=+el.dataset.i;if(!book[i])return;
+    const m=MONS[i];$('dlg').style.display='none';busy=false;
+    dialog(m.n,m.k+' · 드묾 '+'★'.repeat(m.r),`<img src="${monThumb(i).src}" style="width:160px;display:block;margin:0 auto"><p>${m.d}</p><p style="font-size:13px;color:#7a6e5e">처음 만난 날 ${book[i].first} · 만난 횟수 ${book[i].n}번${book[i].from?' · '+esc(book[i].from)+' 님이 소개':''}</p>`,
+      [['같이 다니기',()=>setPet(i),'main'],['닫기',null]]);});
+};
+
+/* ── 교환 — 가까운 사람과 친구를 하나씩 소개해 주고받기 ──
+   A 제안(offer, 내 친구 a) → B 답례 고르기(answer, b) → A 확인(ok) → 둘 다 수첩에 「○○ 님이 소개」로 적힘.
+   내 수첩에서 빠지지 않는다(수첩 = 만난 기록). 소개로 받는 건 하루 3마리까지 */
+const TRADE_MAX=3,esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+let trade=null;   // {with:id, nick, role:'A'|'B', mine, theirs, t}
+const tradeLeft=()=>{const d=LS.get('mong-trade',{});return d.day===dayKey?TRADE_MAX-d.n:TRADE_MAX;};
+function tradeUse(){const d=LS.get('mong-trade',{});LS.set('mong-trade',{day:dayKey,n:(d.day===dayKey?d.n:0)+1});}
+function sendX(to,op,m=-1){liveSend({t:'x',to,op,m});}
+function pickFriend(title,who,onPick,extra=[]){
+  const have=MONS.map((m,i)=>i).filter(i=>book[i]);
+  const cells=have.map(i=>`<div class="mon" data-i="${i}"><img src="${monThumb(i).src}" alt=""><b>${MONS[i].n}</b>${stars(MONS[i].r)}</div>`).join('');
+  dialog(title,who,have.length?`<div class="grid">${cells}</div>`:'<p>아직 소개할 친구가 없어요.</p>',extra);
+  $('dlgB').querySelectorAll('.mon').forEach(el=>el.onclick=()=>{$('dlg').style.display='none';busy=false;onPick(+el.dataset.i);});}
+function tradeStart(o){
+  if(trade){toast('교환을 하나 기다리는 중이에요');return;}
+  if(!Object.keys(book).length){toast('먼저 숲에서 친구를 사귀어 봐요');return;}
+  if(tradeLeft()<=0){toast(`오늘 소개받기는 ${TRADE_MAX}번을 다 썼어요. 내일 또 해요`);return;}
+  target=null;
+  pickFriend(`🔁 ${o.nick} 님과 교환`,`내가 소개할 친구를 골라요 · 오늘 ${tradeLeft()}번 남음`,i=>{
+    trade={with:o.id,nick:o.nick,role:'A',mine:i,t:Date.now()};sendX(o.id,'offer',i);
+    toast(`${o.nick} 님에게 ${jo(MONS[i].n,'을','를')} 내밀었어요 · 답을 기다려요`,3500);},[['그만두기',null]]);}
+function tradeGot(id,fromNick){
+  const first=!book[id];book[id]={n:(book[id]?.n||0)+1,first:book[id]?.first||dayKey,from:book[id]?.from||fromNick};
+  LS.set('mong-book',book);tradeUse();refreshCnt();doAct(player,'cheer');beep(1320);beep(1760,.12,.13);
+  dialog(first?'새 친구! '+MONS[id].n:jo(MONS[id].n,'이','가')+' 또 왔어요',`${fromNick} 님이 소개해 줬어요`,
+    `<img src="${monThumb(id).src}" style="width:160px;display:block;margin:0 auto"><p>${MONS[id].d}</p>`,[['같이 다니기',()=>setPet(id),'main'],['숲으로',null]]);}
+function onTrade(x){
+  const o=others.get(x.from);if(!o)return;
+  if(x.op==='offer'){
+    // 바쁘거나, 다른 교환 중이거나, 오늘 다 받았으면 정중히 거절
+    if(busy||trade||tradeLeft()<=0||!MONS[x.m]){sendX(x.from,'no');return;}
+    trade={with:x.from,nick:o.nick,role:'B',theirs:x.m,t:Date.now()};
+    const m=MONS[x.m];
+    dialog(`🔁 ${o.nick} 님의 교환 제안`,`${jo(m.n,'을','를')} 소개해 주고 싶대요 · 답례로 줄 친구를 골라요`,
+      `<div style="display:flex;gap:10px;align-items:center"><img src="${monThumb(x.m).src}" style="width:90px"><div><b>${m.n}</b> ${stars(m.r)}<br><small>${book[x.m]?'이미 만난 친구예요':'아직 못 만난 친구!'}</small></div></div>`,
+      [['거절',()=>{sendX(x.from,'no');trade=null;}],['답례 고르기',()=>{
+        pickFriend('답례로 소개할 친구',`${o.nick} 님에게 줄 친구`,i=>{trade.mine=i;sendX(x.from,'answer',i);toast(`${jo(MONS[i].n,'을','를')} 내밀었어요 · ${o.nick} 님 확인을 기다려요`,3500);},
+          [['거절',()=>{sendX(x.from,'no');trade=null;}],
+           ...(Object.keys(book).length?[]:[['답례 없이 받기',()=>{trade.mine=-1;sendX(x.from,'answer',-1);toast(`${o.nick} 님 확인을 기다려요`);},'main']])]);},'main']]);
+  } else if(x.op==='answer'&&trade&&trade.role==='A'&&trade.with===x.from&&!MONS[x.m]){
+    // 상대는 아직 친구가 없음 — 답례 없이 소개만 해 줄지
+    trade.theirs=-1;
+    dialog(`🔁 ${o.nick} 님의 답`,'아직 친구가 없어서 답례할 수 없대요',`<p>${jo(MONS[trade.mine].n,'을','를')} 그냥 소개해 줄까요? 내 수첩에서는 빠지지 않아요.</p>`,
+      [['그만두기',()=>{sendX(x.from,'no');trade=null;}],['소개해 주기',()=>{sendX(x.from,'ok');trade=null;toast('🎁 소개해 줬어요');doAct(player,'wave');},'main']]);
+  } else if(x.op==='answer'&&trade&&trade.role==='A'&&trade.with===x.from){
+    trade.theirs=x.m;const m=MONS[x.m];
+    dialog(`🔁 ${o.nick} 님의 답례`,`내 ${MONS[trade.mine].n} ↔ ${o.nick} 님의 ${m.n}`,
+      `<div style="display:flex;gap:10px;align-items:center;justify-content:center"><img src="${monThumb(trade.mine).src}" style="width:90px"><b style="font-size:22px">⇄</b><img src="${monThumb(x.m).src}" style="width:90px"></div><p style="text-align:center;font-size:13px">${book[x.m]?'이미 만난 친구예요':'아직 못 만난 친구!'} · 내 수첩의 친구는 그대로 남아요</p>`,
+      [['그만두기',()=>{sendX(x.from,'no');trade=null;}],['교환해요',()=>{sendX(x.from,'ok');const got=trade.theirs;trade=null;tradeGot(got,o.nick);},'main']]);
+  } else if(x.op==='ok'&&trade&&trade.role==='B'&&trade.with===x.from){const got=trade.theirs;trade=null;tradeGot(got,o.nick);
+  } else if(x.op==='no'&&trade&&trade.with===x.from){trade=null;if($('dlg').style.display==='flex'&&$('dlgT').textContent.startsWith('🔁')){$('dlg').style.display='none';busy=false;}
+    toast(`${o.nick} 님이 지금은 교환하기 어렵대요`);}
+}
+setInterval(()=>{if(trade&&Date.now()-trade.t>60000){if(trade.role==='A'&&trade.theirs==null)toast('답이 없어서 교환을 접었어요');trade=null;}},5000);
+
+/* ── 같이 있는 사람들 — 실시간(추리마을과 같은 서버 village-live, 방 mong-N) ── */
+const LIVE_WS='wss://village-live.swbins.workers.dev/ws',others=new Map();
+let ws=null,roomN=0,retry=0,lastSent=0,sx=NaN,sz=NaN,sr=NaN,hiddenAt=0;
+function liveSend(o){if(ws&&ws.readyState===1)try{ws.send(JSON.stringify(o));}catch(e){}}
+function myLook(){return petId!=null?{...LOOK,pet:petId}:LOOK;}
+function liveReHi(){if(ws){try{ws.close();}catch(e){}}}   // 데리고 다니는 친구가 바뀌면 다시 접속해 새 모습 알림
+function crowdChip(){$('crowd').style.display=ws&&ws.readyState===1?'':'none';$('crowd').textContent=others.size?`👥 같이 ${others.size+1}명`:'👥 지금은 나 혼자';}
+function addOther(p){if(others.has(p.id))return;const l=p.look||{},g=person(l.coat!=null?l:{coat:0x6a6a6a},'🧺 '+p.nick);g.position.set(p.x,0,p.z);g.rotation.y=p.r;
+  let pg=null;if(Number.isInteger(l.pet)&&MONS[l.pet]){pg=makeMon(l.pet);pg.scale.setScalar(1);pg.position.set(p.x+1,0,p.z+1);scene.add(pg);}
+  others.set(p.id,{g,pg,nick:p.nick,x:p.x,z:p.z,r:p.r});crowdChip();}
+function dropOther(id){const o=others.get(id);if(!o)return;scene.remove(o.g);if(o.pg)scene.remove(o.pg);others.delete(id);crowdChip();}
+function liveConnect(){if(Q.has('solo')||ws)return;
+  try{ws=new WebSocket(`${LIVE_WS}?room=mong-${roomN}`);}catch(e){ws=null;return;}
+  ws.onopen=()=>{retry=0;sx=NaN;ws.send(JSON.stringify({t:'hi',nick,look:myLook(),x:player.position.x,z:player.position.z,r:player.rotation.y}));crowdChip();};
+  ws.onmessage=e=>{if(e.data==='pong')return;let m;try{m=JSON.parse(e.data);}catch(_){return;}
+    if(m.t==='all'){for(const id of [...others.keys()])dropOther(id);m.list.forEach(addOther);}
+    else if(m.t==='join'){addOther(m);toast('👋 '+m.nick+' 님이 숲에 왔어요');}
+    else if(m.t==='bye'){if(trade&&trade.with===m.id){trade=null;toast('교환 상대가 숲을 떠났어요');}dropOther(m.id);}
+    else if(m.t==='p'){const o=others.get(m.id);if(o){o.x=m.x;o.z=m.z;o.r=m.r;}}
+    else if(m.t==='a'){const o=others.get(m.id);if(!o)return;
+      if(m.k==='wave'||m.k==='cheer')doAct(o.g,m.k);
+      else if(/^f\d+$/.test(m.k)){const id=+m.k.slice(1);doAct(o.g,'cheer');if(MONS[id])toast(`🎉 ${o.nick} 님이 ${jo(book[id]?MONS[id].n:'새 몽글이','과','와')} 친구가 됐어요`);}}
+    else if(m.t==='x')onTrade(m);
+    else if(m.t==='full')roomN=(roomN+1)%6;};
+  ws.onclose=()=>{ws=null;for(const id of [...others.keys()])dropOther(id);crowdChip();if(!document.hidden)setTimeout(liveConnect,Math.min(30000,1000*2**retry++));};
+  ws.onerror=()=>{};}
+setInterval(()=>{if(ws&&ws.readyState===1)ws.send('ping');if(document.hidden&&hiddenAt&&Date.now()-hiddenAt>120000&&ws)ws.close();},30000);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)hiddenAt=Date.now();else{hiddenAt=0;if(!ws)liveConnect();}});
+if(petId!=null&&book[petId])setPet(petId);
+liveReady=true;liveConnect();
+
+/* ── 루프 ── */
+const clock=new THREE.Clock(),camPos=new THREE.Vector3();
+function tick(){
+  const dt=Math.min(clock.getDelta(),0.05),t=clock.elapsedTime,p=player.position;
+  let dx=0,dz=0;
+  if(!busy){if(keys['arrowup']||keys['w'])dz-=1;if(keys['arrowdown']||keys['s'])dz+=1;if(keys['arrowleft']||keys['a'])dx-=1;if(keys['arrowright']||keys['d'])dx+=1;}
+  if(dx||dz)target=null;else if(target&&!busy){dx=target.x-p.x;dz=target.z-p.z;if(Math.hypot(dx,dz)<0.3){target=null;dx=dz=0;}}
+  const len=Math.hypot(dx,dz);
+  if(len>0){const sp=6.5*dt,nx=p.x+dx/len*sp,nz=p.z+dz/len*sp;if(!blocked(nx,p.z))p.x=nx;if(!blocked(p.x,nz))p.z=nz;turnTo(player,Math.atan2(dx,dz),0.25);}
+  animateChibi(player,t,dt,{walk:len>0});
+  // 몽글이: 집 근처를 어슬렁, 가까이 오면 쳐다봄, 뛰어오면 살짝 물러남
+  near=null;let best=2.6;
+  for(const s of SPAWNS){const g=s.obj;if(!s.visible)continue;
+    if(s.away>0){s.away-=dt;g.visible=false;continue;}g.visible=true;
+    const d=g.position.distanceTo(p);let walk=false;
+    if(d<4&&len>0&&!busy&&MONS[s.id].r>1){const ax=g.position.x-p.x,az=g.position.z-p.z,al=Math.hypot(ax,az)||1;g.position.x+=ax/al*2.2*dt;g.position.z+=az/al*2.2*dt;turnTo(g,Math.atan2(ax,az),0.15);walk=true;}
+    else if(d<5){turnTo(g,Math.atan2(p.x-g.position.x,p.z-g.position.z),0.08);}
+    else{s.wait-=dt;if(s.wait<0&&!s.goal){const a=Math.random()*6.28,r=Math.random()*2.5;s.goal=[s.home[0]+Math.cos(a)*r,s.home[1]+Math.sin(a)*r];}
+      if(s.goal){const gx=s.goal[0]-g.position.x,gz=s.goal[1]-g.position.z,gl=Math.hypot(gx,gz);
+        if(gl<0.1){s.goal=null;s.wait=2+Math.random()*4;}else{g.position.x+=gx/gl*1.2*dt;g.position.z+=gz/gl*1.2*dt;turnTo(g,Math.atan2(gx,gz),0.12);walk=true;}}}
+    animateMon(g,t,dt,walk);
+    if(d<best&&!busy){best=d;near=s;}}
+  nearP=null;if(!near&&!busy){let bp=2.6;for(const [id,o] of others){const d=o.g.position.distanceTo(p);if(d<bp){bp=d;nearP={id,nick:o.nick};}}}
+  if(near){const m=MONS[near.id];$('act').style.display='block';$('act').textContent='🍓 열매 건네기 — '+(book[near.id]?m.n:'???');}
+  else if(nearP){$('act').style.display='block';$('act').textContent='🔁 교환하기 — '+nearP.nick;}
+  else $('act').style.display='none';
+  // 데리고 다니는 친구
+  if(pet){const goal=p.clone().add(new THREE.Vector3(Math.sin(player.rotation.y+2.4)*1.4,0,Math.cos(player.rotation.y+2.4)*1.4)),cd=goal.sub(pet.position);cd.y=0;
+    const cl=cd.length(),w=cl>0.2;if(w){pet.position.addScaledVector(cd.normalize(),Math.min(cl,(cl>3?8:5)*dt));turnTo(pet,Math.atan2(cd.x,cd.z),0.2);}animateMon(pet,t,dt,w);}
+  // 실시간: 내 위치 보내기 · 남들 부드럽게 따라가기
+  {const now=performance.now();if(now-lastSent>200&&(Math.abs(p.x-sx)>0.05||Math.abs(p.z-sz)>0.05||Math.abs(player.rotation.y-sr)>0.1)){lastSent=now;sx=p.x;sz=p.z;sr=player.rotation.y;liveSend({t:'p',x:p.x,z:p.z,r:player.rotation.y});}
+   for(const o of others.values()){const g=o.g,ox=o.x-g.position.x,oz=o.z-g.position.z,d=Math.hypot(ox,oz);
+     if(d>8){g.position.x=o.x;g.position.z=o.z;}else if(d>0.02){const k=Math.min(1,dt*8);g.position.x+=ox*k;g.position.z+=oz*k;}
+     turnTo(g,o.r,0.2);animateChibi(g,t,dt,{walk:d>0.08});
+     if(o.pg){const goal=g.position.clone().add(new THREE.Vector3(Math.sin(g.rotation.y+2.4)*1.4,0,Math.cos(g.rotation.y+2.4)*1.4)),cd=goal.sub(o.pg.position);cd.y=0;const cl=cd.length();
+       if(cl>0.2){o.pg.position.addScaledVector(cd.normalize(),Math.min(cl,(cl>3?8:5)*dt));turnTo(o.pg,Math.atan2(cd.x,cd.z),0.2);}animateMon(o.pg,t,dt,cl>0.2);}}}
+  flame.scale.set(1+Math.sin(t*9)*0.08,1+Math.sin(t*13)*0.15,1);fireLight.intensity=(NIGHT?30:8)*(0.85+Math.sin(t*17)*0.15);
+  lantern.position.set(p.x,3,p.z+1.5);
+  camPos.set(p.x,p.y+10,p.z+13);camera.position.lerp(camPos,0.08);camera.lookAt(p.x,p.y+1.2,p.z);
+  renderer.render(scene,camera);requestAnimationFrame(tick);
+}
+function fitCam(){camera.aspect=innerWidth/innerHeight;camera.fov=camera.aspect<1?Math.min(78,50/camera.aspect*0.62):50;camera.updateProjectionMatrix();}
+fitCam();addEventListener('resize',()=>{fitCam();renderer.setSize(innerWidth,innerHeight);});
+if(Q.get('at')){const [x,z]=Q.get('at').split(',').map(Number);player.position.set(x,0,z);}
+camera.position.set(0,10,27);tick();
+// 시험용: ?book=1 수첩 · ?meet=1 가장 가까운 몽글이 앞으로 가서 친구 되기 창 · ?all=1 수첩 다 채우기(이 기기만)
+if(Q.has('all')){MONS.forEach((m,i)=>book[i]=book[i]||{n:1,first:dayKey});LS.set('mong-book',book);refreshCnt();}
+if(Q.has('book'))setTimeout(()=>$('bookBtn').click(),600);
+if(Q.has('meet'))setTimeout(()=>{const s=SPAWNS.filter(s=>s.visible)[0];player.position.set(s.obj.position.x,0,s.obj.position.z+1.6);setTimeout(()=>{near=s;interact();},400);},600);
+</script>
+</body>
+</html>

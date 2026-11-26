@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>추리마을 — 눈길 뺑소니</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0d1424;font-family:"Pretendard","Malgun Gothic",sans-serif;color:#2b2620}
+  canvas{display:block;touch-action:none}
+  .hud{position:fixed;left:12px;top:12px;display:flex;gap:8px;align-items:center;z-index:5}
+  .chip{background:#f4ecdc;border:1.5px solid #2b2620;border-radius:4px;padding:6px 10px;font-size:13px;box-shadow:2px 2px 0 #2b2620}
+  .btn{background:#f4ecdc;border:1.5px solid #2b2620;border-radius:4px;padding:8px 14px;font-size:14px;cursor:pointer;box-shadow:2px 2px 0 #2b2620;font-family:inherit}
+  .btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 #2b2620}
+  .btn.main{background:#c9472f;color:#fff8ec}
+  #act{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);display:none;z-index:5;font-size:16px;padding:12px 22px}
+  #acts{position:fixed;left:12px;bottom:28px;display:flex;flex-direction:column;gap:8px;z-index:5}
+  #acts .btn{width:46px;height:46px;padding:0;font-size:20px;border-radius:50%}
+  #flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:8}
+  #toast{position:fixed;left:50%;top:60px;transform:translateX(-50%);background:#2b2620;color:#f4ecdc;padding:8px 14px;border-radius:4px;font-size:14px;opacity:0;transition:opacity .3s;z-index:6;pointer-events:none;max-width:86vw;text-align:center}
+  .panel{position:fixed;inset:0;background:rgba(10,14,24,.55);display:none;align-items:center;justify-content:center;z-index:10}
+  .card{background:#f4ecdc;border:2px solid #2b2620;box-shadow:4px 4px 0 #2b2620;border-radius:6px;max-width:440px;width:88vw;max-height:80vh;overflow:auto;padding:18px 18px 14px}
+  .card a{color:#c9472f;font-weight:600}
+  .card h3{margin:0 0 4px;font-size:18px}
+  .card .who{font-size:12px;color:#7a6e5e;margin-bottom:10px}
+  .card p{line-height:1.6;margin:6px 0;font-size:15px}
+  .card .row{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+  .clue{border-top:1px dashed #b3a58c;padding:8px 0}
+  .clue b{display:block;font-size:14px}
+  .clue img{width:100%;border-radius:4px;margin:4px 0}
+  .clue span{font-size:13px;color:#5a4f42}
+  .pick{display:block;width:100%;text-align:left;margin:6px 0}
+  #intro .card{text-align:center}
+  .ending img{width:100%;border-radius:4px}
+  .ending p{border-left:3px solid #c9472f;padding-left:10px}
+</style>
+</head>
+<body>
+<div class="hud">
+  <span class="chip" id="nick"></span>
+  <span class="chip" id="crowd" style="display:none"></span>
+  <span class="chip" id="clock">🕑 --:--</span>
+  <button class="btn" id="noteBtn">수첩 <span id="cnt">0</span>/<span id="tot">7</span></button>
+</div>
+<button class="btn main" id="act"></button>
+<div id="acts"><button class="btn" data-act="wave" title="손 흔들기">👋</button><button class="btn" data-act="snow" title="눈 뭉쳐 던지기">⛄</button><button class="btn" data-act="photo" title="사진 찍기">📷</button></div>
+<div id="flash"></div>
+<div id="toast"></div>
+
+<div class="panel" id="intro" style="display:flex"><div class="card">
+  <h3 id="introH">추리마을 · 이번 주 사건</h3>
+  <div class="who" id="introW"></div>
+  <div id="introB"></div>
+  <p id="introPast" style="font-size:13px"></p>
+  <p style="color:#7a6e5e;font-size:13px">바닥을 누르거나 방향키·WASD 로 걷기 · 가까이 가면 「살펴보기」<br>용의자들은 시간 따라 마을을 오가요 — 수상한 순간엔 📷 · 눈은 발자국을 덮어요 · 고양이 도토리가 냄새로 도와줘요</p>
+  <div class="row" style="justify-content:center"><button class="btn main" id="start">마을로 들어가기</button></div>
+</div></div>
+
+<div class="panel" id="dlg"><div class="card">
+  <h3 id="dlgT"></h3><div class="who" id="dlgW"></div>
+  <div id="dlgB"></div>
+  <div class="row" id="dlgR"></div>
+</div></div>
+
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {makeChibi, animateChibi, doAct, makeCat, animateCat} from './chibi.js';
+
+/* ── 사건 고르기 — 사건 내용은 cases/caseN.js 하나에 ─────────── */
+const Q=new URLSearchParams(location.search);
+const LIVE=6, ALL=[1,2,3,4,5,6];
+const TITLES={1:'눈길 뺑소니',2:'창고 방화',3:'잔치 국솥',4:'가로등이 꺼지는 밤',5:'멈춘 리프트',6:'마을 계좌가 털렸다'};   // 지난 사건 목록용                       // LIVE = 지금 공개 중인 사건 · ALL = 만든 사건(?case=N 으로 미리 보기)
+const CN=ALL.includes(+Q.get('case'))?+Q.get('case'):LIVE;
+const CASE=(await import(`./cases/case${CN}.js`)).default;
+const CLUES=CASE.clues, NPCS=CASE.npcs, NC=CLUES.length, NEED=Math.min(5,NC-1);
+const CULPRIT=NPCS.find(n=>n.culprit);
+for(const n of NPCS)n.route=n.route||(CASE.routes||{})[n.id];   // 시간 따라 걷는 길
+const HAN = {name:"한겨울",job:"사진관 · 탐정",pos:[3,18],color:0xc9b48a};
+const BUILDINGS = [
+  {n:'사진관',x:0,z:34,c:0xcfa77b},{n:'약국',x:25,z:-8,c:0x8fbfa5},{n:'술집 곰방',x:-25,z:-8,c:0xa86b4b},
+  {n:'우체국',x:25,z:-34,c:0xc75a4a},{n:'펜션 솔눈',x:-26,z:-36,c:0xb9a07a,w:12},{n:'정육점',x:-25,z:34,c:0xd9d0c0},
+  {n:'택시 정류장',x:25,z:34,c:0x8a8f99,w:6,h:3},{n:'마을회관',x:-38,z:10,c:0x9aa3b0},
+  ...CASE.buildings
+];
+document.title='추리마을 — '+CASE.title;
+if(CN!==LIVE)document.getElementById('introH').textContent='추리마을 · 사건 '+CN;
+document.getElementById('introW').textContent=CASE.title;
+document.getElementById('introB').innerHTML=CASE.intro;
+document.getElementById('introPast').innerHTML=ALL.filter(n=>n!==CN&&n<=Math.max(LIVE,CN)).map(n=>`<a href="?case=${n}">${n<CN?'지난':'다음'} 사건 ${n} · ${TITLES[n]}</a>`).join(' · ');
+document.getElementById('tot').textContent=NC;
+
+/* ── 기본 장면 ─────────────────────────── */
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1a2440);
+scene.fog = new THREE.Fog(0x1a2440,30,90);
+const camera = new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.1,200);
+scene.add(new THREE.HemisphereLight(0x8fa6d6,0x2a2a3a,0.9));
+const moon = new THREE.DirectionalLight(0xc8d6ff,0.6);
+moon.position.set(-20,40,10); moon.castShadow = true;
+Object.assign(moon.shadow.camera,{left:-60,right:60,top:60,bottom:-60});
+moon.shadow.mapSize.set(2048,2048);
+scene.add(moon);
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(140,140),new THREE.MeshLambertMaterial({color:0xe8edf5}));
+ground.rotation.x = -Math.PI/2; ground.receiveShadow = true; scene.add(ground);
+const roadMat = new THREE.MeshLambertMaterial({color:0xb7bfcc});
+function road(x,z,w,d){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,d),roadMat);m.rotation.x=-Math.PI/2;m.position.set(x,0.01,z);m.receiveShadow=true;scene.add(m);}
+road(0,0,6,80); road(0,0,64,6); road(0,-30,64,5); road(0,30,64,5); road(29,4,8,4);
+
+function label(text,scale=1,bg='#f4ecdc'){
+  const c=document.createElement('canvas');const g=c.getContext('2d');
+  g.font='bold 44px Malgun Gothic, sans-serif';const w=g.measureText(text).width+40;
+  c.width=w;c.height=72;g.fillStyle=bg;g.fillRect(0,0,w,72);g.strokeStyle='#2b2620';g.lineWidth=5;g.strokeRect(2,2,w-4,68);
+  g.fillStyle='#2b2620';g.font='bold 44px Malgun Gothic, sans-serif';g.textBaseline='middle';g.fillText(text,20,38);
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false}));
+  s.scale.set(w/72*scale,scale,1);s.renderOrder=10;return s;
+}
+
+const solids = []; // 충돌용 상자 [minx,maxx,minz,maxz]
+const walls = [];  // 카메라를 가리면 반투명해지는 건물 덩어리
+for(const b of BUILDINGS){
+  const w=b.w||9,h=b.h||(b.burnt?2.2:6),d=7;
+  const body=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color:b.c}));
+  body.position.set(b.x,h/2,b.z);body.castShadow=body.receiveShadow=true;scene.add(body);walls.push(body);
+  if(!b.burnt){const roof=new THREE.Mesh(new THREE.ConeGeometry(Math.max(w,d)*0.78,3,4),new THREE.MeshLambertMaterial({color:0xf2f5fa}));
+  roof.rotation.y=Math.PI/4;roof.scale.z=d/w;roof.position.set(b.x,h+1.5,b.z);roof.castShadow=true;scene.add(roof);walls.push(roof);
+  const facing = b.z>0?-1:1;
+  for(const ox of [-w/4,w/4]){
+    const win=new THREE.Mesh(new THREE.PlaneGeometry(1.4,1.2),new THREE.MeshBasicMaterial({color:0xffd27a}));
+    win.position.set(b.x+ox,h*0.55,b.z+facing*(d/2+0.02));if(facing<0)win.rotation.y=Math.PI;scene.add(win);
+  }}
+  const lb=label(b.n,1.2);lb.position.set(b.x,h+3.6,b.z);scene.add(lb);
+  solids.push([b.x-w/2-0.6,b.x+w/2+0.6,b.z-d/2-0.6,b.z+d/2+0.6]);
+}
+// 가로등
+for(const [x,z] of [[4,-4],[-4,4],[4,-26],[-4,26],[20,4],[-20,-4]]){
+  const p=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,4),new THREE.MeshLambertMaterial({color:0x333}));p.position.set(x,2,z);scene.add(p);
+  const bulb=new THREE.Mesh(new THREE.SphereGeometry(0.3),new THREE.MeshBasicMaterial({color:0xffe2a0}));bulb.position.set(x,4.1,z);scene.add(bulb);
+  const l=new THREE.PointLight(0xffc77a,18,14);l.position.set(x,4,z);scene.add(l);
+}
+// 나무
+for(let i=0;i<40;i++){
+  const x=(Math.random()-.5)*120,z=(Math.random()-.5)*120;
+  if(Math.abs(x)<44&&Math.abs(z)<42)continue;
+  const t=new THREE.Mesh(new THREE.ConeGeometry(1.6,5,7),new THREE.MeshLambertMaterial({color:0x2f4a3e}));t.position.set(x,2.5,z);t.castShadow=true;scene.add(t);
+}
+// 차들
+function car(x,z,color,big){const g=new THREE.Group();
+  const b=new THREE.Mesh(new THREE.BoxGeometry(big?2.4:1.9,big?1.5:1.1,big?4.4:3.6),new THREE.MeshLambertMaterial({color}));b.position.y=big?1:0.8;b.castShadow=true;g.add(b);
+  const top=new THREE.Mesh(new THREE.BoxGeometry(big?2.3:1.7,0.8,big?2.6:1.9),new THREE.MeshLambertMaterial({color}));top.position.set(0,big?2.1:1.7,-0.2);g.add(top);
+  g.position.set(x,0,z);scene.add(g);solids.push([x-1.6,x+1.6,z-2.6,z+2.6]);return g;}
+CASE.props({THREE,scene,car,solids});
+
+/* ── 사람 — 귀여운 3D 인물(chibi.js) ─────────────────────────── */
+function person(look,name,sub){
+  const g=makeChibi(look);g.scale.setScalar(1.35);
+  const sh=new THREE.Mesh(new THREE.CircleGeometry(0.5,20),new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.15}));
+  sh.rotation.x=-Math.PI/2;sh.position.y=0.02;g.add(sh);
+  if(name){const l=label(sub?name+' · '+sub:name,0.5);l.position.y=2.6;g.add(l);}
+  scene.add(g);return g;
+}
+// 내 모습 — 처음 올 때 색을 골라 이 기기에 기억(같이 있는 사람들 눈에 서로 다르게 보이도록)
+const LOOK_PLAYER=(()=>{const P={coat:[0x2b3a5a,0x5a2b2b,0x2b5a3a,0x6a5a3a,0x4a3a5a,0x3a4a4a,0x7a4a2a],scarf:[0xc9472f,0xe0b040,0x3a7ac9,0x2f9a6a,0xc94a8a,0xeeeeee],
+  hair:[0x2a2018,0x141414,0x5a3a20,0x8a6a40],pants:[0x3a3f4a,0x2b2b2b,0x4a3a2a,0x2b3a5a]},pick=a=>a[Math.random()*a.length|0];
+  try{const s=JSON.parse(localStorage.getItem('village-look'));if(s&&s.coat!=null)return s;}catch(e){}
+  const l={coat:pick(P.coat),scarf:pick(P.scarf),hair:pick(P.hair),pants:pick(P.pants)};try{localStorage.setItem('village-look',JSON.stringify(l));}catch(e){}return l;})();
+const LOOK_HAN={coat:0xd9c29a,hair:0x141414,hairStyle:'bob',glasses:true,scarf:0x9aa0a8,camera:true,pants:0x2b3a5a};
+const player=person(LOOK_PLAYER);player.position.set(0,0,14);
+const lantern=new THREE.PointLight(0xffd9a0,14,10);scene.add(lantern);   // 내 주변을 따뜻하게
+for(const n of NPCS){n.obj=person(n.look||{coat:n.color},n.name);n.obj.position.set(n.pos[0],0,n.pos[1]);n.obj.lookAt(0,0,0);}
+HAN.obj=person(LOOK_HAN,'한겨울','탐정');HAN.obj.position.set(HAN.pos[0],0,HAN.pos[1]);HAN.obj.lookAt(3,0,40);
+
+/* ── 단서 반짝이 ─────────────────────────── */
+for(const c of CLUES){
+  const s=new THREE.Mesh(new THREE.OctahedronGeometry(0.35),new THREE.MeshBasicMaterial({color:0xffe066}));
+  const pp=c.pos||[0,-99];s.position.set(pp[0],0.9,pp[1]);scene.add(s);c.obj=s;
+  const glow=new THREE.PointLight(0xffe066,6,4);glow.position.set(pp[0],1,pp[1]);scene.add(glow);c.glow=glow;
+  if(c.photo){s.visible=false;glow.visible=false;}   // 사진으로만 얻는 단서
+}
+
+/* ── 눈 ─────────────────────────── */
+const SN=2500,snowGeo=new THREE.BufferGeometry(),sp=new Float32Array(SN*3);
+for(let i=0;i<SN;i++){sp[i*3]=(Math.random()-.5)*100;sp[i*3+1]=Math.random()*30;sp[i*3+2]=(Math.random()-.5)*100;}
+snowGeo.setAttribute('position',new THREE.BufferAttribute(sp,3));
+const snow=new THREE.Points(snowGeo,new THREE.PointsMaterial({color:0xffffff,size:2.5,sizeAttenuation:false,transparent:true,opacity:.85}));scene.add(snow);
+
+/* ── 상태 ─────────────────────────── */
+const ADJ=['졸린','수상한','포근한','조용한','눈치 빠른','느긋한','꼼꼼한','추운'],NOUN=['외투','장갑','목도리','수첩','손전등','털모자','우산','발자국'];
+const nick=localStorage.getItem('village-nick')||ADJ[Math.random()*ADJ.length|0]+' '+NOUN[Math.random()*NOUN.length|0];
+localStorage.setItem('village-nick',nick);
+document.getElementById('nick').textContent='🕵 '+nick;
+const found=new Set(JSON.parse(localStorage.getItem(CASE.key)||'[]'));
+let miss=0,target=null,near=null,solved=false,talking=null;
+const keys={};
+/* 마을 시계 — 실제 1초 = 마을 1분. 용의자 길(route)·사진 순간(moment)·눈 덮임(snow) 이 이 시계를 따른다 */
+const T0=CASE.startTime||0, PERIOD=CASE.period||40;
+let gmin=0; const hhmm=m=>{m=Math.floor(T0+m)%1440;return String(m/60|0).padStart(2,'0')+':'+String(m%60).padStart(2,'0');};
+const cat=makeCat();cat.scale.setScalar(1.35);cat.position.set(-1.5,0,15);scene.add(cat);
+const sniffed=new Set();
+function routePos(n,m){const r=n.route,tm=m%PERIOD;let a=r[r.length-1],b=r[0];
+  for(let i=0;i<r.length;i++){if(r[i].t<=tm)a=r[i];if(r[i].t>tm){b=r[i];break;}if(i===r.length-1)b={t:PERIOD+r[0].t,p:r[0].p};}
+  if(a===b||b.t===a.t)return a.p;const k=Math.min(1,(tm-a.t)/(b.t-a.t));return [a.p[0]+(b.p[0]-a.p[0])*k,a.p[1]+(b.p[1]-a.p[1])*k];}
+function momentNow(){const mo=CASE.moment;if(!mo)return null;const tm=gmin%PERIOD;return tm>=mo.from&&tm<=mo.to?mo:null;}
+function save(){localStorage.setItem(CASE.key,JSON.stringify([...found]));document.getElementById('cnt').textContent=found.size;}
+for(const c of CLUES)if(found.has(c.id)){c.obj.visible=false;c.glow.visible=false;}
+const isOpen=c=>!found.has(c.id)&&!c.photo&&!c.covered;
+save();
+
+const $=id=>document.getElementById(id);
+function toast(t){$('toast').textContent=t;$('toast').style.opacity=1;clearTimeout(toast.h);toast.h=setTimeout(()=>$('toast').style.opacity=0,2400);}
+function dialog(title,who,html,buttons){
+  $('dlgT').textContent=title;$('dlgW').textContent=who;$('dlgB').innerHTML=html;$('dlgR').innerHTML='';
+  for(const [txt,fn,cls] of buttons){const b=document.createElement('button');b.className='btn '+(cls||'');b.textContent=txt;b.onclick=()=>{$('dlg').style.display='none';fn&&fn();};$('dlgR').appendChild(b);}
+  $('dlg').style.display='flex';
+}
+const close=['닫기'];
+
+function interact(){
+  if(!near)return;
+  if(near.kind==='cat'){cat.userData.purr=1.4;toast('🐈 도토리가 골골거려요');return;}
+  if(near.kind==='clue'){
+    const c=near.ref;found.add(c.id);c.obj.visible=false;c.glow.visible=false;save();
+    dialog(c.t,'단서 '+found.size+'/'+NC,`<img src="${CASE.img}k${c.id}.jpg" alt="" onerror="this.remove()" style="width:100%;border:1.5px solid #2b2620;border-radius:4px"><p>${c.d}</p>`,[close]);
+  }else if(near.kind==='npc'){
+    const n=near.ref;talking=n.obj;let html=`<img src="${CASE.img}${n.id}.png" alt="" onerror="this.remove()" style="float:right;height:130px;margin:0 0 6px 8px">`+n.talk.map(t=>`<p>「${t}」</p>`).join('');
+    for(const k in (n.after||{}))if(found.has(+k))html+=`<p style="color:#c9472f">「${n.after[k]}」</p>`;
+    dialog(n.name,n.job,html,[close]);
+  }else if(near.kind==='han'){
+    talking=HAN.obj;
+    if(solved){dialog('한겨울','사진관 · 탐정','<p>「수고했어요. 다음 주에 또 사건이 생기면 부를게요.」</p>',[close]);return;}
+    if(found.size<NEED){dialog('한겨울','사진관 · 탐정',`<p>「${CASE.hanHint}」</p><p>「단서가 ${NEED}개쯤 모이면 다시 와요. 지금 ${found.size}개.」</p>`,[close]);return;}
+    const html=`<p>「${CASE.accuseQ}」</p>`+NPCS.map(n=>`<button class="btn pick" data-id="${n.id}">${n.name} — ${n.job}</button>`).join('');
+    dialog('범인 찍기','한겨울',html,[['아직',null]]);
+    document.querySelectorAll('.pick').forEach(b=>b.onclick=()=>{$('dlg').style.display='none';accuse(b.dataset.id);});
+  }
+}
+function accuse(id){
+  const n=NPCS.find(x=>x.id===id);
+  if(!n.culprit){miss++;dialog('헛짚었어요',n.name,`<p>「${n.name} 씨는 아니에요. ${found.size<NC?'아직 못 본 단서가 있어요.':'알리바이를 다시 봐요.'}」</p>`,[close]);return;}
+  solved=true;localStorage.setItem(CASE.key+'-solved','1');
+  const stars='★'.repeat(Math.max(1,5-miss))+'☆'.repeat(5-Math.max(1,5-miss));
+  dialog('해결 — '+n.name,CASE.title+' '+stars,`<div class="ending">${CASE.ending}<p style="border:none;color:#7a6e5e">${CASE.next}</p></div>`,[close]);
+}
+
+/* ── 입력 ─────────────────────────── */
+addEventListener('keydown',e=>{
+  if($('dlg').style.display==='flex'){ // 창이 떠 있을 때: Esc 닫기 · 숫자 키로 범인 고르기
+    if(e.key==='Escape'){$('dlg').style.display='none';return;}
+    const pk=document.querySelectorAll('.pick')[+e.key-1];if(pk){pk.click();return;}
+  }
+  keys[e.key.toLowerCase()]=true;if((e.key==='e'||e.key===' '||e.key==='Enter')&&$('dlg').style.display!=='flex')interact();});
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+const ray=new THREE.Raycaster(),mv=new THREE.Vector2();
+renderer.domElement.addEventListener('pointerdown',e=>{
+  mv.set(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1);ray.setFromCamera(mv,camera);
+  const h=ray.intersectObject(ground)[0];if(h)target=h.point.clone();
+});
+$('act').onclick=interact;
+document.querySelectorAll('#acts [data-act]').forEach(b=>b.onclick=()=>act(b.dataset.act));
+$('start').onclick=()=>$('intro').style.display='none';
+{const q=new URLSearchParams(location.search); // 시험용: ?play 소개 건너뛰기 · ?at=x,z 시작 위치
+ if(q.has('play'))$('intro').style.display='none';
+ if(q.get('min'))gmin=+q.get('min'); // 시험용: 마을 시각(분)
+ if(q.get('act'))setTimeout(()=>act(q.get('act')),400); // 시험용: 동작 바로 해 보기
+ if(q.get('walkto')){const [x,z]=q.get('walkto').split(',').map(Number);target=new THREE.Vector3(x,0,z);} // 시험용: 그 자리로 걸어감
+ if(q.get('at')){const [x,z]=q.get('at').split(',').map(Number);player.position.set(x,0,z);camera.position.set(x,11,z+15);}}
+$('noteBtn').onclick=()=>{
+  const list=CLUES.filter(c=>found.has(c.id)).map(c=>`<div class="clue"><b>${c.t}</b><img src="${CASE.img}k${c.id}.jpg" alt="" onerror="this.remove()"><span>${c.d}</span></div>`).join('')||'<p>아직 단서가 없어요. 반짝이는 곳에 다가가 보세요.</p>';
+  dialog('수첩','단서 '+found.size+'/'+NC,list,[close]);
+};
+function fitCam(){camera.aspect=innerWidth/innerHeight;camera.fov=camera.aspect<1?Math.min(78,50/camera.aspect*0.62):50;camera.updateProjectionMatrix();} // 세로(폰)면 시야를 넓힌다
+fitCam();
+addEventListener('resize',()=>{fitCam();renderer.setSize(innerWidth,innerHeight);});
+
+function blocked(x,z){if(Math.abs(x)>60||Math.abs(z)>60)return true;for(const s of solids)if(x>s[0]&&x<s[1]&&z>s[2]&&z<s[3])return true;return false;}
+
+/* ── 움직임 — 새 그림 없이 코드로: 걷기 통통·흔들림·방향 돌기·숨쉬기·쳐다보기·말하기 ── */
+function turnTo(g,ang,k){let d=ang-g.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));g.rotation.y+=d*k;}
+
+/* ── 동작 단추 — 목적 없이 해 보는 것: 손 흔들기 · 사진 · 눈 뭉치기 ── */
+const balls=[];
+function nearNpcs(r){return [...NPCS.map(n=>({g:n.obj,name:n.name})),{g:HAN.obj,name:'한겨울'}].filter(o=>o.g.position.distanceTo(player.position)<r);}
+function act(kind){
+  liveSend({t:'a',k:kind});
+  if(kind==='wave'){doAct(player,'wave');const ns=nearNpcs(8);
+    ns.forEach((o,i)=>setTimeout(()=>doAct(o.g,'wave'),400+i*200));
+    toast(ns.length?ns.map(o=>o.name).join('·')+' 씨도 손을 흔들어요':'손을 흔들었어요');}
+  if(kind==='photo'){const f=$('flash');f.style.transition='none';f.style.opacity=1;requestAnimationFrame(()=>{f.style.transition='opacity .6s';f.style.opacity=0;});
+    const mo=momentNow(),cul=NPCS.find(n=>n.culprit);
+    if(mo&&cul.obj.position.distanceTo(player.position)<14&&!found.has(mo.clue)){
+      const c=CLUES.find(c=>c.id===mo.clue);found.add(c.id);save();
+      setTimeout(()=>dialog('📷 '+c.t,'사진 단서 · '+found.size+'/'+NC,`<img src="${CASE.img}k${c.id}.jpg" alt="" onerror="this.remove()" style="width:100%;border-radius:4px"><p>${c.d}</p>`,[close]),350);
+      return;}
+    renderer.render(scene,camera);const a=document.createElement('a');a.href=renderer.domElement.toDataURL('image/png');a.download='추리마을-'+Date.now()+'.png';a.click();
+    toast('찰칵 — 사진을 저장했어요');}
+  if(kind==='snow')throwSnow(player,false);
+}
+function throwSnow(g,remote){doAct(g,'crouch');setTimeout(()=>{doAct(g,'throw');
+    const ang=g.rotation.y,m=new THREE.Mesh(new THREE.SphereGeometry(0.16,10,8),new THREE.MeshLambertMaterial({color:0xffffff}));
+    m.position.set(g.position.x+Math.sin(ang)*0.5,1.5,g.position.z+Math.cos(ang)*0.5);scene.add(m);
+    balls.push({m,remote,v:new THREE.Vector3(Math.sin(ang)*9,4,Math.cos(ang)*9)});},1000);}
+function updateBalls(dt){
+  for(let i=balls.length-1;i>=0;i--){const b=balls[i];b.v.y-=12*dt;b.m.position.addScaledVector(b.v,dt);
+    const hit=[...NPCS.map(n=>({g:n.obj,name:n.name})),{g:HAN.obj,name:'한겨울'}].find(o=>Math.hypot(o.g.position.x-b.m.position.x,o.g.position.z-b.m.position.z)<0.7&&b.m.position.y<2.2);
+    if(hit||b.m.position.y<0.1){
+      const sp=new THREE.Mesh(new THREE.CircleGeometry(0.35,12),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.9}));
+      sp.rotation.x=-Math.PI/2;sp.position.set(b.m.position.x,0.03,b.m.position.z);scene.add(sp);steps.push({m:sp,born:clock.elapsedTime});
+      scene.remove(b.m);balls.splice(i,1);
+      if(hit){doAct(hit.g,'cheer');if(!b.remote)toast(hit.name+' 씨가 눈을 맞고 웃어요');}
+    }}
+}
+const steps=[],stepMat=new THREE.MeshBasicMaterial({color:0x4f5a70,transparent:true,opacity:.8});
+const stepGeo=new THREE.CircleGeometry(0.2,10);let stepAcc=0,stepSide=1;
+function footstep(x,z,ang){const m=new THREE.Mesh(stepGeo,stepMat.clone());m.rotation.x=-Math.PI/2;m.scale.set(1,1.7,1);
+  m.rotation.z=-ang;stepSide=-stepSide;m.position.set(x+Math.cos(ang)*0.22*stepSide,0.025,z-Math.sin(ang)*0.22*stepSide);
+  scene.add(m);steps.push({m,born:clock.elapsedTime});if(steps.length>90){const o=steps.shift();scene.remove(o.m);}}
+
+/* ── 같이 있는 사람들 — 실시간(workers/village-live, Cloudflare Durable Objects) ──
+   같은 사건을 보는 사람끼리 방 하나(최대 30명, 차면 다음 방). 보내는 건 별명·모습 색·위치·동작뿐, 단서·기록은 안 보냄.
+   서버가 안 되면 조용히 혼자 모드. ?solo=1 이면 안 붙음 */
+const LIVE_WS='wss://village-live.swbins.workers.dev/ws',others=new Map();
+let ws=null,roomN=0,retry=0,lastSent=0,sentX=Infinity,sentZ=Infinity,sentR=Infinity,hiddenAt=0;
+function liveSend(o){if(ws&&ws.readyState===1)try{ws.send(JSON.stringify(o));}catch(e){}}
+function crowdChip(){const n=others.size;$('crowd').style.display=ws&&ws.readyState===1?'':'none';$('crowd').textContent=n?`👥 같이 ${n+1}명`:'👥 지금은 나 혼자';}
+function addOther(p){if(others.has(p.id))return;const g=person(p.look&&p.look.coat!=null?p.look:{coat:0x6a6a6a},'🕵 '+p.nick);   // 🕵 = 다른 탐정(사람), 주민과 구분
+  g.position.set(p.x,0,p.z);g.rotation.y=p.r;others.set(p.id,{g,x:p.x,z:p.z,r:p.r});crowdChip();}
+function dropOther(id){const o=others.get(id);if(!o)return;scene.remove(o.g);others.delete(id);crowdChip();}
+function liveConnect(){
+  if(Q.has('solo')||ws)return;
+  try{ws=new WebSocket(`${LIVE_WS}?room=case${CN}-${roomN}`);}catch(e){ws=null;return;}
+  ws.onopen=()=>{retry=0;sentX=Infinity;liveSend({t:'hi',nick,look:LOOK_PLAYER,x:player.position.x,z:player.position.z,r:player.rotation.y});crowdChip();};
+  ws.onmessage=e=>{if(e.data==='pong')return;let m;try{m=JSON.parse(e.data);}catch(_){return;}
+    if(m.t==='all'){for(const id of [...others.keys()])dropOther(id);m.list.forEach(addOther);crowdChip();}
+    else if(m.t==='join'){addOther(m);toast('👋 '+m.nick+' 님이 마을에 왔어요');}
+    else if(m.t==='bye')dropOther(m.id);
+    else if(m.t==='p'){const o=others.get(m.id);if(o){o.x=m.x;o.z=m.z;o.r=m.r;}}
+    else if(m.t==='a'){const o=others.get(m.id);if(!o)return;
+      if(m.k==='wave')doAct(o.g,'wave');else if(m.k==='snow')throwSnow(o.g,true);
+      else if(m.k==='photo'){const l=new THREE.PointLight(0xffffff,30,8);l.position.set(o.g.position.x,2.2,o.g.position.z);scene.add(l);setTimeout(()=>scene.remove(l),120);}}
+    else if(m.t==='full'){roomN=(roomN+1)%6;}};
+  ws.onclose=()=>{ws=null;for(const id of [...others.keys()])dropOther(id);crowdChip();
+    if(!document.hidden)setTimeout(liveConnect,Math.min(30000,1500*2**retry++));};
+  ws.onerror=()=>{};
+}
+setInterval(()=>{if(ws&&ws.readyState===1)ws.send('ping');
+  if(document.hidden&&hiddenAt&&Date.now()-hiddenAt>120000&&ws)ws.close();},30000);   // 2분 넘게 다른 탭이면 끊음(무료 한도 아끼기)
+document.addEventListener('visibilitychange',()=>{if(document.hidden)hiddenAt=Date.now();else{hiddenAt=0;if(!ws)liveConnect();}});
+function liveTick(t,dt){
+  const now=performance.now(),p=player.position;
+  if(now-lastSent>200&&(Math.abs(p.x-sentX)>0.05||Math.abs(p.z-sentZ)>0.05||Math.abs(player.rotation.y-sentR)>0.1)){
+    lastSent=now;sentX=p.x;sentZ=p.z;sentR=player.rotation.y;liveSend({t:'p',x:p.x,z:p.z,r:player.rotation.y});}
+  for(const o of others.values()){const g=o.g,dx=o.x-g.position.x,dz=o.z-g.position.z,d=Math.hypot(dx,dz);
+    if(d>8){g.position.x=o.x;g.position.z=o.z;}else if(d>0.02){const k=Math.min(1,dt*8);g.position.x+=dx*k;g.position.z+=dz*k;}
+    turnTo(g,o.r,0.2);animateChibi(g,t,dt,{walk:d>0.08});}
+}
+liveConnect();
+
+/* ── 루프 ─────────────────────────── */
+const clock=new THREE.Clock(),camPos=new THREE.Vector3(),occl=new THREE.Raycaster();
+function tick(){
+  const dt=Math.min(clock.getDelta(),0.05),t=clock.elapsedTime;
+  let dx=0,dz=0;
+  if(keys['arrowup']||keys['w'])dz-=1;if(keys['arrowdown']||keys['s'])dz+=1;
+  if(keys['arrowleft']||keys['a'])dx-=1;if(keys['arrowright']||keys['d'])dx+=1;
+  if(dx||dz)target=null;
+  else if(target){dx=target.x-player.position.x;dz=target.z-player.position.z;if(Math.hypot(dx,dz)<0.3){target=null;dx=dz=0;}}
+  const len=Math.hypot(dx,dz);
+  if(len>0){
+    const sp=7*dt,nx=player.position.x+dx/len*sp,nz=player.position.z+dz/len*sp;
+    if(!blocked(nx,player.position.z))player.position.x=nx;
+    if(!blocked(player.position.x,nz))player.position.z=nz;
+    turnTo(player,Math.atan2(dx,dz),0.25);
+    stepAcc+=sp;if(stepAcc>0.75){stepAcc=0;footstep(player.position.x,player.position.z,Math.atan2(dx,dz));}
+  }
+  animateChibi(player,t,dt,{walk:len>0});updateBalls(dt);liveTick(t,dt);
+  gmin+=dt;$('clock').textContent='🕑 '+hhmm(gmin);if(CASE.update)CASE.update(gmin%PERIOD,dt);   // 사건별 시간 소품(꺼지는 가로등 등)
+  for(const c of CLUES)if(c.snow&&!c.covered&&!found.has(c.id)&&gmin>=c.snow){c.covered=true;c.obj.visible=false;c.glow.visible=false;toast('❄ 눈이 「'+c.t+'」 을(를) 덮어 버렸어요');}
+  const mo=momentNow();
+  for(const n of NPCS)if(n.route){const [x,z]=routePos(n,gmin),g=n.obj,ddx=x-g.position.x,ddz=z-g.position.z,mv=Math.hypot(ddx,ddz);
+    n.walking=mv>0.02&&talking!==g;if(n.walking){g.position.x=x;g.position.z=z;turnTo(g,Math.atan2(ddx,ddz),0.2);}}
+  if(mo&&!mo.seen&&NPCS.find(n=>n.culprit).obj.position.distanceTo(player.position)<14){mo.seen=true;toast('👀 '+mo.hint);}
+  if(!mo&&CASE.moment)CASE.moment.seen=false;
+  {const tc=CLUES.find(c=>isOpen(c)&&Math.hypot(c.pos[0]-player.position.x,c.pos[1]-player.position.z)<8);
+   const goal=tc?new THREE.Vector3(tc.pos[0]+0.9,0,tc.pos[1]+0.9):player.position.clone().add(new THREE.Vector3(Math.sin(player.rotation.y+2.5)*1.6,0,Math.cos(player.rotation.y+2.5)*1.6));
+   const cd=goal.clone().sub(cat.position);cd.y=0;const cl=cd.length(),walkC=cl>0.25;
+   if(walkC){cat.position.addScaledVector(cd.normalize(),Math.min(cl,(cl>4?9:6)*dt));turnTo(cat,Math.atan2(cd.x,cd.z),0.2);}
+   else if(tc){turnTo(cat,Math.atan2(tc.pos[0]-cat.position.x,tc.pos[1]-cat.position.z),0.2);if(!sniffed.has(tc.id)){sniffed.add(tc.id);toast('🐈 도토리가 뭔가 냄새를 맡아요');}}
+   animateCat(cat,t,dt,walkC);}
+  if($('dlg').style.display!=='flex')talking=null;
+  for(const g of [...NPCS.map(n=>n.obj),HAN.obj]){
+    const d=g.position.distanceTo(player.position);
+    if(d<7&&!NPCS.find(n=>n.obj===g&&n.walking))turnTo(g,Math.atan2(player.position.x-g.position.x,player.position.z-g.position.z),0.08);   // 가까이 오면 쳐다봄
+    const nn=NPCS.find(n=>n.obj===g);animateChibi(g,t,dt,{talk:talking===g,walk:!!(nn&&nn.walking)});
+  }
+  for(const st of steps){const age=t-st.born;st.m.material.opacity=Math.max(0,.8-age*0.03);}
+  // 가까운 것
+  near=null;let best=3.2;const p=player.position;
+  {const d=cat.position.distanceTo(p);if(d<1.8&&d<best){best=d;near={kind:'cat'};}}
+  for(const c of CLUES)if(isOpen(c)){const d=Math.hypot(p.x-c.pos[0],p.z-c.pos[1]);if(d<best){best=d;near={kind:'clue',ref:c};}}
+  for(const n of NPCS){const d=p.distanceTo(n.obj.position);if(d<best){best=d;near={kind:'npc',ref:n};}}
+  {const d=p.distanceTo(HAN.obj.position);if(d<best){best=d;near={kind:'han'};}}
+  const act=$('act');
+  if(near){act.style.display='block';act.textContent=near.kind==='cat'?'🐈 도토리 쓰다듬기':near.kind==='clue'?'🔍 살펴보기':near.kind==='han'?(found.size>=NEED&&!solved?'🗂 범인 찍기':'💬 한겨울'):'💬 '+near.ref.name+'에게 말 걸기';}
+  else act.style.display='none';
+  for(const c of CLUES){c.obj.rotation.y=t*2;c.obj.position.y=0.9+Math.sin(t*3+c.id)*0.15;}
+  const a=snowGeo.attributes.position.array;
+  for(let i=0;i<SN;i++){a[i*3+1]-=dt*2;a[i*3]+=Math.sin(t+i)*dt*0.3;if(a[i*3+1]<0)a[i*3+1]=30;}
+  snowGeo.attributes.position.needsUpdate=true;snow.position.set(p.x,0,p.z);lantern.position.set(p.x,3.2,p.z+1.5);
+  camPos.set(p.x,p.y+11,p.z+15);camera.position.lerp(camPos,0.08);camera.lookAt(p.x,p.y+1.6,p.z);
+  // 카메라와 나 사이 건물은 반투명
+  {const to=new THREE.Vector3(p.x,1.5,p.z),dir=to.clone().sub(camera.position),dist=dir.length();
+   occl.set(camera.position,dir.normalize());occl.far=dist;const hit=new Set(occl.intersectObjects(walls,false).map(h=>h.object));
+   for(const w of walls){const wp=w.position,front=wp.z>p.z+3&&wp.z<camera.position.z+4&&Math.abs(wp.x-p.x)<9;const m=w.material,want=(hit.has(w)||front)?0.22:1;if(m.opacity!==want){if(!m.transparent){m.transparent=true;m.needsUpdate=true;}m.opacity+=(want-m.opacity)*0.25;if(Math.abs(m.opacity-want)<0.02)m.opacity=want;m.depthWrite=m.opacity>0.9;}}}
+  renderer.render(scene,camera);requestAnimationFrame(tick);
+}
+camera.position.set(0,11,29);tick();
+
+/* ── 화면 확인(?show=clue|npc|note|accuse|end) — 저장 안 함 ── */
+{const sh=new URLSearchParams(location.search).get('show');
+ if(sh){const keep=localStorage.getItem(CASE.key);
+  if(sh==='clue'){near={kind:'clue',ref:CLUES[2]};interact();}
+  if(sh==='npc'){found.add(4);near={kind:'npc',ref:NPCS[0]};interact();}
+  if(sh==='note'){CLUES.forEach(c=>found.add(c.id));$('noteBtn').click();}
+  if(sh==='accuse'||sh==='end'){CLUES.forEach(c=>found.add(c.id));near={kind:'han'};interact();if(sh==='end')document.querySelector(`.pick[data-id="${CULPRIT.id}"]`).click();}
+  if(keep===null)localStorage.removeItem(CASE.key);else localStorage.setItem(CASE.key,keep);localStorage.removeItem(CASE.key+'-solved');}}
+
+/* ── 자가 시험(?selftest=1) — 저장은 건드리지 않고 단서·대화·범인 찍기를 차례로 돌려 결과를 적는다 ── */
+if(new URLSearchParams(location.search).has('selftest')){
+  const out=[],ok=(c,m)=>out.push((c?'✔ ':'✘ ')+m),title=()=>$('dlgT').textContent,shut=()=>$('dlg').style.display='none';
+  localStorage.removeItem(CASE.key);localStorage.removeItem(CASE.key+'-solved');
+  found.clear();miss=0;solved=false;
+  near={kind:'han'};interact();ok(new RegExp(NEED+'개쯤').test($('dlgB').textContent)&&!document.querySelector('.pick'),'단서 0개 — 한겨울이 범인 찍기를 막음');shut();
+  for(const n of NPCS){near={kind:'npc',ref:n};interact();ok(title()===n.name&&$('dlgB').querySelectorAll('p').length===n.talk.length,n.name+' 대화 '+n.talk.length+'줄');shut();}
+  for(const c of CLUES){near={kind:'clue',ref:c};interact();ok(title()===c.t&&!c.obj.visible,'단서 '+c.id+' '+c.t);shut();}
+  ok(found.size===NC&&$('cnt').textContent===String(NC),'수첩 '+NC+'/'+NC);
+  for(const n of NPCS.filter(n=>n.after)){near={kind:'npc',ref:n};interact();const extra=$('dlgB').querySelectorAll('p').length-n.talk.length;ok(extra===Object.keys(n.after).length,n.name+' 단서 뒤 추가 대사 '+extra);shut();}
+  near={kind:'han'};interact();ok(document.querySelectorAll('.pick').length===5,'범인 찍기 — 용의자 5명');
+  const wrong=NPCS.find(n=>!n.culprit);document.querySelector(`.pick[data-id="${wrong.id}"]`).click();ok(title()==='헛짚었어요'&&miss===1,wrong.name+' 찍음 → 헛짚음');shut();
+  near={kind:'han'};interact();document.querySelector(`.pick[data-id="${CULPRIT.id}"]`).click();
+  ok(title().startsWith('해결')&&$('dlgW').textContent.includes('★★★★☆'),CULPRIT.name+' 찍음 → 해결 · 별 4');
+  ok(localStorage.getItem(CASE.key+'-solved')==='1','해결 저장');shut();
+  near={kind:'han'};interact();ok(/수고했어요/.test($('dlgB').textContent),'해결 뒤 한겨울 대사');shut();
+  localStorage.removeItem(CASE.key);localStorage.removeItem(CASE.key+'-solved');
+  const pre=document.createElement('pre');pre.id='selftest';pre.textContent=out.join('\n')+'\n'+(out.every(l=>l[0]==='✔')?'모두 통과':'실패 있음');
+  pre.style.cssText='position:fixed;right:10px;top:10px;z-index:20;background:#f4ecdc;border:2px solid #2b2620;padding:10px;font-size:13px;max-height:90vh;overflow:auto';
+  document.body.appendChild(pre);
+}
+</script>
+</body>
+</html>

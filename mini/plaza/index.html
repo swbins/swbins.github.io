@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>미니게임 광장</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start, THREE} from '../mini.js';
+import {liveCounts} from '../live.js';
+
+// 광장 둘레의 문 — 미니게임 목록(mini/index.html)과 같은 순서. 새 장소가 생기면 여기에도 한 줄.
+const PLACES = [["village","🔍","추리마을"],["pocha","🍢","퇴근길 포장마차"],["bungeo","🐟","붕어빵 노점"],["rooftop","🌙","옥상 별 캠핑"],["mong","🌿","몽글숲"],["office","🪪","출근 도장"],["antarctica","🐧","남극 기지"],["arctic","🌌","북극 오로라"],["amazon","🐬","아마존 강 배"],["station","🛰","우주정거장"],["dino","🦕","공룡 시대"],["future","🚖","2100년 서울"],["moon","🌕","달 기지"],["deepsea","🐙","심해 잠수정"],["joseon","🪙","조선 장터"],["laundry","🫧","동네 빨래방"],["busstop","🚌","비 오는 버스 정류장"],["hangang","🪁","한강 돗자리"],["cvs","🍙","새벽 편의점"],["jjim","🐑","동네 찜질방"],["mars","🔴","화성 기지"],["everest","🏔","에베레스트 베이스캠프"],["pyramid","🔺","피라미드 안쪽"],["volcano","🌋","화산 관측소"],["sahara","🐪","사하라 사막 밤"],["liner1912","🚢","1912 대서양 여객선"],["iss-walk","🧑‍🚀","우주 유영"],["cave","🦇","깊은 동굴"],["treetop","🦥","열대 우림 꼭대기"],["dragon-palace","🐢","바닷속 용궁"],["iceage","🦣","빙하기 들판"],["stationery","🍬","학교 앞 문방구"],["arcade","🕹","지하 오락실"],["karaoke","🎤","코인 노래방"],["kimjang","🥬","김장하는 마당"],["fish-auction","🦀","새벽 수산시장 경매"],["lighthouse","🗼","외딴섬 등대"],["night-flight","✈️","밤 비행기 창가 자리"]];
+const R = 17.5, DOOR_C = [0xc9472f, 0x2f5fa8, 0x3a8a6a, 0xd9a22b, 0x7a4a8a, 0x2b8a8a];
+const doors = [];
+let counts = {}, near = null, asked = null;
+
+function spriteText(draw, w, h, sw, depthTest = true) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({map: t, transparent: true, depthTest})); s.scale.set(sw, sw * h / w, 1); return s;
+}
+function label(icon, name) {
+  return spriteText((g, w, h) => {
+    g.fillStyle = '#f4ecdc'; g.strokeStyle = '#2b2620'; g.lineWidth = 6; g.fillRect(4, 4, w - 8, h - 8); g.strokeRect(4, 4, w - 8, h - 8);
+    g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#2b2620';
+    g.font = '64px "Segoe UI Emoji","Apple Color Emoji",sans-serif'; g.fillText(icon, w / 2, 52);
+    let fs = 40; do { g.font = `800 ${fs}px "Malgun Gothic",sans-serif`; fs -= 2; } while (g.measureText(name).width > w - 24 && fs > 20);
+    g.fillText(name, w / 2, 122);
+  }, 320, 160, 2.7);
+}
+function badge(n) {
+  return spriteText((g, w, h) => {
+    g.fillStyle = '#c9472f'; g.beginPath(); g.roundRect(4, 4, w - 8, h - 8, 26); g.fill();
+    g.fillStyle = '#fff8ec'; g.font = '800 40px "Malgun Gothic",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(`👥 ${n}명`, w / 2, h / 2 + 2);
+  }, 200, 64, 1.6, false);
+}
+function showCounts(c) {
+  if (!c) return; counts = c;
+  for (const d of doors) {
+    const n = c[d.slug] || 0;
+    if (d.badge) { d.scene.remove(d.badge); d.badge.material.map.dispose(); d.badge = null; }
+    if (n > 0) { d.badge = badge(n); d.badge.position.set(d.x, 2.6, d.z); d.badge.renderOrder = 8; d.scene.add(d.badge); }
+  }
+}
+const go = slug => { location.href = '../' + slug + '/'; };
+
+start({
+  key: 'plaza', title: '미니게임 광장', enter: '광장으로 들어가기', nickIcon: '⛲',
+  nick: [['산책하는', '두리번거리는', '처음 온', '심심한', '잠깐 들른', '길 잃은'], ['여행자', '구경꾼', '나그네', '손님', '동네 주민', '탐험가']],
+  intro: '<p>장소 서른여덟 곳으로 가는 문이 둘러선 광장.<br>여기선 다른 사람들과 같이 돌아다녀요.</p><p>문 앞에 서면 들어갈 수 있고,<br>빨간 숫자는 그 안에 <b>지금 있는 사람</b>이에요.</p>',
+  floor: {w: 40, d: 40, c1: '#b8ad98', c2: '#c4b9a4', around: 0x6f8a5a},
+  startPos: [0, 7], cam: {h: 12, back: 14},
+  playerLook: {coat: 0x2b3a5a, pants: 0x3a3f4a, hair: 0x2a2018},
+  lamps: [[6, 6], [-6, 6], [6, -6], [-6, -6]],
+  build(c) {
+    const {box, cyl, ball, solid, fx, scene, player, dialog, count} = c;
+    // 가운데 분수
+    cyl(3.2, 3.4, 0.7, 0x9a9488, 0, 0.35, 0); cyl(2.8, 2.8, 0.1, 0x4a8ab8, 0, 0.72, 0); cyl(0.4, 0.6, 2.2, 0x9a9488, 0, 1.4, 0); cyl(1.2, 0.8, 0.3, 0x9a9488, 0, 2.5, 0);
+    solid(0, 0, 6.4, 6.4);
+    const drops = []; for (let i = 0; i < 10; i++) { const d = ball(0.09, 0xbfe0ff, 0, 2.6, 0); d.castShadow = false; drops.push({d, a: i / 10 * Math.PI * 2, t: i / 10}); }
+    fx.push(dt => { for (const o of drops) { o.t = (o.t + dt * 0.7) % 1; const r = o.t * 1.9; o.d.position.set(Math.cos(o.a) * r, 2.6 + Math.sin(o.t * Math.PI) * 0.9 - o.t * 1.8, Math.sin(o.a) * r); } });
+    // 벤치 넷
+    for (const [x, z, ry] of [[0, 6, 0], [0, -6, 0], [6, 0, 1], [-6, 0, 1]]) { const b = box(2.4, 0.5, 0.7, 0x8a6a4a, x, 0.45, z); if (ry) b.rotation.y = Math.PI / 2; solid(x, z, ry ? 0.7 : 2.4, ry ? 2.4 : 0.7); }
+    // 둘레 길
+    { const ring = new THREE.Mesh(new THREE.RingGeometry(R - 2.2, R + 1.2, 64), new THREE.MeshLambertMaterial({color: 0x9a8f7a})); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.01; ring.receiveShadow = true; scene.add(ring); }
+    // 문
+    PLACES.forEach(([slug, icon, name], i) => {
+      const a = i / PLACES.length * Math.PI * 2, x = Math.sin(a) * R, z = Math.cos(a) * R, col = DOOR_C[i % DOOR_C.length];
+      const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = a + Math.PI; scene.add(g);
+      box(0.25, 3, 0.25, 0x5a5048, -1, 1.5, 0, g); box(0.25, 3, 0.25, 0x5a5048, 1, 1.5, 0, g); box(2.3, 0.3, 0.3, 0x5a5048, 0, 3.1, 0, g);
+      const panel = box(1.75, 2.85, 0.08, col, 0, 1.45, -0.05, g); panel.material.emissive = new THREE.Color(col); panel.material.emissiveIntensity = 0.15;
+      const lb = label(icon, name); lb.position.set(x, 4.1, z); scene.add(lb);
+      doors.push({slug, icon, name, x, z, scene, lb, g, front: false, badge: null, ax: x - Math.sin(a) * 1.4, az: z - Math.cos(a) * 1.4});
+    });
+    // 카메라 쪽(내 뒤) 문 이름표는 화면을 가리니 숨김
+    // 문 바로 앞에 서면 그 이름표는 흐리게(내 인물을 가리지 않게)
+    // 카메라와 나 사이(내 앞쪽 z)에 있는 문은 반투명 — 문 앞에 선 내가 가려지지 않게
+    fx.push(() => { const p = player.position; for (const d of doors) { const front = d.z > p.z + 1; d.lb.visible = !front; if (d.badge) d.badge.visible = !front;
+      d.lb.material.opacity = Math.hypot(p.x - d.x, p.z - d.z) < 3.2 ? 0.3 : 1;
+      if (front !== d.front) { d.front = front; d.g.traverse(m => { if (m.material) { m.material.transparent = front; m.material.opacity = front ? 0.15 : 1; m.castShadow = !front; } }); } } });
+    // 문 앞에 서면 묻기 — 한 번 물은 문은 떨어졌다 다시 와야 또 묻는다
+    fx.push(() => {
+      const p = player.position; let best = null, bd = 1.8;
+      for (const d of doors) { const dist = Math.hypot(p.x - d.x, p.z - d.z); if (dist < bd) { bd = dist; best = d; } }
+      if (asked && Math.hypot(p.x - asked.x, p.z - asked.z) > 2.6) asked = null;
+      if (best && best !== asked && !c.busy) {
+        asked = best; const n = counts[best.slug] || 0;
+        dialog(best.icon + ' ' + best.name, n ? `지금 ${n}명이 안에 있어요` : '지금은 아무도 없어요 — 먼저 가 보기',
+          '<p>들어갈까요? 다 놀고 나서 「↩ 목록」 대신 뒤로 가기를 누르면 광장으로 돌아와요.</p>',
+          [['그냥 있기', null], ['들어가기', () => { count('door'); go(best.slug); }, 'main']]);
+      }
+    });
+    liveCounts().then(showCounts); setInterval(() => { if (!document.hidden) liveCounts().then(showCounts); }, 30000);
+  },
+  acts: [
+    {id: 'busy', icon: '🔥', label: '사람 많은 곳', run(c, done) {
+      const top = doors.map(d => [d, counts[d.slug] || 0]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1])[0];
+      if (!top) { c.toast('지금은 광장 말고는 다 조용해요'); return done(); }
+      c.count('busy'); c.toast(`${top[0].icon} ${top[0].name} 쪽으로 — ${top[1]}명`); asked = null; done(); c.goTo(top[0].ax, top[0].az);
+    }},
+    {id: 'dice', icon: '🎲', label: '아무 데나', run(c, done) {
+      const d = doors[Math.random() * doors.length | 0]; c.count('dice'); c.toast(`${d.icon} ${d.name} 당첨!`); asked = null; done(); c.goTo(d.ax, d.az);
+    }},
+    {id: 'coin', icon: '🪙', label: '동전 던지기', spot: [0, 4], face: Math.PI, run(c, done) {
+      const n = c.count('coin'), WISH = ['오늘은 칼퇴', '내일 비 안 오기', '월급 조금만 더', '푹 자기', '좋은 사람 만나기', '점심 메뉴 고민 끝'];
+      c.doAct(c.player, 'cheer'); c.beep(1200, .08); c.beep(900, .1, .15);
+      c.toast(`🪙 퐁당 — 「${WISH[Math.random() * WISH.length | 0]}」 (오늘 ${n}번째)`); setTimeout(done, 1200);
+    }},
+  ],
+});
+</script></body></html>

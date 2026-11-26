@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>동네 빨래방</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 게시판 쪽지 — 날짜마다 하나
+const NOTES = [
+  '양말 한 짝 주인 찾아요. 회색, 왼발, 조금 외로워 보임.',
+  '건조기 3번 문이 덜 닫힙니다. 발로 한 번 차 주세요. (살살)',
+  '세제를 많이 넣는다고 더 깨끗해지지 않습니다. — 옆집 202호',
+  '어제 두고 간 체크 셔츠 보관 중. 입고 오셔도 돌려드립니다.',
+  '동전 교환기는 없습니다. 마음의 준비를 하고 오세요.',
+  '새벽 2시 건조기 소리가 제일 좋다는 분, 연락 주세요. 같이 앉읍시다.',
+  '세탁 끝났으면 빨래 좀 꺼내 주세요. 기다리는 사람 있어요. 저요.',
+  '이불 빨래는 4번만. 나머지 기계는 이불을 싫어합니다.',
+  '비 오는 날 건조기는 만원입니다. 우산 쓰고 오신 분들 죄송.',
+  '누가 먼지 거름망을 비우고 갔다. 복 받으세요.',
+  '주머니 확인하세요. 어제 천 원짜리 한 장이 세탁됐습니다.',
+  '겨울엔 건조기가 난로입니다. 따뜻하다고 자고 가지 마세요.',
+  '자판기에 바나나우유 채웠습니다. (누가 자꾸 전부 사 감)',
+  '빨래방 고양이 아닙니다. 주인 있는 고양이입니다. 만지지 마세요. 만져도 됩니다.',
+];
+const DRINKS = [['바나나우유', '🍌', '단지 모양 병은 이유가 있다.'], ['캔커피', '☕', '잠은 집에 가서 자기로 한다.'], ['이온음료', '🥤', '빨래 돌리는데 땀이 난다.'],
+  ['식혜', '🍚', '밥알 하나 건져 먹는 재미.'], ['사이다', '🧃', '트림이 나왔다. 아무도 없어서 다행.'], ['옥수수수염차', '🌽', '구수하다. 건조기 냄새랑 어울린다.'],
+  ['딸기우유', '🍓', '분홍색인데 생각보다 달다.'], ['율무차', '🥛', '종이컵이 뜨겁다. 두 손으로 든다.'], ['탄산수', '🫧', '밍밍한 줄 알았는데 톡 쏜다.']];
+const ITEMS = [['🧦', '양말'], ['👕', '티셔츠'], ['👖', '바지'], ['🧣', '수건'], ['🧤', '장갑']];
+const seedOf = d => d.getFullYear() * 372 + (d.getMonth() + 1) * 31 + d.getDate();
+const rng = seed => { let s = seed * 7919 % 2147483647 || 1; return () => (s = s * 48271 % 2147483647) / 2147483647; };
+const shuffle = (a, r) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = r() * (i + 1) | 0; [b[i], b[j]] = [b[j], b[i]]; } return b; };
+
+start({
+  key: 'laundry', title: '동네 빨래방', enter: '자동문 들어가기', time: 'night', nickIcon: '🧺',
+  nick: [['건조기 앞', '양말 한 짝', '동전 모자란', '세제 많이 넣는', '밤 늦은', '이불 들고 온'], ['손님', '빨래', '건조망', '세탁망', '바구니', '주머니']],
+  intro: '<p>비 오는 밤, 불 켜진 무인 빨래방.<br>세탁기 돌아가는 걸 멍하니 보다 가요.</p>',
+  floor: {w: 24, d: 20, c1: '#aeb8be', c2: '#bcc6cb', pattern: 'tile', around: 0x14181f},
+  bg: {night: 0x0b1020}, startPos: [0, 7], cam: {h: 10, back: 12},
+  playerLook: {coat: 0x7a4a3a, pants: 0x3a3f4a, hair: 0x2a2018},
+  build(c) {
+    const {box, cyl, glowBall, sign, solid, npc, fx, THREE, scene} = c;
+    const mat = (col, o = {}) => new THREE.MeshLambertMaterial({color: col, ...o});
+    // 벽 (뒤·양옆만 — 천장 없음)
+    box(24, 7, 0.5, 0xcfd8dc, 0, 3.5, -10.25); box(0.5, 7, 20, 0xc2ccd0, -12.25, 3.5, 0); box(0.5, 7, 20, 0xc2ccd0, 12.25, 3.5, 0);
+    box(24, 0.5, 0.52, 0x4a7ab0, 0, 0.25, -10.0);
+    sign(['동네 빨래방', '24시 · 무인'], 6.6, 1.5, '#2f6fb0', '#fff8ec', -4.5, 5.4, -9.95, 0, [66, 30]);
+    // 창밖 비 오는 길 (왼쪽 벽)
+    for (const [w, h, y, z] of [[8.4, 0.12, 4.38, 1], [8.4, 0.12, 1.62, 1], [0.12, 2.8, 3, -3.2], [0.12, 2.8, 3, 5.2]]) box(0.1, h, w, 0xe8ecee, -11.96, y, z);
+    const wp = new THREE.Mesh(new THREE.PlaneGeometry(8.2, 2.7), new THREE.MeshBasicMaterial({color: 0x1c2e4c})); wp.position.set(-11.97, 3, 1); wp.rotation.y = Math.PI / 2; scene.add(wp);
+    const sl = new THREE.Mesh(new THREE.CircleGeometry(0.6, 16), new THREE.MeshBasicMaterial({color: 0xffd98a, transparent: true, opacity: .55})); sl.position.set(-11.95, 3.4, 3.2); sl.rotation.y = Math.PI / 2; scene.add(sl);
+    const rain = []; for (let i = 0; i < 34; i++) { const m = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.5, 0.03), new THREE.MeshBasicMaterial({color: 0xa8c4ea, transparent: true, opacity: .6}));
+      m.position.set(-11.93, 1.7 + Math.random() * 2.6, -3 + Math.random() * 8); m.userData.v = 2.4 + Math.random() * 1.6; scene.add(m); rain.push(m); }
+    fx.push(dt => rain.forEach(m => { m.position.y -= m.userData.v * dt; if (m.position.y < 1.7) { m.position.y = 4.3; m.position.z = -3 + Math.random() * 8; } }));
+    // 둥근 창 — 안 빨래가 빙글빙글
+    const wins = [];
+    function win(x, y, z, cols) {
+      const t = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.09, 8, 20), mat(0xb8bcc2)); t.position.set(x, y, z + 0.82); scene.add(t);
+      cyl(0.5, 0.5, 0.02, 0x1b2a44, x, y, z + 0.81, undefined, 20).rotation.x = Math.PI / 2;
+      const g = new THREE.Group(); g.position.set(x, y, z + 0.86); scene.add(g);
+      cols.forEach((col, i) => { const a = i * 2.1; box(0.28, 0.22, 0.1, col, Math.cos(a) * 0.22, Math.sin(a) * 0.22, 0, g).rotation.z = a; });
+      const gl = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.03, 20), mat(0x9ac4e0, {transparent: true, opacity: .28})); gl.rotation.x = Math.PI / 2; gl.position.set(x, y, z + 0.92); scene.add(gl);
+      const o = {g, rate: 0}; wins.push(o); return o;
+    }
+    fx.push(dt => wins.forEach(o => { o.g.rotation.z += o.rate * dt; }));
+    // 드럼 세탁기 넷 (벽 따라) — 둘째 줄 셋째가 내 자리
+    const WC = [0xe4e8ea, 0xdfe4e6, 0xe4e8ea, 0xd4d8da], CL = [[0xd65a5a, 0xf0e0c0, 0x4a7ab0], [0x6aa070, 0xf4f4f0, 0xc9a060], [0xe0b040, 0x8a6ab0, 0xf4f4f0], [0x4a7ab0, 0xd65a5a, 0xf4f4f0]];
+    [-9, -6.5, -4, -1.5].forEach((x, i) => { box(2, 2.4, 1.6, WC[i], x, 1.2, -9); solid(x, -9, 2, 1.6);
+      box(1.7, 0.32, 0.05, 0x39424d, x, 2.1, -8.18); glowBall(0.05, i === 3 ? 0xff5a4a : 0x66ff88, x + 0.65, 2.1, -8.12, 0);
+      const w = win(x, 1.1, -9, CL[i]); if (i === 0) w.rate = 4; if (i === 1) w.rate = -3; if (i === 2) c.mine = w; });
+    sign(['고장'], 1, 0.55, '#f4ecdc', '#c9472f', -1.5, 1.1, -8.1, 0, [52]);
+    // 건조기 둘(이층) — 안에서 천천히 구름
+    [7.25, 9.75].forEach((x, i) => { box(2, 1.2, 1.6, 0xc9ced2, x, 0.6, -9); box(2, 1.2, 1.6, 0xd6dade, x, 1.8, -9); solid(x, -9, 2, 1.6);
+      win(x, 0.6, -9, [0xe0b040, 0xd65a5a, 0xf4f4f0]).rate = i ? 2.2 : 0; win(x, 1.8, -9, [0x6aa070, 0x4a7ab0, 0xf4f4f0]).rate = i ? 0 : 2.6; });
+    // 게시판
+    box(3.4, 2.1, 0.1, 0x8a6a4a, 3.5, 3.4, -9.95); box(3.1, 1.8, 0.04, 0xc9a878, 3.5, 3.4, -9.88);
+    [[-1.1, 0.4, 0xf4ecdc], [-0.2, 0.55, 0xf0d870], [0.7, 0.35, 0xf4ecdc], [1.2, 0.1, 0xa8d8c0], [-0.7, -0.4, 0xf4b8b8], [0.2, -0.45, 0xf4ecdc], [1.15, -0.5, 0xf0d870]]
+      .forEach(([dx, dy, col], i) => { const p = box(0.55, 0.65, 0.02, col, 3.5 + dx, 3.4 + dy, -9.84); p.rotation.z = (i % 3 - 1) * 0.08; });
+    sign(['게시판'], 1.6, 0.4, '#8a6a4a', '#fff8ec', 3.5, 4.7, -9.9, 0, [34]);
+    // 자판기 (왼쪽 벽) — 앞면이 +x
+    box(1.2, 3, 1.4, 0xc9472f, -11.2, 1.5, -6); solid(-11.2, -6, 1.2, 1.4);
+    box(0.06, 1.7, 1.0, 0xf4f4f0, -10.57, 1.9, -6);
+    [0, 1, 2].forEach(r => [0, 1, 2].forEach(k => cyl(0.08, 0.08, 0.34, [0xe0b040, 0x4a7ab0, 0xd65a5a, 0x6aa070, 0xf4f4f0][(r * 3 + k) % 5], -10.52, 2.5 - r * 0.5, -6.3 + k * 0.3, undefined, 8)));
+    box(0.1, 0.3, 0.7, 0x222222, -10.55, 0.55, -6);
+    sign(['음료'], 1, 0.4, '#f4ecdc', '#c9472f', -10.54, 2.95, -6, Math.PI / 2, [34]);
+    glowBall(0.1, 0xfff4d0, -10.2, 3.2, -6, 6, 6);
+    // 접는 탁자 + 빨래 바구니
+    box(4, 0.1, 1.8, 0xd9d2c4, -3, 1.0, 1); for (const [dx, dz] of [[-1.8, -0.7], [1.8, -0.7], [-1.8, 0.7], [1.8, 0.7]]) box(0.1, 1, 0.1, 0x888888, -3 + dx, 0.5, 1 + dz); solid(-3, 1, 4, 1.8);
+    box(0.8, 0.12, 0.6, 0x4a7ab0, -3.8, 1.1, 1); box(0.6, 0.1, 0.5, 0xf4f4f0, -2.4, 1.1, 1.1);
+    for (const [x, z, col, cc] of [[-6.5, -5.2, 0x3a6ab0, 0xd65a5a], [1.5, -5.6, 0xd65a8a, 0xf4f4f0], [6.5, 4.5, 0x6aa070, 0xe0b040]]) { box(1, 0.6, 0.75, col, x, 0.3, z); box(0.8, 0.2, 0.55, cc, x, 0.65, z); }
+    // 플라스틱 의자 + 손님 둘 (폰 보는 중)
+    for (const z of [-2.5, 0, 2.5]) { box(0.7, 0.08, 0.7, 0x3a6ab0, 11, 0.5, z); box(0.08, 0.7, 0.7, 0x3a6ab0, 11.35, 0.9, z); for (const dz of [-0.28, 0.28]) cyl(0.04, 0.04, 0.5, 0x888888, 11, 0.25, z + dz, undefined, 6); }
+    c.guests = [npc({coat: 0x55606e, glasses: true, pants: 0x2b2f3a}, [[10.5, -2.5]], {face: -Math.PI / 2, idle: ['stretch', 'sip']}),
+      npc({coat: 0x8a5a6a, hairStyle: 'bob', hair: 0x2a2018}, [[10.5, 0]], {face: -Math.PI / 2, idle: ['sip']})];
+    box(0.3, 0.02, 0.5, 0x222222, 10.0, 0.6, 2.5);
+    // 불빛 — 형광등 느낌의 흰 불 둘
+    glowBall(0.2, 0xe8f4ff, 0, 5.8, -3, 16, 24); glowBall(0.2, 0xe8f4ff, 6, 5.8, 3, 12, 20);
+  },
+  lamps: [],
+  acts: [
+    {id: 'wash', icon: '🫧', label: '세탁', spot: [-4, -7.1], face: Math.PI, run(c, done) {
+      const m = 30 + (Math.random() * 15 | 0); c.mine.rate = 7; c.beep(500, .1); c.beep(700, .1, .12);
+      c.toast(`🫧 세탁 시작 · 남은 시간 ${m}분`, 1500);
+      setTimeout(() => c.toast(`남은 시간 ${Math.round(m / 2)}분 · 창 안을 본다`, 1500), 1700);
+      setTimeout(() => c.toast('남은 시간 3분 · 아무 생각 없음', 1500), 3400);
+      setTimeout(() => { c.mine.rate = 0; for (let i = 0; i < 3; i++) c.beep(1500, .22, i * .3, 'square', .06); const n = c.count('wash');
+        c.stamp('삐-', n === 1 ? '세탁 끝 · 빨래가 뜨끈해요' : `오늘 ${n}번째 세탁 끝`); c.doAct(c.player, 'stretch'); setTimeout(done, 1500); }, 5200); }},
+    {id: 'fold', icon: '🧺', label: '개기', spot: [-3, 2.8], face: Math.PI, run(c, done) {
+      const d = c.now(), ORD = shuffle(ITEMS, rng(seedOf(d))), SHOW = shuffle(ITEMS, Math.random), LIMIT = 25000;
+      c.play(`<h3>빨래 개기</h3><p id="note" style="font-size:14px;margin:4px 0"></p>
+        <div style="height:8px;background:#e4d9c2;border:1.5px solid #2b2620;border-radius:4px;margin:8px 0"><div id="bar" style="height:100%;width:100%;background:#4a7ab0"></div></div>
+        <div id="grid" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0"></div><p id="msg" style="font-size:14px;min-height:22px"></p>
+        <div class="row" style="justify-content:center"><button class="btn" id="giveup">그만두기</button></div>`,
+        (el, close) => {
+          const $ = s => el.querySelector(s); let k = 0, over = false, hide; const t0 = Date.now();
+          const showNote = ms => { $('#note').textContent = '쪽지: ' + ORD.map(x => x[0] + x[1]).join(' → '); clearTimeout(hide); hide = setTimeout(() => { if (!over) $('#note').textContent = '쪽지는 주머니에 넣었다. 틀리면 다시 꺼내 본다'; }, ms); };
+          showNote(5000);
+          const tick = setInterval(() => { const left = 1 - (Date.now() - t0) / LIMIT; $('#bar').style.width = Math.max(0, left * 100) + '%';
+            if (left <= 0 && !over) { over = true; clearInterval(tick); clearTimeout(hide); $('#msg').textContent = '시간 초과 — 건조기가 먼저 식었다';
+              setTimeout(() => { close(); c.toast('다 못 갰다. 내일 또 쌓일 테니 괜찮다', 3000); done(); }, 1500); } }, 100);
+          SHOW.forEach(([em, nm]) => { const b = document.createElement('button'); b.className = 'btn'; b.style.cssText = 'font-size:26px;width:74px;height:70px;padding:4px';
+            b.innerHTML = `${em}<br><small style="font-size:12px">${nm}</small>`;
+            b.onclick = () => { if (over || b.disabled) return;
+              if (nm !== ORD[k][1]) { c.beep(200, .12); $('#msg').textContent = '그것 말고. 쪽지를 다시 본다'; showNote(2500); return; }
+              k++; b.disabled = true; b.style.opacity = .25; c.beep(500 + k * 120, .08, 0, 'sine'); $('#msg').textContent = ORD.slice(0, k).map(x => x[0]).join(' ') + ' 개켰다';
+              if (k === ORD.length) { over = true; clearInterval(tick); clearTimeout(hide); const sec = ((Date.now() - t0) / 1000).toFixed(1), best = c.DB.foldBest;
+                if (!best || +sec < best) { c.DB.foldBest = +sec; } c.count('fold'); $('#msg').textContent = `${sec}초 — 각이 잡혔다`;
+                setTimeout(() => { close(); c.stamp('착착', `${sec}초 · 오늘 순서대로`); done(); }, 1000); } };
+            $('#grid').appendChild(b); });
+          $('#giveup').onclick = () => { over = true; clearInterval(tick); clearTimeout(hide); close(); done(); };
+        }); }},
+    {id: 'drink', icon: '🥤', label: '자판기', spot: [-9.4, -6], face: -Math.PI / 2, run(c, done) {
+      const d = c.now(), sold = seedOf(d) % DRINKS.length, pool = DRINKS.filter((_, i) => i !== sold), pick = pool[Math.random() * pool.length | 0];
+      c.beep(1900, .05); c.beep(1900, .05, .1); c.toast(`동전 투입… (오늘은 ${DRINKS[sold][0]} 품절)`, 1500);
+      setTimeout(() => { c.beep(180, .25, 0, 'square', .08);
+        const can = new c.THREE.Mesh(new c.THREE.CylinderGeometry(0.1, 0.1, 0.3, 10), new c.THREE.MeshLambertMaterial({color: [0xd65a5a, 0x4a7ab0, 0xe0b040, 0x6aa070][Math.random() * 4 | 0]})); c.hand.add(can);
+        c.doAct(c.player, 'sip'); const n = c.count('drink');
+        setTimeout(() => { c.hand.remove(can); c.toast(`${pick[1]} ${pick[0]} — ${n > 2 ? `오늘 ${n}캔째. 동전이 모자란다` : pick[2]}`, 3000); done(); }, 2200); }, 1700); }},
+    {id: 'note', icon: '📌', label: '쪽지', spot: [3.5, -8], face: Math.PI, run(c, done) {
+      const d = c.now(), idx = (d.getDate() * 5 + d.getMonth() * 3) % NOTES.length, first = !c.today().note;
+      c.doAct(c.player, 'stretch'); c.count('note'); const got = new Set(c.DB.notes || []); got.add(idx); c.DB.notes = [...got]; c.save();
+      setTimeout(() => { c.stamp('📌', '오늘의 쪽지');
+        setTimeout(() => c.dialog('게시판 · 오늘 새로 붙은 쪽지', `${d.getMonth() + 1}월 ${d.getDate()}일 · ${c.visits()}번째 온 날`,
+          `<p style="font-size:17px;background:#fff7d0;border:1.5px solid #2b2620;padding:12px;transform:rotate(-1deg)">${NOTES[idx]}</p>` + (first ? '' : '<p style="color:#7a6e5e;font-size:13px">쪽지는 하루에 하나씩 바뀐다. 이건 아까 읽은 것.</p>'), [['잘 읽었다', done, 'main']]), 700); }, 900); }},
+  ],
+  recExtra: c => `<p style="font-size:13px;color:#7a6e5e">읽은 쪽지 ${(c.DB.notes || []).length}/${NOTES.length}${c.DB.foldBest ? ` · 빨래 개기 최고 ${c.DB.foldBest}초` : ''}</p>`,
+  onEnter(c) { c.toast(c.visits() > 1 ? `🧺 또 왔네요. ${c.visits()}번째 — 오늘도 건조기 한 대는 비었다` : '🧺 삑— 자동문이 열린다. 빗소리, 세탁기 소리', 3200); },
+});
+</script></body></html>

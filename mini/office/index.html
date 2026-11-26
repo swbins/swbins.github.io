@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>출근 도장 — 주식회사 오늘도</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#1a2030;font-family:"Pretendard","Malgun Gothic",sans-serif;color:#2b2620}
+  canvas{display:block;touch-action:none}
+  .hud{position:fixed;left:12px;top:12px;display:flex;gap:8px;align-items:center;z-index:5;flex-wrap:wrap;right:12px}
+  .chip{background:#f4ecdc;border:1.5px solid #2b2620;border-radius:4px;padding:6px 10px;font-size:13px;box-shadow:2px 2px 0 #2b2620}
+  .btn{background:#f4ecdc;border:1.5px solid #2b2620;border-radius:4px;padding:8px 14px;font-size:14px;cursor:pointer;box-shadow:2px 2px 0 #2b2620;font-family:inherit;color:#2b2620}
+  .btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 #2b2620}
+  .btn.main{background:#c9472f;color:#fff8ec}
+  .btn:disabled{opacity:.5}
+  #acts{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:10px;z-index:5}
+  #acts .btn{width:66px;height:62px;padding:4px 0 0;font-size:22px;line-height:1.1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  #acts .btn small{font-size:11px;margin-top:3px}
+  #toast{position:fixed;left:50%;top:64px;transform:translateX(-50%);background:#2b2620;color:#f4ecdc;padding:8px 14px;border-radius:4px;font-size:14px;opacity:0;transition:opacity .3s;z-index:6;pointer-events:none;max-width:86vw;text-align:center}
+  #stamp{position:fixed;left:50%;top:40%;width:170px;height:170px;margin:-85px 0 0 -85px;border:6px double #c9472f;border-radius:50%;color:#c9472f;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;z-index:7;pointer-events:none;opacity:0;transform:scale(2.2) rotate(-14deg);transition:transform .25s cubic-bezier(.2,1.6,.4,1),opacity .2s;background:rgba(244,236,220,.85)}
+  #stamp.on{opacity:1;transform:scale(1) rotate(-14deg)}
+  #stamp b{font-size:30px;letter-spacing:4px}
+  #stamp span{font-size:20px;margin-top:4px}
+  #stamp small{font-size:12px;margin-top:4px;font-weight:600}
+  #fade{position:fixed;inset:0;background:#111;opacity:0;pointer-events:none;transition:opacity .8s;z-index:8}
+  .panel{position:fixed;inset:0;background:rgba(10,14,24,.55);display:none;align-items:center;justify-content:center;z-index:10}
+  .card{background:#f4ecdc;border:2px solid #2b2620;box-shadow:4px 4px 0 #2b2620;border-radius:6px;max-width:400px;width:88vw;max-height:82vh;overflow:auto;padding:18px 18px 14px}
+  .card h3{margin:0 0 4px;font-size:18px}
+  .card .who{font-size:12px;color:#7a6e5e;margin-bottom:10px}
+  .card p{line-height:1.6;margin:6px 0;font-size:15px}
+  .card .row{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+  .stat{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+  .stat div{border:1.5px solid #2b2620;border-radius:4px;padding:8px;background:#fffaf0}
+  .stat b{display:block;font-size:22px}
+  .stat span{font-size:12px;color:#7a6e5e}
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;font-size:11px;text-align:center;margin-top:8px}
+  .cal i{font-style:normal;color:#7a6e5e}
+  .cal div{aspect-ratio:1;border-radius:3px;background:#e6dcc8;display:flex;align-items:center;justify-content:center}
+  .cal .in{background:#e9a48f}.cal .early{background:#c9472f;color:#fff}.cal .off{background:transparent;color:#b3a58c}
+  #intro .card{text-align:center}
+</style>
+</head>
+<body>
+<div class="hud">
+  <span class="chip" id="nick"></span>
+  <span class="chip" id="clock">🕘 --:--</span>
+  <span class="chip" id="state">아직 출근 전</span>
+  <span class="chip" id="crowd" style="display:none"></span>
+  <span class="chip" id="together" style="display:none"></span>
+  <button class="btn" id="waveBtn" style="display:none" title="손 흔들기">👋</button>
+  <button class="btn" id="recBtn">📒 내 기록</button>
+  <a class="btn" href="../" style="text-decoration:none">↩ 목록</a>
+</div>
+<div id="acts">
+  <button class="btn" data-a="in">🪪<small>출근 찍기</small></button>
+  <button class="btn" data-a="coffee">☕<small>커피</small></button>
+  <button class="btn" data-a="stretch">🙆<small>기지개</small></button>
+  <button class="btn" data-a="out">🛗<small>퇴근</small></button>
+</div>
+<div id="toast"></div>
+<div id="stamp"><b>출근</b><span id="stampT">08:52</span><small id="stampS"></small></div>
+<div id="fade"></div>
+
+<div class="panel" id="intro" style="display:flex"><div class="card">
+  <h3>주식회사 오늘도 · 1층 로비</h3>
+  <div class="who" id="introW"></div>
+  <p>출근 찍고, 커피 한 잔, 기지개 한 번.<br>퇴근은 엘리베이터로.</p>
+  <p style="color:#7a6e5e;font-size:13px">바닥을 누르거나 방향키·WASD 로 걷기<br>기록은 이 기기에만 남아요 (가입 없음)</p>
+  <div class="row" style="justify-content:center"><button class="btn main" id="start">로비로 들어가기</button></div>
+</div></div>
+
+<div class="panel" id="dlg"><div class="card">
+  <h3 id="dlgT"></h3><div class="who" id="dlgW"></div>
+  <div id="dlgB"></div>
+  <div class="row" id="dlgR"></div>
+</div></div>
+
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {makeChibi, animateChibi, doAct} from '../chibi.js';
+import {startLive, myScarf} from '../live.js';
+
+const $=id=>document.getElementById(id);
+const Q=new URLSearchParams(location.search);
+
+/* ── 시각 — ?hour=20.5 · ?weekend=1 로 시험 ─────────────────────── */
+function now(){
+  const d=new Date();
+  if(Q.has('hour')){const h=+Q.get('hour');d.setHours(h|0,Math.round((h%1)*60),0);}
+  return d;
+}
+const pad=n=>String(n).padStart(2,'0');
+const hm=d=>pad(d.getHours())+':'+pad(d.getMinutes());
+const dkey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+/* 공휴일 — 양력은 매년, 설·추석은 연도별(전날·당일·다음날). ?date=2027-02-07 로 시험 */
+if(Q.has('date')){const [y,m,dd]=Q.get('date').split('-').map(Number);const _now=now;now=()=>{const d=_now();d.setFullYear(y,m-1,dd);return d;};}
+const SOLAR=['01-01','03-01','05-05','06-06','08-15','10-03','10-09','12-25'];
+const LUNAR={seol:['2026-02-17','2027-02-07','2028-01-27','2029-02-13','2030-02-03'],chu:['2026-09-25','2027-09-15','2028-10-03','2029-09-22','2030-09-12']};
+const shift=(s,n)=>{const d=new Date(s+'T12:00');d.setDate(d.getDate()+n);return dkey(d);};
+function holiday(d){   // → {name, kind:'seol'|'chu'|'day', off, eve}  eve = 연휴 앞 사흘(꾸미기만)
+  const k=dkey(d);
+  for(const kind of ['seol','chu'])for(const s of LUNAR[kind]){
+    if([-1,0,1].some(n=>shift(s,n)===k))return {name:kind==='seol'?'설 연휴':'추석 연휴',kind,off:true};
+    if([-4,-3,-2].some(n=>shift(s,n)===k))return {name:kind==='seol'?'설':'추석',kind,off:false,eve:true};
+  }
+  if(SOLAR.includes(k.slice(5)))return {name:'공휴일',kind:'day',off:true};
+  return null;
+}
+const isOff=d=>Q.get('weekend')==='1'||d.getDay()===0||d.getDay()===6||!!holiday(d)?.off;
+const mins=s=>{const [h,m]=s.split(':');return +h*60+ +m;};
+
+/* ── 기록 (localStorage 만) ─────────────────────── */
+if(Q.has('fresh'))localStorage.removeItem('commute');
+const DB=JSON.parse(localStorage.getItem('commute')||'{}');
+DB.days=DB.days||{};
+const ADJ=['졸린','배고픈','성실한','느긋한','칼퇴하는','커피 중독','월요일의','조용한','바쁜','멍한'],NOUN=['사원증','스테이플러','포스트잇','모니터','키보드','머그컵','결재판','볼펜','의자','클립'];
+DB.nick=DB.nick||ADJ[Math.random()*ADJ.length|0]+' '+NOUN[Math.random()*NOUN.length|0];
+const save=()=>localStorage.setItem('commute',JSON.stringify(DB));
+save();
+const today=()=>{const k=dkey(now());return DB.days[k]=DB.days[k]||{};};
+$('nick').textContent='🪪 '+DB.nick;
+$('introW').textContent='오늘의 별명: '+DB.nick;
+
+function streak(){   // 오늘(또는 어제)부터 거꾸로 평일 연속 출근
+  let n=0;const d=now();if(!(DB.days[dkey(d)]||{}).in)d.setDate(d.getDate()-1);
+  for(let i=0;i<400;i++){
+    if(d.getDay()!==0&&d.getDay()!==6){if((DB.days[dkey(d)]||{}).in)n++;else break;}
+    d.setDate(d.getDate()-1);
+  }
+  return n;
+}
+
+/* ── 장면 ─────────────────────── */
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);
+renderer.shadowMap.enabled=true;document.body.appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.1,200);
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+
+const hemi=new THREE.HemisphereLight(0xffffff,0x8a7a66,1);scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xffffff,1.2);sun.position.set(-14,20,10);sun.castShadow=true;
+sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-20,right:20,top:20,bottom:-20});scene.add(sun);
+
+const L=(c)=>new THREE.MeshLambertMaterial({color:c});
+function box(w,h,d,c,x,y,z,parent=scene){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),typeof c==='number'?L(c):c);m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;parent.add(m);return m;}
+function textTex(lines,w,h,bg,fg,size){
+  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');
+  x.fillStyle=bg;x.fillRect(0,0,w,h);x.fillStyle=fg;x.textAlign='center';x.textBaseline='middle';
+  lines.forEach((t,i)=>{x.font=`700 ${size[i]||size[0]}px "Malgun Gothic",sans-serif`;x.fillText(t,w/2,h/2+(i-(lines.length-1)/2)*size[0]*1.25);});
+  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return {t,c,x};
+}
+
+// 바닥 — 바둑판 대리석
+{const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');
+ for(let i=0;i<4;i++)for(let j=0;j<4;j++){x.fillStyle=(i+j)%2?'#d9d2c4':'#e8e2d6';x.fillRect(i*64,j*64,64,64);}
+ const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(8,7);t.colorSpace=THREE.SRGBColorSpace;
+ const f=new THREE.Mesh(new THREE.PlaneGeometry(32,28),new THREE.MeshLambertMaterial({map:t}));f.rotation.x=-Math.PI/2;f.receiveShadow=true;scene.add(f);}
+const floorHit=new THREE.Mesh(new THREE.PlaneGeometry(32,28),new THREE.MeshBasicMaterial({visible:false}));floorHit.rotation.x=-Math.PI/2;scene.add(floorHit);
+// 바깥(정문 너머) 보도
+{const s=new THREE.Mesh(new THREE.PlaneGeometry(60,30),L(0x9a948a));s.rotation.x=-Math.PI/2;s.position.set(0,-0.01,28);scene.add(s);}
+
+// 벽 — 뒤(엘리베이터)·옆. 앞(카메라 쪽)은 열어 둔다
+const WALL=0xefe6d6;
+box(32,8,0.4,WALL,0,4,-14);
+box(0.4,8,28,WALL,-16,4,0);
+box(0.4,8,28,WALL,16,4,0);
+box(32,0.3,0.6,0x8a6a4a,0,0.15,-13.7);      // 걸레받이
+// 왼쪽 벽 큰 창 — 하늘색이 시간 따라
+// 창밖 도시 — 한 장의 그림을 창 셋이 나눠 본다. 밤엔 건물 창에 불이 켜진다
+const skyC=document.createElement('canvas');skyC.width=1536;skyC.height=480;const skyX=skyC.getContext('2d');
+const SKYLINE=(()=>{let s=7;const r=()=>(s=(s*16807)%2147483647)/2147483647;const b=[];
+  for(let x=0;x<1536;){const w=50+r()*110,h=110+r()*300;b.push({x,w,h,far:r()<.45,lit:Array.from({length:60},()=>r())});x+=w+4+r()*14;}return b;})();
+function drawSky(h){
+  const x=skyX,night=!(h>=6&&h<19.5),eve=h>=16.5&&h<19.5;
+  const [a,b]=night?['#0b1030','#26305a']:eve?['#ff8a5c','#ffd29a']:h<10?['#ffcf9a','#fff0d8']:['#8cc4f2','#d8ecff'];
+  const g=x.createLinearGradient(0,0,0,480);g.addColorStop(0,a);g.addColorStop(1,b);x.fillStyle=g;x.fillRect(0,0,1536,480);
+  if(night){x.fillStyle='#fff6d8';x.beginPath();x.arc(1180,90,34,0,7);x.fill();x.fillStyle='#0b1030';x.beginPath();x.arc(1196,80,30,0,7);x.fill();
+    x.fillStyle='rgba(255,255,255,.7)';for(let i=0;i<40;i++)x.fillRect((i*397)%1536,(i*131)%200,2,2);}
+  for(const far of [true,false])for(const bd of SKYLINE){if(bd.far!==far)continue;
+    const top=480-bd.h*(far?1.15:0.85);
+    x.fillStyle=night?(far?'#1a2244':'#10162c'):eve?(far?'#8a5a6a':'#5a3a4a'):(far?'#a8b8cc':'#7a8aa0');x.fillRect(bd.x,top,bd.w,480-top);
+    if(far)continue;let i=0;                                  // 앞 건물 창
+    for(let wy=top+14;wy<470;wy+=22)for(let wx=bd.x+8;wx<bd.x+bd.w-12;wx+=18){const v=bd.lit[i++%60];
+      x.fillStyle=night?(v<.5?'#ffe08a':'#1c2340'):eve?(v<.15?'#ffd27a':'rgba(255,220,180,.25)'):'rgba(220,235,255,.45)';x.fillRect(wx,wy,9,12);}
+  }
+  skyTex.forEach(t=>t.needsUpdate=true);
+}
+const skyTex=[0,1,2].map(i=>{const t=new THREE.CanvasTexture(skyC);t.colorSpace=THREE.SRGBColorSpace;t.repeat.x=1/3;t.offset.x=i/3;return t;});
+[-7,0,7].forEach((z,i)=>{const w=new THREE.Mesh(new THREE.PlaneGeometry(5.4,5),new THREE.MeshBasicMaterial({map:skyTex[i]}));w.rotation.y=Math.PI/2;w.position.set(-15.78,3.6,z);scene.add(w);
+  box(0.2,5.4,0.2,0x4a4a4a,-15.7,3.6,z-2.8);box(0.2,5.4,0.2,0x4a4a4a,-15.7,3.6,z+2.8);box(0.2,0.2,5.8,0x4a4a4a,-15.7,6.2,z);box(0.2,0.2,5.8,0x4a4a4a,-15.7,1.0,z);});
+// 오른쪽 벽 창 둘(같은 도시 그림의 다른 부분) — 카메라에서 잘 보이는 쪽
+[-9,-1.5].forEach((z,i)=>{const w=new THREE.Mesh(new THREE.PlaneGeometry(5,4.4),new THREE.MeshBasicMaterial({map:skyTex[(i+1)%3]}));w.rotation.y=-Math.PI/2;w.position.set(15.78,4,z);scene.add(w);
+  box(0.2,4.8,0.2,0x4a4a4a,15.7,4,z-2.6);box(0.2,4.8,0.2,0x4a4a4a,15.7,4,z+2.6);box(0.2,0.2,5.4,0x4a4a4a,15.7,6.3,z);box(0.2,0.2,5.4,0x4a4a4a,15.7,1.7,z);});
+// 회사 이름판
+{const {t}=textTex(['주식회사 오늘도','TODAY TOO Inc.'],512,160,'#2b2620','#f4ecdc',[54,24]);
+ const s=new THREE.Mesh(new THREE.PlaneGeometry(8,2.5),new THREE.MeshBasicMaterial({map:t}));s.position.set(0,6.3,-13.78);scene.add(s);}
+// 벽시계 — 진짜 시각
+const clockTex=textTex(['--:--'],256,128,'#f4ecdc','#2b2620',[70]);
+{const s=new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.2),new THREE.MeshBasicMaterial({map:clockTex.t}));s.position.set(9,5.6,-13.78);scene.add(s);}
+function drawClock(t){const x=clockTex.x;x.fillStyle='#f4ecdc';x.fillRect(0,0,256,128);x.strokeStyle='#2b2620';x.lineWidth=8;x.strokeRect(4,4,248,120);
+  x.fillStyle='#c9472f';x.font='700 70px "Malgun Gothic",sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(t,128,68);clockTex.t.needsUpdate=true;}
+
+// 엘리베이터 두 대
+const ELEV=[];
+for(const ex of [-5,5]){
+  box(3.6,5,0.3,0x6b6b6b,ex,2.5,-13.7);                       // 문틀
+  const inner=box(3,4.4,0.1,0xfff3cf,ex,2.2,-13.85);inner.material=new THREE.MeshBasicMaterial({color:0xfff3cf}); // 안쪽 불빛
+  const doors=[-1,1].map(s=>box(1.5,4.4,0.12,0xb8bcc2,ex+s*0.75,2.2,-13.5));
+  const lamp=new THREE.Mesh(new THREE.CircleGeometry(0.18,16),new THREE.MeshBasicMaterial({color:0x555555}));lamp.position.set(ex+2.3,2.4,-13.54);scene.add(lamp);
+  const {t}=textTex(['1'],64,64,'#222','#ffb347',[44]);const fl=new THREE.Mesh(new THREE.PlaneGeometry(0.6,0.6),new THREE.MeshBasicMaterial({map:t}));fl.position.set(ex,5.4,-13.54);scene.add(fl);
+  ELEV.push({x:ex,doors,lamp,open:0,want:0});
+}
+// 출입 게이트(개찰구) — 기둥 넷, 가운데 셋이 통로
+const GATE_Z=2;const GATES=[];
+for(const gx of [-4.5,-1.5,1.5,4.5])box(0.6,1.1,2.2,0x3a3f4a,gx,0.55,GATE_Z);
+for(const gx of [-3,0,3]){
+  const bar=box(2.2,0.08,0.08,0x9aa0a8,gx,0.95,GATE_Z);
+  const led=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.06,0.3),new THREE.MeshBasicMaterial({color:0x335577}));led.position.set(gx-1.35,1.13,GATE_Z+0.5);scene.add(led);
+  GATES.push({x:gx,bar,led,t:0});
+}
+// 안내 데스크
+box(5,1.2,1.4,0x8a6a4a,10,0.6,6);box(5.2,0.12,1.6,0xd9c29a,10,1.26,6);
+{const {t}=textTex(['안내'],128,64,'#8a6a4a','#f4ecdc',[34]);const s=new THREE.Mesh(new THREE.PlaneGeometry(1.4,0.7),new THREE.MeshBasicMaterial({map:t}));s.position.set(10,0.7,6.72);scene.add(s);}
+// 커피 머신
+const COFFEE={x:-12.6,z:-5};
+box(1.8,2.6,1.2,0x2b2f3a,-14.6,1.3,-5);box(1.2,0.5,0.1,0x111111,-14.6,1.9,-4.36);
+{const c=new THREE.Mesh(new THREE.CircleGeometry(0.12,12),new THREE.MeshBasicMaterial({color:0x6fe08a}));c.position.set(-14.1,2.35,-4.35);scene.add(c);}
+box(2.6,1,1.2,0x8a6a4a,-14.6,0.5,-1.8);   // 컵 놓는 장
+{const {t}=textTex(['☕ COFFEE'],256,64,'#c9472f','#fff8ec',[30]);const s=new THREE.Mesh(new THREE.PlaneGeometry(2,0.5),new THREE.MeshBasicMaterial({map:t}));s.position.set(-14.6,3.1,-4.38);scene.add(s);}
+// 화분·소파
+const LEAVES=[];
+function plant(x,z){box(0.9,0.9,0.9,0xc9a27a,x,0.45,z);const p=new THREE.Mesh(new THREE.SphereGeometry(0.9,10,8),L(0x4f7a52));p.position.set(x,1.6,z);p.scale.y=1.3;p.castShadow=true;scene.add(p);LEAVES.push(p);}
+plant(-14.6,-12.6);plant(14.6,-12.6);plant(14.6,11);plant(-9,-12.6);plant(9,-12.6);
+box(4.2,0.7,1.4,0x5a6e8a,12.8,0.35,-4);box(4.2,1.1,0.4,0x5a6e8a,12.8,0.9,-3.4+ -0.9);
+
+// 충돌 상자 [minx,maxx,minz,maxz]
+const SOLIDS=[[-4.9,-4.1,0.8,3.2],[-1.9,-1.1,0.8,3.2],[1.1,1.9,0.8,3.2],[4.1,4.9,0.8,3.2],[4.9,16,1.5,2.5],[-16,-4.9,1.5,2.5],
+  [7.3,12.7,5.1,7],[-16,-13.5,-6,-1],[10.5,15,-5.5,-3],[-15.3,-13.9,-13.3,-11.9],[13.9,15.3,-13.3,-11.9],[13.9,15.3,10.3,11.7],[-9.7,-8.3,-13.3,-11.9],[8.3,9.7,-13.3,-11.9]];
+const blocked=(x,z)=>x<-15.4||x>15.4||z<-13.2||z>13.5||SOLIDS.some(s=>x>s[0]-0.35&&x<s[1]+0.35&&z>s[2]-0.35&&z<s[3]+0.35);
+
+/* ── 사람 ─────────────────────── */
+function person(look){
+  const g=makeChibi(look);g.scale.setScalar(1.2);
+  const sh=new THREE.Mesh(new THREE.CircleGeometry(0.5,20),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.15}));
+  sh.rotation.x=-Math.PI/2;sh.position.y=0.02;g.add(sh);scene.add(g);return g;
+}
+const BASE_LOOK={coat:0x2b3a5a,pants:0x3a3f4a,hair:0x2a2018},MY_LOOK={...BASE_LOOK,scarf:myScarf(DB,save)};   // 목도리 색 = 같이 있을 때 구별
+const player=person(MY_LOOK);
+// 목에 건 사원증
+{const lan=new THREE.Mesh(new THREE.BoxGeometry(0.22,0.3,0.04),new THREE.MeshBasicMaterial({color:0xfafafa}));lan.position.set(0,0.82,0.4);player.userData.root.add(lan);
+ const st=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.08,0.042),new THREE.MeshBasicMaterial({color:0xc9472f}));st.position.set(0,0.9,0.401);player.userData.root.add(st);}
+const cup=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.07,0.2,12),new THREE.MeshLambertMaterial({color:0xfafafa}));
+cup.position.set(0.05,-0.55,0.08);cup.visible=false;player.userData.arms[1].add(cup);
+player.position.set(0,0,10);player.rotation.y=Math.PI;
+
+/* 동료(화면 속 직원, 진짜 사람 아님) — 시간대마다 하는 일이 다르다 */
+const LOOKS=[{coat:0x6b5a4a,hairStyle:'bob',hair:0x3a2a1a},{coat:0x3a4a3a,glasses:true},{coat:0xd9c29a,hairStyle:'bun',hair:0x141414},
+  {coat:0x7a3a3a,hair:0x5a3a22,hairStyle:'perm'},{coat:0x44506a,hat:{type:'beanie',c:0x8a8a8a}},{coat:0xe0d6c4,hairStyle:'long',hair:0x2a2018,glasses:true},{coat:0x2b2f3a}];
+const P={door:[0,13],gate:[[-3,0,3]],elev:[[-5,-12.6],[5,-12.6]],coffee:[COFFEE.x,COFFEE.z],sofa:[12.8,-5.8],desk:[10,4.4],win:[-13.5,3]};
+function routeFor(i,h){   // 지금 시각이면 이 동료가 도는 길
+  const g=[[-3,0,3][i%3],0],E=P.elev[i%2];
+  if(isOff(now()))return i<1?[[10,4.4],[10,4.4]]:null;                       // 주말엔 안내 데스크 한 명만
+  if(h>=7&&h<9.5)return [[P.door[0]+(i-3)*1.5,13.5],[g[0],5],[g[0],-1],E];      // 출근 러시: 정문 → 게이트 → 엘리베이터
+  if(h>=11.8&&h<13)return i===0?[[10,4.4],[10,4.4]]:(i<4?[E,[g[0],-1],[g[0],5],[(i-3)*1.5,13.5]]:[[(i-3)*1.5,13.5],[g[0],5],[g[0],-1],E]);   // 점심: 나가는 사람·들어오는 사람
+  if(h>=9.5&&h<17.5)return i<3?[[[10,4.4],P.coffee,P.sofa][i],[[10,4.4],P.coffee,P.sofa][i]]:(i<5?[E,[g[0],-1],P.coffee,[-11,-8],[g[0],-1],E]:null);
+  if(h>=17.5&&h<20)return [E,[g[0],-1],[g[0],5],[(i-3)*1.5,13.5]];               // 퇴근 러시
+  return i===0?[[10,4.4],[10,4.4]]:(i===1?[P.coffee,[-11,-8],P.coffee]:null);      // 밤: 경비 한 명, 야근 한 명
+}
+const MATES=LOOKS.map((lk,i)=>{const o=person(lk);o.visible=false;return {o,i,k:0,seg:0,wait:Math.random()*4,route:null};});
+function tickMates(dt,t){
+  const d=now(),h=d.getHours()+d.getMinutes()/60;
+  for(const m of MATES){
+    const r=routeFor(m.i,h);
+    if(!r){m.o.visible=false;continue;}
+    if(m.route!==JSON.stringify(r)){m.route=JSON.stringify(r);m.seg=0;m.wait=m.i*1.6;m.o.position.set(r[0][0],0,r[0][1]);}
+    m.o.visible=m.wait<=0||r.length===2;
+    if(m.wait>0){m.wait-=dt;animateChibi(m.o,t,dt,{walk:false});continue;}
+    const tgt=r[Math.min(m.seg+1,r.length-1)],dx=tgt[0]-m.o.position.x,dz=tgt[1]-m.o.position.z,dist=Math.hypot(dx,dz);
+    if(dist<0.15){
+      m.seg++;
+      if(m.seg>=r.length-1){                       // 끝 — 멈춰 있는 길(2점)은 그대로, 아니면 처음부터 다시
+        if(r.length===2){m.seg=0;animateChibi(m.o,t,dt,{walk:false});if(Math.random()<0.002)doAct(m.o,Math.random()<.5?'sip':'stretch');continue;}
+        m.seg=0;m.wait=3+Math.random()*6;m.o.visible=false;m.o.position.set(r[0][0],0,r[0][1]);continue;
+      }
+    }else{const s=Math.min(dist,2.6*dt);m.o.position.x+=dx/dist*s;m.o.position.z+=dz/dist*s;m.o.rotation.y=Math.atan2(dx,dz);}
+    animateChibi(m.o,t,dt,{walk:dist>=0.15});
+  }
+}
+
+/* ── 계절·요일 꾸미기 — ?month=12 · ?mon=1 로 시험 ─────────────────────── */
+const MONTH=Q.has('month')?+Q.get('month'):now().getMonth()+1;
+const MONDAY=Q.get('mon')==='1'||(!Q.has('mon')&&now().getDay()===1);
+const fx=[];   // 매 프레임 움직이는 것들 (dt)=>{}
+function fallers(n,area,color,size,speed,drift){   // 눈·비·꽃잎 — area=[x0,x1,y0,y1,z0,z1]
+  const g=new THREE.BufferGeometry(),p=new Float32Array(n*3),[x0,x1,y0,y1,z0,z1]=area;
+  for(let i=0;i<n;i++){p[i*3]=x0+Math.random()*(x1-x0);p[i*3+1]=y0+Math.random()*(y1-y0);p[i*3+2]=z0+Math.random()*(z1-z0);}
+  g.setAttribute('position',new THREE.BufferAttribute(p,3));
+  const pts=new THREE.Points(g,new THREE.PointsMaterial({color,size,sizeAttenuation:false,transparent:true,opacity:.8}));scene.add(pts);
+  fx.push(dt=>{for(let i=0;i<n;i++){p[i*3+1]-=speed*dt;p[i*3]+=Math.sin(p[i*3+1]+i)*drift*dt;if(p[i*3+1]<y0)p[i*3+1]=y1;}g.attributes.position.needsUpdate=true;});
+  return pts;
+}
+const OUTSIDE=[-30,30,0,16,14.5,40];    // 정문 너머
+if(MONTH===12||MONTH<=2){                // 겨울 — 바깥에 눈, 12월엔 트리
+  fallers(900,OUTSIDE,0xffffff,3,2.2,0.8);
+  if(MONTH===12){
+    const tx=-11,tz=-9;box(0.5,0.8,0.5,0x6b4424,tx,0.4,tz);
+    for(const [r,y] of [[1.9,1.6],[1.5,2.8],[1.0,3.9]]){const c=new THREE.Mesh(new THREE.ConeGeometry(r,1.6,10),L(0x2f6a46));c.position.set(tx,y,tz);c.castShadow=true;scene.add(c);}
+    const star=new THREE.Mesh(new THREE.OctahedronGeometry(0.35),new THREE.MeshBasicMaterial({color:0xffd34a}));star.position.set(tx,4.95,tz);scene.add(star);
+    const balls=[];for(let i=0;i<16;i++){const a=i*2.4,y=1.2+i*0.18,r=1.85-i*0.1;const b=new THREE.Mesh(new THREE.SphereGeometry(0.13,8,6),new THREE.MeshBasicMaterial({color:[0xc9472f,0xffd34a,0x6fb0ff][i%3]}));b.position.set(tx+Math.cos(a)*r*0.8,y,tz+Math.sin(a)*r*0.8);scene.add(b);balls.push(b);}
+    let bt=0;fx.push(dt=>{bt+=dt;star.rotation.y+=dt;balls.forEach((b,i)=>b.visible=((bt*2+i)|0)%3!==0);});
+    SOLIDS.push([tx-1.6,tx+1.6,tz-1.6,tz+1.6]);
+  }
+  LEAVES.forEach(l=>l.material.color.setHex(0x3e5e48));
+}else if(MONTH<=5){                      // 봄 — 화분에 분홍 꽃, 꽃잎 날림
+  LEAVES.forEach(l=>{l.material.color.setHex(0xf2b6c6);});
+  fallers(260,[-15,15,0,7,-13,13],0xf6c6d4,4,0.6,1.2);
+}else if(MONTH<=8){                      // 여름 — 진한 초록, 정문 앞 햇볕 줄무늬 매트
+  LEAVES.forEach(l=>l.material.color.setHex(0x3f8a4a));
+  for(let i=0;i<5;i++)box(1.2,0.03,3,i%2?0x6fb0d0:0xf4ecdc,-3+i*1.2,0.02,11.5);
+}else{                                   // 가을 — 단풍 화분, 바닥 낙엽
+  LEAVES.forEach((l,i)=>l.material.color.setHex([0xd9822b,0xc9472f,0xe0b040][i%3]));
+  for(let i=0;i<40;i++){const f=new THREE.Mesh(new THREE.CircleGeometry(0.16,5),new THREE.MeshLambertMaterial({color:[0xd9822b,0xc9472f,0xe0b040][i%3],side:THREE.DoubleSide}));
+    f.rotation.x=-Math.PI/2;f.rotation.z=Math.random()*6;f.position.set((Math.random()-.5)*12,0.03,10+Math.random()*3.6);scene.add(f);}
+}
+/* 금요일·점심시간 — ?fri=1 로 시험 */
+const FRIDAY=Q.get('fri')==='1'||(!Q.has('fri')&&now().getDay()===5);
+const isLunch=()=>{const d=now(),h=d.getHours()+d.getMinutes()/60;return !isOff(d)&&h>=11.8&&h<13;};
+// 게이트 위 걸개 — 시간 따라 글이 바뀐다
+const banTex=textTex([''],1024,160,'#c9472f','#fff8ec',[64]);
+const banner=new THREE.Mesh(new THREE.PlaneGeometry(9,1.4),new THREE.MeshBasicMaterial({map:banTex.t,transparent:true}));banner.position.set(0,5.6,GATE_Z);scene.add(banner);
+const banPoles=[-4.4,4.4].map(x=>box(0.06,2.4,0.06,0x2b2620,x,6.9,GATE_Z));
+function drawBanner(){
+  const d=now(),h=d.getHours()+d.getMinutes()/60;let t=null,bg='#c9472f';
+  const hol=holiday(d);
+  if(hol?.kind==='day')t=null;
+  else if(hol?.off){t='🏮 '+hol.name+' — 오늘은 회사 안 와도 돼요';bg='#2b4a8a';}
+  else if(hol?.eve&&!isLunch()){t='🎁 곧 '+hol.name+' — 고향 가는 길 미리 챙겨요';bg='#2b4a8a';}
+  else if(isOff(d))t=null;
+  else if(isLunch()){t='🍚 점심시간 — 오늘 뭐 먹지?';bg='#e0a030';}
+  else if(FRIDAY&&h>=17)t='🎉 불금 — 오늘은 일찍 들어가요';
+  else if(FRIDAY)t='🎉 금요일 — 조금만 버티면 주말';
+  else if(MONDAY&&h<12)t='☔ 월요일 — 커피부터 한 잔';
+  banner.visible=!!t;banPoles.forEach(p=>p.visible=!!t);if(!t)return;
+  const x=banTex.x;x.clearRect(0,0,1024,160);x.fillStyle=bg;x.beginPath();x.roundRect(8,8,1008,144,18);x.fill();
+  let fs=64;do{x.font=`800 ${fs}px "Malgun Gothic",sans-serif`;fs-=4;}while(x.measureText(t).width>940&&fs>30);   // 긴 글은 작게
+  x.fillStyle='#fff8ec';x.textAlign='center';x.textBaseline='middle';x.fillText(t,512,84);banTex.t.needsUpdate=true;
+}
+if(FRIDAY&&!isOff(now())){                // 금요일 — 천장에 삼각 깃발 줄, 깃발이 살랑
+  const flags=[];
+  for(const z of [-5,-10])for(let i=0;i<22;i++){const f=new THREE.Mesh(new THREE.ConeGeometry(0.35,0.8,3),new THREE.MeshBasicMaterial({color:[0xc9472f,0xe0b040,0x6fb0d0,0x7ab06a][i%4]}));
+    f.rotation.x=Math.PI;f.position.set(-15+i*1.43,7.3-Math.sin(i/21*Math.PI)*0.8,z);scene.add(f);flags.push(f);}
+  let ft=0;fx.push(dt=>{ft+=dt;flags.forEach((f,i)=>f.rotation.z=Math.sin(ft*2+i)*0.15);});
+}
+// 명절(설·추석, 앞 사흘~연휴) — 청사초롱·선물 세트
+{const hol=holiday(now());
+ if(hol&&hol.kind!=='day'){
+  const lan=[];
+  for(const [x,y,z] of [[-4.5,4.4,GATE_Z],[4.5,4.4,GATE_Z],[-7.4,4.6,-13.3],[7.4,4.6,-13.3],[-2.6,4.6,-13.3],[2.6,4.6,-13.3]]){
+    const g=new THREE.Group();g.position.set(x,y,z);scene.add(g);
+    const top=new THREE.Mesh(new THREE.CylinderGeometry(0.32,0.32,0.45,12),new THREE.MeshLambertMaterial({color:0xc9472f,emissive:0x701810}));top.position.y=0.22;g.add(top);
+    const bot=new THREE.Mesh(new THREE.CylinderGeometry(0.32,0.32,0.45,12),new THREE.MeshLambertMaterial({color:0x2b4a8a,emissive:0x101a40}));bot.position.y=-0.22;g.add(bot);
+    for(const yy of [0.46,-0.46]){const r=new THREE.Mesh(new THREE.CylinderGeometry(0.36,0.36,0.06,12),L(0x2b2620));r.position.y=yy;g.add(r);}
+    const str=new THREE.Mesh(new THREE.CylinderGeometry(0.015,0.015,1.2),L(0x2b2620));str.position.y=1.05;g.add(str);
+    const glow=new THREE.PointLight(0xffb070,6,5);g.add(glow);lan.push(g);
+  }
+  let lt=0;fx.push(dt=>{lt+=dt;lan.forEach((g,i)=>g.rotation.z=Math.sin(lt*1.3+i)*0.06);});
+  // 선물 세트 더미 — 데스크 옆
+  [[12.2,0.35,4.4,0xc9472f],[13.1,0.35,4.4,0xe0b040],[12.65,1.0,4.4,0x2b4a8a],[13.6,0.35,5.2,0x7ab06a]].forEach(([x,y,z,c])=>{
+    box(0.8,0.7,0.6,c,x,y,z);box(0.82,0.72,0.1,0xf4ecdc,x,y,z);});
+  SOLIDS.push([11.7,14,4,5.6]);
+ }}
+// 점심 — 안내 데스크에 배달 봉투, 시간 밖엔 숨김
+const bags=[0,1,2].map(i=>{const b=box(0.6,0.7,0.4,[0xf4ecdc,0xc9a27a,0xf4ecdc][i],8.6+i*0.8,1.67,6);b.visible=false;return b;});
+
+if(MONDAY){                              // 월요일 — 비. 바깥 빗줄기·창에 물줄기·정문 우산꽂이
+  fallers(1400,OUTSIDE,0x9fb4d0,2,22,0);
+  const c=document.createElement('canvas');c.width=64;c.height=256;const x=c.getContext('2d');x.strokeStyle='rgba(220,235,255,.55)';x.lineWidth=2;
+  for(let i=0;i<14;i++){const px=Math.random()*64,py=Math.random()*256;x.beginPath();x.moveTo(px,py);x.lineTo(px-2,py+30+Math.random()*30);x.stroke();}
+  const rt=new THREE.CanvasTexture(c);rt.wrapS=rt.wrapT=THREE.RepeatWrapping;rt.repeat.set(4,1);
+  for(const z of [-7,0,7]){const w=new THREE.Mesh(new THREE.PlaneGeometry(5.4,5),new THREE.MeshBasicMaterial({map:rt,transparent:true}));w.rotation.y=Math.PI/2;w.position.set(-15.74,3.6,z);scene.add(w);}
+  fx.push(dt=>{rt.offset.y+=dt*0.6;});
+  box(0.8,0.9,0.8,0x3a3f4a,6.5,0.45,4);
+  [0xc9472f,0x2b3a5a,0xe0b040].forEach((col,i)=>{const u=new THREE.Mesh(new THREE.ConeGeometry(0.22,1.4,8),L(col));u.position.set(6.3+i*0.2,1.3,3.9+(i-1)*0.15);u.rotation.z=(i-1)*0.12;scene.add(u);});
+  SOLIDS.push([6.1,6.9,3.6,4.4]);
+}
+
+/* ── 시간대 빛 ─────────────────────── */
+function applyTime(){
+  const d=now(),h=d.getHours()+d.getMinutes()/60;let sky,amb,sunI,sunC,bg;
+  if(h>=6&&h<10){sky=0xffd9a8;amb=1.0;sunI=1.3;sunC=0xffe2b8;bg=0x2a2a36;}
+  else if(h>=10&&h<16.5){sky=0xbfe0ff;amb=1.1;sunI=1.4;sunC=0xffffff;bg=0x2a3040;}
+  else if(h>=16.5&&h<19.5){sky=0xff9f6b;amb=0.85;sunI=1.0;sunC=0xffb07a;bg=0x2e2228;}
+  else{sky=0x1a2340;amb=0.55;sunI=0.25;sunC=0x8aa0ff;bg=0x0d1020;}
+  drawSky(h);hemi.intensity=amb;sun.intensity=sunI;sun.color.setHex(sunC);scene.background=new THREE.Color(bg);
+  const dark=!(h>=6&&h<19.5),late=dark&&(h>=21||h<6);   // 9시 넘으면 절전 — 커피 머신·안내 데스크 불만
+  night.forEach((l,i)=>l.visible=dark&&(!late||i>=3));
+  if(late){hemi.intensity=0.32;sun.intensity=0.12;}
+  drawBanner();bags.forEach(b=>b.visible=isLunch());
+  drawClock(hm(d));$('clock').textContent='🕘 '+hm(d)+(isOff(d)?' · 쉬는 날':'');
+}
+const night=[[-5,-10],[5,-10],[0,4],[-12,-4],[10,6]].map(([x,z])=>{const l=new THREE.PointLight(0xffd59a,22,14);l.position.set(x,6,z);scene.add(l);return l;});
+// 천장 등 모양
+for(const [x,z] of [[-8,-6],[8,-6],[-8,6],[8,6],[0,-6],[0,6]]){const p=new THREE.Mesh(new THREE.CircleGeometry(0.9,20),new THREE.MeshBasicMaterial({color:0xfff6e0}));p.rotation.x=Math.PI/2;p.position.set(x,7.98,z);scene.add(p);}
+
+/* ── 상태 표시 ─────────────────────── */
+function refreshState(){
+  const t=today();let s='아직 출근 전';
+  if(isOff(now()))s='🛋 오늘은 쉬는 날';
+  else if(t.out)s='퇴근 '+t.out;
+  else if(t.in)s='출근 '+t.in+' · 근무 중';
+  $('state').textContent=s;
+}
+function toast(t,ms=2600){$('toast').textContent=t;$('toast').style.opacity=1;clearTimeout(toast.h);toast.h=setTimeout(()=>$('toast').style.opacity=0,ms);}
+function dialog(title,who,html,buttons){
+  $('dlgT').textContent=title;$('dlgW').textContent=who;$('dlgB').innerHTML=html;$('dlgR').innerHTML='';
+  for(const [txt,fn,cls] of buttons){const b=document.createElement('button');b.className='btn '+(cls||'');b.textContent=txt;b.onclick=()=>{$('dlg').style.display='none';fn&&fn();};$('dlgR').appendChild(b);}
+  $('dlg').style.display='flex';
+}
+function stamp(word,time,sub){$('stamp').firstChild.textContent=word;$('stampT').textContent=time;$('stampS').textContent=sub||'';
+  $('stamp').classList.add('on');clearTimeout(stamp.h);stamp.h=setTimeout(()=>$('stamp').classList.remove('on'),1800);}
+let actx;
+function beep(f=1320,len=.12,when=0){try{actx=actx||new AudioContext();const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=f;o.type='square';g.gain.value=.05;
+  o.connect(g).connect(actx.destination);o.start(actx.currentTime+when);o.stop(actx.currentTime+when+len);}catch(e){}}
+
+/* ── 걷기 ─────────────────────── */
+let target=null,onArrive=null,busy=false;const keys={};
+function goTo(x,z,then){target=new THREE.Vector3(x,0,z);onArrive=then||null;}
+addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;});
+addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
+const ray=new THREE.Raycaster(),mv=new THREE.Vector2();
+renderer.domElement.addEventListener('pointerdown',e=>{
+  if(busy)return;
+  mv.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(mv,camera);
+  const h=ray.intersectObject(floorHit)[0];if(h)goTo(h.point.x,h.point.z);
+});
+
+/* ── 동작 넷 ─────────────────────── */
+function nearestGate(){return GATES.reduce((a,b)=>Math.abs(b.x-player.position.x)<Math.abs(a.x-player.position.x)?b:a);}
+const ACTS={
+  in(){
+    const d=now(),t=today();
+    if(isOff(d)){toast('🛋 오늘은 쉬는 날이에요. 출근 찍기는 평일만');return;}
+    if(t.in){toast(`오늘은 ${t.in} 에 이미 찍었어요`);return;}
+    if(t.out){toast('오늘은 이미 퇴근했어요');return;}
+    const g=nearestGate();const before=player.position.z>GATE_Z;
+    busy=true;
+    goTo(g.x,before?GATE_Z+1.6:GATE_Z-1.6,()=>{
+      player.rotation.y=before?Math.PI:0;doAct(player,'wave');
+      setTimeout(()=>{
+        beep(1320);beep(1760,.12,.13);g.t=1.2;
+        const tm=hm(now());t.in=tm;save();
+        const late=mins(tm)>9*60;
+        stamp('출근',tm,late?'지각… 아무도 못 봤어요':'연속 '+streak()+'일째');
+        refreshState();
+        count('/in').then(r=>{if(r&&r.rank)setTimeout(()=>toast(`🪪 오늘 전국 ${r.rank}번째 출근`,3200),1900);});
+        setTimeout(()=>goTo(g.x,GATE_Z-2.4,()=>{busy=false;}),700);
+      },500);
+    });
+  },
+  coffee(){
+    busy=true;goTo(COFFEE.x,COFFEE.z,()=>{
+      player.rotation.y=-Math.PI/2;beep(520,.3);
+      setTimeout(()=>{cup.visible=true;player.rotation.y=Math.PI/2;doAct(player,'sip');
+        const t=today();t.coffee=(t.coffee||0)+1;save();
+        toast(['☕ 오늘 '+t.coffee+'잔째','☕ 살 것 같다','☕ 아아 한 잔 — 오늘 '+t.coffee+'잔째','☕ 이게 없으면 일 못 해요'][t.coffee>3?3:Math.random()*3|0]);
+        setTimeout(()=>{cup.visible=false;busy=false;},2300);},600);
+    });
+  },
+  stretch(){
+    target=null;doAct(player,'stretch');
+    const h=now().getHours();
+    const MENU=['김치찌개','제육볶음','돈가스','국밥','쌀국수','비빔밥','짜장면','샐러드','칼국수','순두부'];
+    toast(isLunch()?'🙆 오늘 점심은… '+MENU[(now().getDate()*7+now().getMonth())%MENU.length]+'?':FRIDAY&&h>=15?'🙆 불금까지 조금만':h<11?'🙆 아직 오전이라니…':h<14?'🙆 점심 먹고 졸려요':h<18?'🙆 퇴근까지 '+(18-h)+'시간쯤':'🙆 이제 집에 가요');
+  },
+  out(){
+    const d=now(),t=today();
+    if(t.out){toast('오늘은 '+t.out+' 에 퇴근했어요');return;}
+    const E=ELEV.reduce((a,b)=>Math.abs(b.x-player.position.x)<Math.abs(a.x-player.position.x)?b:a);
+    busy=true;
+    goTo(E.x,-11.6,()=>{
+      player.rotation.y=Math.PI;E.want=1;beep(880,.25);
+      setTimeout(()=>goTo(E.x,-13.2,()=>{
+        player.rotation.y=0;
+        const tm=hm(now()),m=mins(tm);
+        if(!isOff(d)&&t.in){t.out=tm;save();outCount=count('/out');}else outCount=null;
+        if(m>=18*60&&m<=18*60+30)doAct(player,'cheer');else doAct(player,'wave');
+        setTimeout(()=>{E.want=0;},900);
+        setTimeout(()=>{
+          $('fade').style.opacity=.92;
+          setTimeout(()=>leaveCard(tm,m,d,t),900);
+        },1900);
+      }),900);
+    });
+  }
+};
+document.querySelectorAll('#acts .btn').forEach(b=>b.onclick=()=>{if(busy&&b.dataset.a!=='stretch')return;ACTS[b.dataset.a]();});
+
+function leaveCard(tm,m,d,t){
+  let title,line;
+  if(isOff(d)){title='주말 출근…?';line='쉬는 날인데 로비까지 왔네요. 오늘 기록은 남기지 않아요.';}
+  else if(!t.in){title='퇴근';line='출근 도장을 안 찍었어요. 내일은 게이트에서 꼭 찍어요.';}
+  else if(m<17*60){title='조퇴…? 🤫';line=`아직 ${tm}. 아무한테도 말 안 할게요.`;}
+  else if(m<18*60){title='살짝 일찍 🫢';line=`${tm} 퇴근. 이 정도는 괜찮아요.`;}
+  else if(m<=18*60+30){title='칼퇴 성공 🎉';line=`${tm} 퇴근! 오늘 저녁은 내 거예요.`;}
+  else{const o=m-18*60;title='오늘도 고생했어요';line=`${tm} 퇴근 · 야근 ${o/60|0}시간 ${o%60}분`;}
+  if(FRIDAY&&!isOff(d)&&t.in)line+=m>18*60+30?'<br>불금인데… 주말엔 푹 쉬어요.':'<br>🎉 불금! 좋은 주말 보내요.';
+  const work=t.in&&t.out?((mins(t.out)-mins(t.in))):0;
+  dialog(title,'주식회사 오늘도 · 퇴근 기록',`<p>${line}</p>`+(work>0?`<p style="color:#7a6e5e;font-size:13px">출근 ${t.in} → 퇴근 ${t.out} · 회사에 ${work/60|0}시간 ${work%60}분${t.coffee?' · 커피 '+t.coffee+'잔':''}</p>`:''),
+    [['📒 내 기록',()=>{back();showRec();}],['로비로 돌아가기',back,'main']]);
+  if(outCount)outCount.then(r=>{if(!r||!r.rank)return;const p=document.createElement('p');p.style.cssText='color:#7a6e5e;font-size:13px';
+    p.textContent=`🛗 오늘 전국 ${r.rank}번째 퇴근`+(r.working?` · 아직 ${r.working}명 근무 중`:' · 이제 다 퇴근했어요');$('dlgB').appendChild(p);});
+}
+
+/* ── 전국 숫자 (Cloudflare Workers, workers/office-count) ───────
+   기록은 이 기기에만, 서버엔 「오늘 몇 명」 숫자만. 서버가 안 되면 조용히 숨긴다.
+   시험 주소(로컬)는 세지 않는다 — ?count=1 이면 셈 */
+const API='https://office-count.swbins.workers.dev';
+const COUNT_OK=location.hostname==='swbins.github.io'||Q.has('count');
+let outCount=null;
+async function api(path,method='GET'){
+  try{const c=new AbortController();setTimeout(()=>c.abort(),4000);
+    const r=await fetch(API+path,{method,signal:c.signal});if(!r.ok)return null;const j=await r.json();showCrowd(j);return j;}catch(e){return null;}
+}
+function count(path){return COUNT_OK?api(path,'POST'):Promise.resolve(null);}
+function showCrowd(j){
+  if(!j||isOff(now())){$('crowd').style.display='none';return;}
+  $('crowd').textContent=j.in?`👥 오늘 출근 ${j.in}명 · 근무 중 ${j.working}명`:'👥 오늘 첫 출근을 기다려요';
+  $('crowd').style.display='';
+}
+api('/stats');setInterval(()=>{if(!document.hidden)api('/stats');},60000);
+function back(){$('fade').style.opacity=0;player.position.set(0,0,10);player.rotation.y=Math.PI;busy=false;refreshState();}
+
+/* ── 내 기록 ─────────────────────── */
+function showRec(){
+  const d=now(),ym=dkey(d).slice(0,7),list=Object.entries(DB.days).filter(([k,v])=>k.startsWith(ym)&&v.in);
+  const early=list.filter(([k,v])=>v.out&&mins(v.out)>=18*60&&mins(v.out)<=18*60+30).length;
+  const outs=list.filter(([k,v])=>v.out).map(([k,v])=>mins(v.out));
+  const avg=outs.length?outs.reduce((a,b)=>a+b,0)/outs.length:0;
+  const first=new Date(d.getFullYear(),d.getMonth(),1),days=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+  let cal='<i>일</i><i>월</i><i>화</i><i>수</i><i>목</i><i>금</i><i>토</i>'+'<div class="off"></div>'.repeat(first.getDay());
+  for(let i=1;i<=days;i++){const k=ym+'-'+pad(i),v=DB.days[k]||{},wd=(first.getDay()+i-1)%7;
+    const cls=v.out&&mins(v.out)>=18*60&&mins(v.out)<=18*60+30?'early':v.in?'in':(wd===0||wd===6?'off':'');
+    cal+=`<div class="${cls}" title="${v.in?v.in+' → '+(v.out||'-'):''}">${i}</div>`;}
+  dialog('📒 내 기록',DB.nick+' · '+(d.getMonth()+1)+'월',
+    `<div class="stat"><div><b>${streak()}일</b><span>연속 출근</span></div><div><b>${list.length}일</b><span>이번 달 출근</span></div>
+     <div><b>${early}일</b><span>칼퇴 (18:00~18:30)</span></div><div><b>${avg?pad(avg/60|0)+':'+pad(Math.round(avg%60)):'-'}</b><span>평균 퇴근</span></div></div>
+     <div class="cal">${cal}</div><p style="font-size:12px;color:#7a6e5e">진한 칸 = 칼퇴한 날 · 기록은 이 기기에만 있어요</p>`,
+    [['🖼 카드 이미지',shareCard],['기록 복사',()=>{navigator.clipboard?.writeText(`[출근 도장] ${d.getMonth()+1}월 출근 ${list.length}일 · 칼퇴 ${early}일 · 연속 ${streak()}일 — 주식회사 오늘도`);toast('복사했어요');}],['닫기',null,'main']]);
+}
+$('recBtn').onclick=showRec;
+
+/* 공유 카드 — 이번 달 기록 한 장 (1080×1350, 종이 노트 결) */
+function monthStats(d){
+  const ym=dkey(d).slice(0,7),list=Object.entries(DB.days).filter(([k,v])=>k.startsWith(ym)&&v.in);
+  const isEarly=v=>v.out&&mins(v.out)>=18*60&&mins(v.out)<=18*60+30;
+  const outs=list.filter(([k,v])=>v.out).map(([k,v])=>mins(v.out));
+  const avg=outs.length?outs.reduce((a,b)=>a+b,0)/outs.length:0;
+  const coffee=list.reduce((a,[k,v])=>a+(v.coffee||0),0);
+  return {ym,list,isEarly,early:list.filter(([k,v])=>isEarly(v)).length,avg,coffee};
+}
+function drawCard(){
+  const d=now(),S=monthStats(d),W=1080,H=1350,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  const F=(w,s)=>`${w} ${s}px "Pretendard","Malgun Gothic",sans-serif`;
+  x.fillStyle='#f4ecdc';x.fillRect(0,0,W,H);
+  x.strokeStyle='#e2d6bf';x.lineWidth=2;for(let y=120;y<H;y+=54){x.beginPath();x.moveTo(0,y);x.lineTo(W,y);x.stroke();}   // 노트 줄
+  x.strokeStyle='#2b2620';x.lineWidth=6;x.strokeRect(40,40,W-80,H-80);
+  x.fillStyle='#2b2620';x.font=F(800,40);x.textAlign='left';x.fillText('주식회사 오늘도 · 출근 도장',90,130);
+  x.font=F(800,96);x.fillText(`${d.getMonth()+1}월의 나`,90,250);
+  x.font=F(600,40);x.fillStyle='#7a6e5e';x.fillText(DB.nick,90,315);
+  // 도장
+  x.save();x.translate(W-230,230);x.rotate(-0.25);x.strokeStyle='#c9472f';x.lineWidth=10;x.beginPath();x.arc(0,0,120,0,7);x.stroke();
+  x.lineWidth=3;x.beginPath();x.arc(0,0,104,0,7);x.stroke();x.fillStyle='#c9472f';x.textAlign='center';x.font=F(800,58);x.fillText(S.early?'칼퇴':'출근',0,10);
+  x.font=F(700,30);x.fillText(S.early?S.early+'회':S.list.length+'일',0,56);x.restore();
+  // 숫자 넷
+  const cells=[[streak()+'일','연속 출근'],[S.list.length+'일','이번 달 출근'],[S.early+'일','칼퇴 18:00~18:30'],[S.avg?pad(S.avg/60|0)+':'+pad(Math.round(S.avg%60)):'-','평균 퇴근']];
+  cells.forEach(([v,l],i)=>{const cx=90+(i%2)*460,cy=380+(i/2|0)*200;x.fillStyle='#fffaf0';x.fillRect(cx,cy,440,170);x.strokeStyle='#2b2620';x.lineWidth=4;x.strokeRect(cx,cy,440,170);
+    x.fillStyle='#2b2620';x.textAlign='left';x.font=F(800,72);x.fillText(v,cx+30,cy+95);x.font=F(600,32);x.fillStyle='#7a6e5e';x.fillText(l,cx+30,cy+145);});
+  // 달력
+  const first=new Date(d.getFullYear(),d.getMonth(),1),days=new Date(d.getFullYear(),d.getMonth()+1,0).getDate(),cw=128,top=820;
+  x.font=F(700,28);x.textAlign='center';'일월화수목금토'.split('').forEach((w,i)=>{x.fillStyle='#7a6e5e';x.fillText(w,90+i*cw+cw/2-6,top);});
+  for(let i=1;i<=days;i++){const k=S.ym+'-'+pad(i),v=DB.days[k]||{},p=first.getDay()+i-1,cx=90+(p%7)*cw,cy=top+20+(p/7|0)*72;
+    x.fillStyle=S.isEarly(v)?'#c9472f':v.in?'#e9a48f':((p%7===0||p%7===6)?'rgba(0,0,0,0)':'#e6dcc8');x.fillRect(cx,cy,cw-12,62);
+    x.fillStyle=S.isEarly(v)?'#fff':'#2b2620';x.font=F(600,26);x.fillText(i,cx+(cw-12)/2,cy+41);}
+  x.fillStyle='#2b2620';x.textAlign='left';x.font=F(600,32);
+  x.fillText(`☕ 커피 ${S.coffee}잔`,90,H-90);x.textAlign='right';x.fillStyle='#7a6e5e';x.fillText('swbins.github.io/mini/office',W-90,H-90);
+  return c;
+}
+function shareCard(){
+  const c=drawCard(),url=c.toDataURL('image/png'),name=`출근도장-${dkey(now()).slice(0,7)}.png`;
+  dialog('🖼 이번 달 카드','길게 눌러 저장하거나 아래 단추로',`<img src="${url}" alt="이번 달 출근 기록 카드" style="width:100%;border:1.5px solid #2b2620;border-radius:4px">`,
+    [['내려받기',()=>{const a=document.createElement('a');a.href=url;a.download=name;a.click();}],
+     ['공유',()=>c.toBlob(async b=>{const f=new File([b],name,{type:'image/png'});
+        if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'출근 도장'});}catch(e){}}else toast('이 브라우저는 바로 공유가 안 돼요 — 내려받기로');}),'main']]);
+}
+$('start').onclick=()=>{$('intro').style.display='none';beep(660,.08);
+  const d=now(),t=today();
+  if(isOff(d))toast('🛋 오늘은 쉬는 날 — 로비만 구경해요',3200);
+  else if(!t.in)toast((MONDAY?'☔ 월요일인데 비까지… ':'')+'🪪 게이트에서 출근부터 찍어요',3400);};
+
+/* 시험용: ?do=in,coffee,out — 소개 창 건너뛰고 동작을 차례로(각 4.5초 간격), ?rec=1 기록 창 */
+if(Q.has('do')||Q.has('rec')){$('intro').style.display='none';
+  (Q.get('do')||'').split(',').filter(Boolean).forEach((a,i)=>setTimeout(()=>ACTS[a](),600+i*4500));
+  if(Q.has('rec'))setTimeout(showRec,800);}
+if(Q.has('shot'))for(const s of ['.hud','#acts','#intro'])document.querySelector(s).style.display='none';   // 표지 그림용
+if(Q.has('card')){$('intro').style.display='none';setTimeout(shareCard,800);}
+
+/* ── 돌리기 ─────────────────────── */
+applyTime();refreshState();setInterval(()=>{applyTime();},20000);
+// 같이 있는 사람들(live.js) — 로비에 들어온 다른 사람. ?solo=1 · ?shot=1 이면 혼자
+const live=startLive({THREE,scene,player,person,key:'office',nick:DB.nick,look:MY_LOOK,baseLook:BASE_LOOK,toast,doAct,animateChibi,
+  crowdEl:$('together'),waveBtn:$('waveBtn'),off:Q.has('solo')||Q.has('shot')});
+const clock=new THREE.Clock();let tt=0;const camPos=new THREE.Vector3();
+function loop(){
+  requestAnimationFrame(loop);
+  const dt=Math.min(clock.getDelta(),0.05);tt+=dt;
+  // 방향키
+  let kx=(keys['arrowright']||keys['d']?1:0)-(keys['arrowleft']||keys['a']?1:0),kz=(keys['arrowdown']||keys['s']?1:0)-(keys['arrowup']||keys['w']?1:0);
+  let walking=false;
+  if(!busy&&(kx||kz)){target=null;const l=Math.hypot(kx,kz),nx=player.position.x+kx/l*5*dt,nz=player.position.z+kz/l*5*dt;
+    if(!blocked(nx,player.position.z))player.position.x=nx;if(!blocked(player.position.x,nz))player.position.z=nz;
+    player.rotation.y=Math.atan2(kx,kz);walking=true;}
+  else if(target){
+    const dx=target.x-player.position.x,dz=target.z-player.position.z,dist=Math.hypot(dx,dz);
+    if(dist<0.12){target=null;const f=onArrive;onArrive=null;f&&f();}
+    else{const s=Math.min(dist,5*dt),nx=player.position.x+dx/dist*s,nz=player.position.z+dz/dist*s;
+      // 걸어가는 길: 일반 걷기는 막히면 멈춤, 동작 이동(busy)은 엘리베이터 안까지 들어가도록 통과
+      if(busy||!blocked(nx,nz)){player.position.x=nx;player.position.z=nz;}else{target=null;onArrive=null;}
+      player.rotation.y=Math.atan2(dx,dz);walking=true;}
+  }
+  animateChibi(player,tt,dt,{walk:walking});
+  tickMates(dt,tt);live.tick(dt,tt);
+  for(const f of fx)f(dt);
+  // 게이트 불빛·막대
+  for(const g of GATES){if(g.t>0){g.t-=dt;g.led.material.color.setHex(0x3ee07a);g.bar.rotation.y=Math.min(1,g.t)*Math.PI/2;}else{g.led.material.color.setHex(0x335577);g.bar.rotation.y=0;}}
+  // 엘리베이터 문
+  for(const E of ELEV){E.open+=(E.want-E.open)*Math.min(1,dt*4);E.doors[0].position.x=E.x-0.75-E.open*1.4;E.doors[1].position.x=E.x+0.75+E.open*1.4;
+    E.lamp.material.color.setHex(E.want?0xffb347:0x555555);}
+  // 카메라 — 뒤에서 내려다보기
+  const far=camera.aspect<0.8?1.45:1;   // 폰 세로 화면은 더 멀리서
+  camPos.set(player.position.x*0.85,12*far,player.position.z+14*far);camera.position.lerp(camPos,Math.min(1,dt*3));
+  camera.lookAt(player.position.x*0.9,1,player.position.z-2);
+  renderer.render(scene,camera);
+}
+loop();
+</script>
+</body>
+</html>

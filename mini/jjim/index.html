@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>동네 찜질방</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 매점 오늘의 메뉴 · TV 프로 — 날짜마다 하나
+const MENU = [['군고구마', '껍질이 타서 더 맛있다.'], ['구운 오징어', '찢어 먹어야 오래 간다.'], ['컵라면', '찜질방에서 먹는 컵라면은 다른 음식이다.'], ['쥐포구이', '고소하다. 고추장이 필요하다.'],
+  ['팥빙수', '땀 빼고 먹는 얼음은 반칙이다.'], ['미역국', '아침에 먹는 사람이 많다. 이유는 모른다.'], ['떡볶이', '컵에 담아 주는데 양이 이상하게 많다.'], ['수정과', '계피 맛이 센 날이다.'], ['구운 감자', '소금 찍어 먹는다. 버터는 없다.']];
+const TV = ['주말 연속극 재방송', '동물 농장', '요리 대결', '옛날 가요 무대', '야구 중계', '가족 드라마 · 99회', '바다낚시 여행', '퀴즈쇼', '다큐 · 고래의 하루', '뉴스와 날씨'];
+const STEPS = ['수건 적시기', '길게 접기', '돌돌 말기', '양 끝 꼬기', '머리에 얹기'];
+const SIK = ['밥알이 세 개 떠 있다. 하나씩 건져 먹는다.', '시원하다. 이가 시리다.', '달다. 달아서 또 마시게 된다.', '식혜는 마시는 게 아니라 씹는 거다.'];
+const seedOf = d => d.getFullYear() * 372 + (d.getMonth() + 1) * 31 + d.getDate();
+const shuffle = (a, r) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = r() * (i + 1) | 0; [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const DX = -9.5, DZ = -9.5;   // 불가마 자리
+
+start({
+  key: 'jjim', title: '동네 찜질방', enter: '찜질복 받고 들어가기', nickIcon: '♨',
+  nick: [['땀 흘리는', '양머리 한', '계란 까는', '식혜 좋아하는', 'TV 앞', '목침 베고 온'], ['손님', '찜질복', '맥반석', '목침', '수건', '가마']],
+  intro: '<p>찜질복 입고 거실로. 식혜 한 잔, 계란 하나,<br>가마에서 몇 초 버티다 가요.</p>',
+  floor: {w: 30, d: 24, c1: '#c68a52', c2: '#a8713f', pattern: 'plank', around: 0x20140e},
+  bg: {day: 0x20140e, evening: 0x20140e, night: 0x20140e}, startPos: [0, 9], cam: {h: 10, back: 12},
+  playerLook: {coat: 0xf0883a, pants: 0xf0883a, hair: 0x2a2018},
+  build(c) {
+    const {box, cyl, ball, glowBall, sign, solid, npc, fx, THREE, scene} = c;
+    const pm = (col, o = {}) => new THREE.MeshLambertMaterial({color: col, ...o});
+    const d = c.now(), sd = seedOf(d), menu = MENU[sd % MENU.length], tv = TV[(sd * 3 + 1) % TV.length];
+    c.amb = new THREE.AmbientLight(0xffd9a8, 0.6); scene.add(c.amb);   // 실내 빛 — 낮엔 약하게
+    c.heat = 1; c.nod = {t: 9};
+    // 벽 (뒤·양옆만 — 천장 없음)
+    box(30, 7, 0.5, 0xe3cfa6, 0, 3.5, -12.25); box(0.5, 7, 24, 0xdcc59a, -15.25, 3.5, 0); box(0.5, 7, 24, 0xdcc59a, 15.25, 3.5, 0);
+    box(30, 1.1, 0.6, 0x9a6a3a, 0, 0.55, -12.0); box(0.6, 1.1, 24, 0x9a6a3a, -15.0, 0.55, 0); box(0.6, 1.1, 24, 0x9a6a3a, 15.0, 0.55, 0);
+    sign(['불가마 찜질방', '입장권 한 장 · 하루 종일'], 7.4, 1.5, '#8a3a22', '#ffe9c0', 0, 5.9, -11.95, 0, [64, 28]);
+    // 큰 TV — 오늘의 프로, 화면 빛이 깜빡
+    box(6.4, 3.5, 0.3, 0x1a1a1e, 0, 3.2, -11.8);
+    sign([tv, 'CH ' + (5 + sd % 30)], 5.9, 3.0, '#25496e', '#f0f6ff', 0, 3.2, -11.63, 0, [44, 26]);
+    const gl = new THREE.Mesh(new THREE.PlaneGeometry(5.9, 3.0), new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: .06})); gl.position.set(0, 3.2, -11.6); scene.add(gl);
+    const tvl = new THREE.PointLight(0x8ab4ff, 10, 12); tvl.position.set(0, 3.2, -9.5); scene.add(tvl);
+    fx.push((dt, t) => { const k = Math.abs(Math.sin(t * 3.1) * Math.sin(t * 7.3)); gl.material.opacity = .04 + .08 * k; tvl.intensity = 8 + 5 * k; });
+    // 불가마 — 낮은 반원 돔(뒤쪽 왼편), 입구에서 주황 빛
+    const dome = new THREE.Mesh(new THREE.SphereGeometry(2.6, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), pm(0xb5714a)); dome.position.set(DX, 0, DZ); dome.castShadow = dome.receiveShadow = true; scene.add(dome);
+    cyl(2.75, 2.75, 0.18, 0x8a5030, DX, 0.09, DZ, undefined, 24);
+    box(1.9, 1.5, 0.3, 0x2a1810, DX, 0.75, DZ + 2.55);
+    const door = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.2), new THREE.MeshBasicMaterial({color: 0xff8a2a})); door.position.set(DX, 0.7, DZ + 2.62); scene.add(door);
+    sign(['불가마'], 2.0, 0.55, '#6b2a1a', '#ffe0b0', DX, 2.0, DZ + 1.7, 0, [40]);
+    solid(DX, DZ, 5.2, 5.2);
+    const kiln = new THREE.PointLight(0xff7a2a, 20, 12); kiln.position.set(DX, 1.2, DZ + 3.3); scene.add(kiln);
+    fx.push((dt, t) => { kiln.intensity = 17 * c.heat + Math.sin(t * 9) * 2.5; door.material.color.setHSL(0.07, 1, 0.5 + 0.06 * Math.sin(t * 7)); });
+    const steam = []; for (let i = 0; i < 8; i++) { const m = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: .25})); m.userData.t = Math.random() * 2; scene.add(m); steam.push(m); }
+    fx.push(dt => steam.forEach((m, i) => { m.userData.t += dt; const k = m.userData.t % 2; m.position.set(DX + Math.sin(i * 2 + k * 2) * 0.5, 1.4 + k * 1.2, DZ + 3.2); m.material.opacity = .28 * (1 - k / 2); m.scale.setScalar(1 + k); }));
+    // 매점 (뒤쪽 오른편) — 식혜 통 · 맥반석 계란 · 냉장고
+    box(7, 1.1, 1.6, 0x8a5a32, 9.5, 0.55, -9.3); box(7.2, 0.1, 1.8, 0xd8c8a8, 9.5, 1.15, -9.3); solid(9.5, -9.3, 7, 1.6);
+    sign(['매점', '오늘의 메뉴 · ' + menu[0]], 5.6, 1.4, '#2f6a52', '#fff8ec', 9.5, 4.2, -11.9, 0, [60, 30]);
+    cyl(0.4, 0.4, 0.8, 0xd9a860, 8, 1.6, -9.3); cyl(0.43, 0.43, 0.1, 0xb8bcc2, 8, 2.05, -9.3); box(0.12, 0.12, 0.2, 0x888888, 8, 1.4, -8.45);
+    box(1.2, 0.25, 0.8, 0x8a6a4a, 11.2, 1.32, -9.3);
+    for (const [x, z] of [[-0.3, -0.15], [0, 0.15], [0.3, -0.1], [-0.15, 0.2], [0.15, -0.25]]) ball(0.11, 0xc9a070, 11.2 + x, 1.55, -9.3 + z);
+    for (let i = 0; i < 3; i++) cyl(0.1, 0.08, 0.2, 0xf4ecdc, 9.6 + i * 0.3, 1.3, -9.2, undefined, 10);
+    box(1.2, 3.2, 1.4, 0xcfd6da, 14.1, 1.6, -10.8); solid(14.1, -10.8, 1.2, 1.4);
+    // 평상 · 안마의자 · 화분
+    box(4.2, 0.5, 2.6, 0x9a6a3a, -10, 0.25, 4.2); box(1.1, 0.12, 1.1, 0xc9472f, -11, 0.56, 4.2); box(0.8, 0.12, 0.5, 0xd8c8a8, -9, 0.56, 4.2); solid(-10, 4.2, 4.2, 2.6);
+    box(1.2, 0.7, 1.4, 0x5a3a2a, 13.3, 0.35, -3); box(0.35, 1.3, 1.4, 0x4a2e22, 14.1, 0.85, -3); box(0.9, 0.2, 1.1, 0x9a3a2a, 13.2, 0.8, -3); solid(13.6, -3, 1.6, 1.5);
+    for (const x of [-13.5, 13.5]) { cyl(0.4, 0.3, 0.6, 0xb8643a, x, 0.3, 9); ball(0.7, 0x4a8a4a, x, 1.2, 9); solid(x, 9, 1, 1); }
+    // 누워 있는 손님 셋 — 목침 베고 TV 쪽으로 머리
+    const sheep = o => { const h = o.userData.head, g = new THREE.Group(); h.add(g); box(0.8, 0.16, 0.5, 0xf4f4f0, 0, 0.52, 0, g);
+      for (const x of [-1, 1]) { ball(0.22, 0xffffff, x * 0.5, 0.42, 0, g); ball(0.13, 0xf4ecdc, x * 0.62, 0.3, 0.1, g); } o.userData.sheep = g; return g; };
+    c.sheep = sheep;
+    const LAY = [[-3, 0x4a7a9a, 0xf0883a, {}], [0.5, 0x6a9a5a, 0xf08aa8, {hairStyle: 'bob', hair: 0x2a2018}], [4, 0xd9a24a, 0xf0c43a, {glasses: true}]];
+    LAY.forEach(([x, mat, col, extra], i) => {
+      box(1.6, 0.06, 3.0, mat, x, 0.03, -4.9); box(1.1, 0.3, 0.6, 0x9a6a3a, x, 0.15, -5.65); solid(x, -4.9, 1.6, 3.0);
+      const n = npc({coat: col, pants: col, ...extra}, [[x, -3.7]], {face: 0}), o = n.o;
+      const sh = o.children.find(ch => ch.geometry && ch.geometry.type === 'CircleGeometry'); if (sh) o.remove(sh);
+      o.rotation.order = 'YXZ'; o.rotation.x = -Math.PI / 2; o.position.y = 0.6; if (i === 1) sheep(o); });
+    // 서 있는 손님 · 매점 아주머니 · 지나가는 손님
+    c.seller = npc({coat: 0x6aa08a, hairStyle: 'perm', hair: 0x3a2a1a, apron: 0xf4ecdc}, [[9.5, -10.9]], {face: 0, idle: ['wave']});
+    npc({coat: 0xf08aa8, pants: 0xf08aa8, hairStyle: 'bun', hair: 0x2a2018}, [[-5.5, -1.5]], {face: Math.PI, idle: ['sip', 'stretch']});
+    const walker = npc({coat: 0xf0c43a, pants: 0xf0c43a, hair: 0x4a3a2a}, [[-12, 2], [12, 2]], {wait: 5, speed: 1.6, idle: ['stretch']}); sheep(walker.o);
+    // 보이는 곳의 불 — 따뜻한 전구 (카메라 위는 비워 둠)
+    for (const [x, z, l] of [[-7, -2, 8], [0, -2, 0], [7, -2, 8], [-7, 6, 0], [7, 6, 8], [0, 7, 8]]) glowBall(0.22, 0xffe0a8, x, 5.6, z, l, 18);
+    fx.push(dt => { const k = c.nod; if (k.t < 0.5) { k.t += dt; c.player.userData.head.rotation.x = Math.sin(Math.min(1, k.t / 0.5) * Math.PI) * 0.7; } });
+  },
+  onTime(p, c) { if (c.amb) c.amb.intensity = p === 'day' ? 0.2 : 0.75; },
+  lamps: [],
+  acts: [
+    {id: 'sheep', icon: '🐑', label: '양머리', spot: [-7.4, 4.2], face: -Math.PI / 2, run(c, done) {
+      const u = c.player.userData; if (u.sheep) { u.head.remove(u.sheep); u.sheep = null; c.toast('양머리를 풀었다. 다시 말아 본다', 1400); }
+      const ORD = STEPS, SHOW = shuffle(STEPS, Math.random), LIMIT = 25000;
+      c.play(`<h3>양머리 만들기</h3><p style="font-size:14px;margin:4px 0">수건 한 장. 순서대로 눌러 주세요.</p>
+        <div style="height:8px;background:#e4d9c2;border:1.5px solid #2b2620;border-radius:4px;margin:8px 0"><div id="bar" style="height:100%;width:100%;background:#c9472f"></div></div>
+        <p id="msg" style="font-size:14px;min-height:22px;margin:6px 0">수건이 아직 말라 있다.</p>
+        <div id="grid" style="display:flex;flex-direction:column;gap:6px;align-items:center;margin:8px 0"></div>
+        <div class="row" style="justify-content:center"><button class="btn" id="giveup">그만두기</button></div>`,
+        (el, close) => {
+          const $ = s => el.querySelector(s); let k = 0, over = false; const t0 = Date.now();
+          const tick = setInterval(() => { const left = 1 - (Date.now() - t0) / LIMIT; $('#bar').style.width = Math.max(0, left * 100) + '%';
+            if (left <= 0 && !over) { over = true; clearInterval(tick); $('#msg').textContent = '시간 초과 — 수건이 식었다';
+              setTimeout(() => { close(); c.toast('양머리는 내일 다시. 오늘은 맨머리', 3000); done(); }, 1400); } }, 100);
+          SHOW.forEach(nm => { const b = document.createElement('button'); b.className = 'btn'; b.style.cssText = 'width:200px;font-size:15px'; b.textContent = nm;
+            b.onclick = () => { if (over || b.disabled) return;
+              if (nm !== ORD[k]) { c.beep(200, .12); $('#msg').textContent = '그건 아직 아니다'; return; }
+              k++; b.disabled = true; b.style.opacity = .25; c.beep(500 + k * 120, .08, 0, 'sine'); $('#msg').textContent = ORD[k - 1] + ' — 됐다';
+              if (k === ORD.length) { over = true; clearInterval(tick); const sec = ((Date.now() - t0) / 1000).toFixed(1), best = c.DB.sheepBest;
+                if (!best || +sec < best) c.DB.sheepBest = +sec; c.count('sheep'); c.sheep(c.player);
+                close(); c.doAct(c.player, 'cheer'); c.stamp('양머리', `${sec}초 · 머리가 무겁다`); done(); } };
+            $('#grid').appendChild(b); });
+          $('#giveup').onclick = () => { over = true; clearInterval(tick); close(); done(); };
+        }); }},
+    {id: 'sikhye', icon: '🍶', label: '식혜', spot: [8, -7.4], face: Math.PI, run(c, done) {
+      const cup = new c.THREE.Group(); c.cyl(0.11, 0.09, 0.24, 0xf4ecdc, 0, 0.08, 0, cup, 10); c.cyl(0.095, 0.095, 0.02, 0xd9a860, 0, 0.2, 0, cup, 10); c.hand.add(cup);
+      c.doAct(c.player, 'sip'); c.beep(330, .15, 0, 'sine', .08); const n = c.count('sikhye'), m = MENU[seedOf(c.now()) % MENU.length][0];
+      setTimeout(() => { c.hand.remove(cup);
+        c.toast(n === 1 ? `식혜 한 잔. 오늘의 메뉴는 ${m}인데 일단 식혜부터` : n < 3 ? SIK[Math.random() * SIK.length | 0] : `식혜 ${n}잔째. 배에서 출렁 소리가 난다`, 3000); done(); }, 2300); }},
+    {id: 'egg', icon: '🥚', label: '계란', spot: [11.4, -7.4], face: Math.PI, run(c, done) {
+      const egg = c.ball(0.1, 0xc9a070, 0, 0.05, 0, c.hand); c.doAct(c.player, 'sip'); c.toast('맥반석 계란. 이마로 깨는 게 제맛이라고 한다', 1800);
+      const tap = (at, w) => setTimeout(() => { c.nod.t = 0; setTimeout(() => c.beep(1400, .03, 0, 'triangle', .14), 220); }, at), r = Math.random();
+      tap(900); setTimeout(() => { egg.material.color.setHex(r < .85 ? 0xf6efe0 : 0xc9a070); const n = c.count('egg');
+        if (r < .55) { c.stamp('톡', '한 번에 깨졌다'); } else if (r < .85) { c.stamp('톡…', '금만 갔다. 한 번 더'); tap(0); setTimeout(() => { egg.material.color.setHex(0xf6efe0); c.beep(1500, .03, 0, 'triangle', .14); }, 700); }
+        else c.stamp('아야', '계란은 멀쩡하다');
+        setTimeout(() => { c.hand.remove(egg); c.toast(r >= .85 ? '이마가 먼저 깨질 뻔했다. 손으로 깐다' : n >= 4 ? `오늘 ${n}개째. 소금이 떨어졌다` : '소금 찍어 한입. 노른자가 퍽퍽하다', 3000); done(); }, 2200); }, 1250); }},
+    {id: 'kiln', icon: '🔥', label: '불가마', spot: [DX, -6.0], face: Math.PI, run(c, done) {
+      const sd = seedOf(c.now()), temp = 78 + sd % 13, base = 16 - (temp - 78) / 2, limit = base * 1.15 + Math.random() * 3; c.heat = 1.8;
+      c.play(`<h3>불가마</h3><p style="font-size:14px;margin:4px 0">오늘 가마 ${temp}도 · 버틴 만큼 기록. 너무 오래 있으면 쓰러진다.</p>
+        <div style="height:8px;background:#e4d9c2;border:1.5px solid #2b2620;border-radius:4px;margin:8px 0"><div id="bar" style="height:100%;width:0;background:linear-gradient(90deg,#e0a040,#c9472f)"></div></div>
+        <div id="sec" style="font-size:36px;font-weight:800;margin:6px 0">0.0초</div>
+        <p id="msg" style="font-size:14px;min-height:22px;margin:4px 0">문턱에서 발이 뜨겁다.</p>
+        <div class="row" style="justify-content:center"><button class="btn main" id="go">들어간다</button><button class="btn" id="giveup">그만두기</button></div>`,
+        (el, close) => {
+          const $ = s => el.querySelector(s); let st = 0, t0 = 0, tick;
+          const out = () => { c.heat = 1; close(); };
+          $('#go').onclick = () => {
+            if (st === 0) { st = 1; t0 = Date.now(); $('#go').textContent = '나간다'; c.beep(300, .1, 0, 'sine');
+              tick = setInterval(() => { const e = (Date.now() - t0) / 1000, f = e / base; $('#sec').textContent = e.toFixed(1) + '초'; $('#bar').style.width = Math.min(100, e / (base * 1.3) * 100) + '%';
+                $('#msg').textContent = f < .3 ? '따뜻하다. 아니, 뜨겁다.' : f < .6 ? '땀이 줄줄. 수건을 눌러 쓴다.' : f < .9 ? '숨이 턱 막힌다.' : '눈앞이 하얘진다. 나갈까…';
+                if (e >= limit) { st = 2; clearInterval(tick); $('#msg').textContent = '…정신이 흐릿하다'; c.beep(180, .4, 0, 'sine', .08);
+                  setTimeout(() => { out(); c.doAct(c.player, 'crouch'); c.toast('너무 오래 있었다. 아주머니가 물수건을 건넨다', 3200); done(); }, 1200); } }, 100);
+            } else if (st === 1) { st = 2; clearInterval(tick); const sec = ((Date.now() - t0) / 1000).toFixed(1), best = c.DB.kilnBest, nb = !best || +sec > best;
+              if (nb) c.DB.kilnBest = +sec; c.count('kiln'); out(); c.doAct(c.player, 'stretch');
+              c.stamp('후끈', +sec < 3 ? '문만 열어 봤다' : `${sec}초 버텼다${nb && best ? ' · 최고 기록' : ''}`); done(); } };
+          $('#giveup').onclick = () => { st = 2; clearInterval(tick); out(); done(); };
+        }); }},
+  ],
+  recExtra: c => { const d = c.now(), sd = seedOf(d);
+    return `<p style="font-size:13px;color:#7a6e5e">오늘 가마 ${78 + sd % 13}도 · 메뉴 ${MENU[sd % MENU.length][0]} · TV ${TV[(sd * 3 + 1) % TV.length]}${c.DB.kilnBest ? `<br>불가마 최고 ${c.DB.kilnBest}초` : ''}${c.DB.sheepBest ? ` · 양머리 최고 ${c.DB.sheepBest}초` : ''}</p>`; },
+  onEnter(c) { c.toast(c.visits() > 1 ? `또 왔네요. ${c.visits()}번째 — 오늘도 목침은 딱딱하다` : '찜질복이 한 치수 크다. 바닥은 따뜻하다', 3200); },
+});
+</script></body></html>

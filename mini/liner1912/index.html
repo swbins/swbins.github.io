@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>1912 대서양 여객선</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 갑판에서 듣는 한 줄 사실 — 날짜마다 하나씩 차례로
+const FACT = [
+  '1910년대에 대서양을 건너는 큰 여객선은 보통 일주일쯤 걸렸어요.',
+  '그 무렵 무선 전신은 모스 부호로 주고받았어요. 점과 선, 두 가지 신호만 써요.',
+  '큰 여객선은 1등·2등·3등실로 나뉘어 있었어요.',
+  '배의 속도는 노트로 재요. 1노트는 시속 약 1.85km예요.',
+  '석탄을 때서 물을 끓이고, 그 증기의 힘으로 움직이는 증기선이었어요. 굴뚝은 연기와 열기가 나가는 길이에요.',
+  '배는 밤에 왼쪽(좌현)에 붉은 불, 오른쪽(우현)에 초록 불을 켜요. 지금도 그래요.',
+  '배에서는 종을 쳐서 시간을 알려요. 30분마다 종소리가 하나씩 늘어 최대 여덟 번까지 가요.',
+  '여객선은 사람뿐 아니라 우편물도 함께 실어 날랐어요.',
+  '항해사는 육분의로 별이나 해와 수평선 사이 각도를 재서 배의 위치를 알아냈어요.',
+  '등급마다 식당과 산책 갑판이 따로 있는 배가 많았어요.',
+];
+// 별 보기 한마디
+const SKY = [
+  '북극성은 북쪽 하늘 끝 가까이 있어서 거의 움직이지 않아요. 오래전부터 뱃사람의 길잡이였어요.',
+  '북두칠성 국자 끝 두 별을 이어 쭉 뻗으면 북극성이 나와요.',
+  '별이 깜박이는 건 별빛이 공기층을 지나며 흔들리기 때문이에요.',
+  '지금 보는 별빛은 아주 오래전에 출발한 빛이에요. 가까운 별도 몇 년, 먼 별은 수천 년이 걸려요.',
+  '불빛 없는 바다 한가운데서는 맨눈으로 수천 개의 별이 보여요.',
+];
+const TEA = ['설탕 한 조각을 넣은 홍차', '우유를 조금 부은 홍차', '레몬 한 조각을 띄운 홍차', '진하게 우려낸 홍차', '따뜻한 우유차', '비스킷을 곁들인 홍차'];
+const SEA = ['거울처럼 잔잔한 바다', '잔물결이 이는 바다', '부드러운 너울이 오가는 바다', '살짝 출렁이는 바다'];
+const WX = [['별이 쏟아지는 맑은 밤', 1], ['옅은 구름이 걸린 밤', .55], ['달 없는 맑은 밤', 1], ['가는 안개가 낀 밤', .35], ['바람 한 점 없는 밤', .9], ['서늘하고 맑은 밤', .95]];
+const MORSE = [['A', 'dl'], ['D', 'ldd'], ['G', 'lld'], ['K', 'ldl'], ['N', 'ld'], ['R', 'dld'], ['U', 'ddl'], ['W', 'dll'], ['B', 'lddd'], ['C', 'ldld'], ['F', 'ddld'], ['L', 'dldd']];
+const S = {spark: 0};
+function daily(d) {   // 오늘의 항해 일지 — 날짜로만 정해진다
+  const dn = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
+  return {dn, day: dn % 7 + 1, sea: (dn * 5 + 3) % 4, wx: (dn * 7 + 1) % 6};
+}
+function skySvg(D) {
+  let s = D.dn * 9301 + 49297; const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280, n = Math.round(90 * WX[D.wx][1]); let dots = '';
+  for (let i = 0; i < n; i++) dots += `<circle cx="${(rnd() * 300).toFixed(1)}" cy="${(rnd() * 125).toFixed(1)}" r="${(0.5 + rnd() * rnd() * 1.6).toFixed(1)}" fill="#fff7dc" class="tw" style="animation-delay:${(rnd() * 3).toFixed(1)}s"/>`;
+  return `<style>@keyframes tw{0%,100%{opacity:.35}50%{opacity:1}}.tw{animation:tw 2.4s infinite}@keyframes ss{0%{transform:translate(0,0);opacity:0}8%{opacity:1}22%{transform:translate(70px,34px);opacity:0}100%{transform:translate(70px,34px);opacity:0}}.ss{animation:ss 6s infinite 1.2s}</style>
+    <svg viewBox="0 0 300 150" width="100%" style="border:1.5px solid #2b2620;border-radius:6px;display:block;background:#0a1226"><rect width="300" height="150" fill="#0a1226"/>${dots}
+    <path d="M70 18 L96 30" stroke="#fff" stroke-width="1.6" stroke-linecap="round" class="ss"/><rect y="128" width="300" height="22" fill="#0c1c36"/>
+    <path d="M0 134 q20 -4 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" stroke="#3d5f8c" stroke-width="1" fill="none"/></svg>`;
+}
+
+start({
+  key: 'liner1912', title: '1912 대서양 여객선', enter: '갑판으로 나가기', time: 'night', nickIcon: '🚢',
+  nick: [['잔잔한', '밤바람 쐬는', '홍차 식힌', '갑판 위', '별 세는', '외투 입은'], ['승객', '전신수', '갑판 의자', '승무원', '트렁크', '산책객']],
+  intro: '<p>잔잔한 밤바다를 건너는 오래된 증기 여객선.<br>갑판을 걷고, 전신을 두드리고, 별을 보다 홍차 한 잔 하고 가요.</p>',
+  floor: {w: 26, d: 20, pattern: 'plank', c1: '#a07c52', c2: '#6b4f33', around: '#0c1c36'},
+  bg: {night: 0x0a1226}, startPos: [0, 7], cam: {h: 10, back: 12},
+  playerLook: {coat: 0x2f3340, pants: 0x25262c, hat: {type: 'cap', c: 0x2b2b30}, scarf: 0xf4ecdc},
+  build(c) {
+    const {box, cyl, ball, glowBall, sign, solid, fx, THREE, scene, npc} = c;
+    const grp = (x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); scene.add(g); return g; };
+    const D = daily(c.now());
+    // 배 옆면 — 낮은 벽 · 흰 마루턱 · 난간
+    for (const x of [-12.85, 12.85]) { box(0.3, 0.9, 20, 0x1d222e, x, 0.45, 0); box(0.4, 0.08, 20.2, 0xe8e4da, x, 0.94, 0); box(0.08, 0.08, 20.2, 0xe8e4da, x, 1.5, 0);
+      for (let z = -9; z <= 9; z += 2) cyl(0.04, 0.04, 0.6, 0xe8e4da, x, 1.2, z, undefined, 6); }
+    box(26.6, 0.9, 0.3, 0x1d222e, 0, 0.45, 10.05); box(26.6, 0.08, 0.4, 0xe8e4da, 0, 0.94, 10.05); box(26, 0.08, 0.08, 0xe8e4da, 0, 1.5, 10.05);
+    for (let x = -12; x <= 12; x += 2) cyl(0.04, 0.04, 0.6, 0xe8e4da, x, 1.2, 10.05, undefined, 6);
+    // 뒤쪽 선실 벽 — 창 두 줄 · 큰 간판 · 식당칸 문
+    box(26, 5.4, 1.6, 0xe6dec9, 0, 2.7, -9.2); box(26, 0.15, 2, 0x4a4036, 0, 5.45, -9.2); solid(0, -9.2, 26, 1.6);
+    const glass = new THREE.MeshBasicMaterial({color: 0xffd98a});
+    for (let x = -11; x <= 11; x += 2.2) for (const y of [1.5, 3.0]) { if (y < 2 && Math.abs(x - 8) < 1.4) continue;
+      const w = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.8), glass); w.position.set(x, y, -8.39); scene.add(w); }
+    const door = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.9), new THREE.MeshBasicMaterial({color: 0xf0b45a})); door.position.set(8, 0.95, -8.39); scene.add(door);
+    sign(['식당칸'], 1.8, 0.5, '#f4ecdc', '#5a3a22', 8, 2.65, -8.38, 0, [34]);
+    sign(['1912 대서양 여객선'], 6.4, 0.9, '#f4ecdc', '#2f3340', 0, 4.7, -8.38, 0, [44]);
+    // 굴뚝 셋 — 누런 몸통에 검은 목
+    const puffs = [];
+    for (const x of [-4, 0, 4]) { cyl(0.9, 1.05, 5.2, 0xc99a45, x, 2.6, -3.2); cyl(0.93, 0.93, 0.7, 0x1a1a1f, x, 4.85, -3.2); solid(x, -3.2, 1.9, 1.9);
+      for (let i = 0; i < 5; i++) { const m = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 6), new THREE.MeshBasicMaterial({color: 0x3b4558, transparent: true, opacity: .4, depthWrite: false})); scene.add(m); puffs.push({m, x, age: i * 1.4}); } }
+    // 구명보트 — 양쪽 난간 옆에 걸어 둔 배
+    function lifeboat(x, z) { box(1.5, 0.7, 4.2, 0xe6dfcf, x, 1.6, z); box(1.55, 0.1, 4.25, 0xd9722a, x, 1.98, z); box(1.2, 0.35, 3.2, 0xd8cdb0, x, 2.2, z);
+      for (const dz of [-1.4, 1.4]) { cyl(0.05, 0.05, 1.6, 0x555b63, x, 0.8, z + dz, undefined, 6); } solid(x, z, 1.7, 4.3); }
+    lifeboat(-11.2, 0); lifeboat(11.2, -2); lifeboat(11.2, 2.8);
+    // 구명 고리
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.35, 0.1, 8, 16), new THREE.MeshLambertMaterial({color: 0xe8642a})); ring.position.set(12.55, 1.1, 6.5); ring.rotation.y = Math.PI / 2; scene.add(ring);
+    // 갑판 의자 둘 (왼쪽 난간 앞, 바다를 보고)
+    for (const z of [4.7, 6.6]) { const g = grp(-11.2, 0, z), cv = 0xb9c4d4, wd = 0x8b5a2b;
+      box(1.4, 0.08, 0.65, cv, 0, 0.45, 0, g); const bk = box(0.9, 0.08, 0.65, cv, 0.98, 0.8, 0, g); bk.rotation.z = 0.9;
+      for (const dz of [-0.34, 0.34]) { box(1.5, 0.05, 0.05, wd, 0.1, 0.4, dz, g); box(0.05, 0.4, 0.05, wd, -0.6, 0.2, dz, g); box(0.05, 0.4, 0.05, wd, 0.7, 0.2, dz, g); } solid(-11.2, z, 1.6, 0.8); }
+    // 무선실 — 작은 오두막 · 안테나줄
+    box(3, 2.8, 2.2, 0xd9d2bf, -9.5, 1.4, -6.5); box(3.3, 0.15, 2.5, 0x5a4a3a, -9.5, 2.85, -6.5); solid(-9.5, -6.5, 3, 2.2);
+    const hw = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.7), glass); hw.position.set(-9.5, 1.4, -5.39); scene.add(hw);
+    sign(['무선실'], 1.4, 0.4, '#f4ecdc', '#2b2620', -9.5, 2.35, -5.38, 0, [34]);
+    for (const x of [-11.5, -3.5]) { cyl(0.06, 0.06, 6.4, 0x777777, x, 3.2, -6.5, undefined, 6); }
+    box(8, 0.03, 0.03, 0x333333, -7.5, 6.35, -6.5);
+    const spark = glowBall(0.17, 0xffe08a, -9.5, 3.1, -6.5, 0); spark.visible = false;
+    // 식당칸 앞 탁자 — 흰 보 · 찻주전자 · 잔 둘 · 의자 둘
+    cyl(0.35, 0.35, 0.05, 0x5a4030, 8, 0.03, -6.6); cyl(0.08, 0.08, 0.8, 0x5a4030, 8, 0.4, -6.6); cyl(0.75, 0.75, 0.07, 0xf4f1e8, 8, 0.84, -6.6); solid(8, -6.6, 1.6, 1.6);
+    ball(0.17, 0xe8e4dc, 8.1, 1.05, -6.6); box(0.18, 0.05, 0.05, 0xe8e4dc, 8.3, 1.06, -6.6);
+    for (const x of [7.6, 8.4]) cyl(0.07, 0.05, 0.1, 0xf4f0e6, x, 0.92, -6.35);
+    for (const x of [6.7, 9.3]) { box(0.5, 0.08, 0.5, 0x6b4a2e, x, 0.5, -6.6); box(0.06, 0.55, 0.5, 0x6b4a2e, x + (x < 8 ? -0.22 : 0.22), 0.78, -6.6); solid(x, -6.6, 0.6, 0.6); }
+    const steam = []; for (let i = 0; i < 3; i++) { const m = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: .4, depthWrite: false})); scene.add(m); steam.push({m, age: i}); }
+    // 등불 기둥 둘 · 좌현 붉은 불 · 우현 초록 불
+    for (const x of [-6, 6]) { cyl(0.06, 0.06, 3.2, 0x3a3a40, x, 1.6, 1.5); glowBall(0.24, 0xffd98a, x, 3.3, 1.5, 0); solid(x, 1.5, 0.4, 0.4); }
+    glowBall(0.16, 0xff3b30, -12.5, 1.7, -9, 5, 7); glowBall(0.16, 0x38d96b, 12.5, 1.7, -9, 5, 7);
+    // 바다 — 배가 가르는 물결 줄무늬 (바다 상태가 거친 날일수록 또렷하다)
+    const wake = [], wm = new THREE.MeshBasicMaterial({color: 0x6f93c4, transparent: true, opacity: .22 + D.sea * .07, depthWrite: false});
+    for (let i = 0; i < 44; i++) { const side = i % 2 ? 1 : -1, w = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.02, 1.5 + Math.random() * 3), wm);
+      w.position.set(side * (15 + Math.random() * 45), 0.01, -65 + Math.random() * 100); scene.add(w); wake.push(w); }
+    // 바다 위 별 — 먼 바다에 비친 별빛 (그날 날씨만큼)
+    const N = Math.round(520 * WX[D.wx][1]), layers = [];
+    for (let k = 0; k < 2; k++) { const n = N >> 1, p = new Float32Array(n * 3), g = new THREE.BufferGeometry();
+      for (let i = 0; i < n; i++) { let x, z; do { x = (Math.random() - .5) * 190; z = -95 + Math.random() * 135; } while (Math.abs(x) < 17 && z > -12);
+        p[i * 3] = x; p[i * 3 + 1] = 0.08 + Math.random() * (z < -50 ? 1.6 : 0.4); p[i * 3 + 2] = z; }
+      g.setAttribute('position', new THREE.BufferAttribute(p, 3));
+      const m = new THREE.PointsMaterial({color: k ? 0xcfe0ff : 0xfff1c9, size: 2.4, sizeAttenuation: false, transparent: true, opacity: .8, fog: false, depthWrite: false}); scene.add(new THREE.Points(g, m)); layers.push(m); }
+    // 매 프레임 — 물결·연기·김·별 깜박임·무선 불꽃
+    fx.push((dt, t) => {
+      for (const w of wake) { w.position.z += (1.6 + D.sea * .5) * dt; if (w.position.z > 36) w.position.z = -65; }
+      for (const q of puffs) { q.age += dt; if (q.age > 7) q.age = 0; const a = q.age / 7;
+        q.m.position.set(q.x + a * 1.2, 5.4 + a * 5, -3.2 + a * 3); q.m.scale.setScalar(0.5 + a * 1.6); q.m.material.opacity = .42 * (1 - a); }
+      for (const q of steam) { q.age += dt; if (q.age > 3) q.age = 0; const a = q.age / 3; q.m.position.set(8.1 + Math.sin(t * 2 + q.age) * .05, 1.25 + a * .8, -6.6); q.m.scale.setScalar(1 + a * 2); q.m.material.opacity = .4 * (1 - a); }
+      layers[0].opacity = .55 + Math.sin(t * 1.7) * .3; layers[1].opacity = .55 + Math.sin(t * 1.7 + 3) * .3;
+      S.spark = Math.max(0, S.spark - dt); spark.visible = S.spark > 0 && Math.sin(t * 60) > -.3;
+    });
+    // 승객·승무원 — 난간에 기댄 신사, 갑판을 오가는 부인, 찻상 옆 급사, 뛰노는 아이
+    npc({coat: 0x23242c, pants: 0x1c1d22, hat: {type: 'cap', c: 0x23242c}, scarf: 0xe8e0cf}, [[11.7, 6.5]], {face: Math.PI / 2, idle: ['sip', 'stretch']});
+    npc({coat: 0x6a3a4a, pants: 0x4a2a38, hairStyle: 'bun', hair: 0x5a3a22, pearls: true}, [[-5, 5.6], [5, 5.6]], {speed: 1.3, idle: ['wave']});
+    npc({coat: 0xf0ecdf, pants: 0x2b2b35, hat: {type: 'cap', c: 0x1e2a44}}, [[9.9, -6.2]], {face: -1.3, idle: ['wave', 'stretch']});
+    npc({coat: 0x3f6a8a, pants: 0x2b2b35, hat: {type: 'beanie', c: 0xb85a3a}}, [[-4, 3], [4, 3], [4, 0], [-4, 0]], {speed: 2.1, scale: 0.95});
+  },
+  lamps: [[-6, 1.5], [6, 1.5], [0, -6]],
+  acts: [
+    {id: 'walk', icon: '🚶', label: '갑판 산책', run(c, done) {
+      const d = c.now(), D = daily(d);
+      c.goTo(-8, 7.6, () => c.goTo(8, 7.6, () => { c.doAct(c.player, 'stretch'); const n = c.count('walk');
+        setTimeout(() => c.dialog('항해 일지', `${c.hm(d)} · 항해 ${D.day}일째`,
+          `<p><b>바다</b> ${SEA[D.sea]}<br><b>하늘</b> ${WX[D.wx][0]}</p><p style="font-size:16px">「${FACT[(D.dn + n - 1) % FACT.length]}」</p>`, [['다 읽었어요', () => { if (n % 3 === 0) c.stamp('갑판 한 바퀴', `오늘 ${n}번째`); done(); }, 'main']]), 600); })); }},
+    {id: 'morse', icon: '📡', label: '모스 전신', spot: [-9.5, -4.2], face: Math.PI, run(c, done) {
+      const pool = n => MORSE.filter(m => m[1].length === n).sort(() => Math.random() - .5), a = pool(3), rounds = [a[0], a[1], pool(4)[0]];
+      c.play(`<h3>전신 두드리기</h3><p style="font-size:13px;color:#7a6e5e">신호를 보고 들은 뒤 똑같이 눌러요.<br>짧게 누르면 점(·), 길게 누르면 선(−)</p>
+        <div id="lamp" style="width:54px;height:54px;border-radius:50%;margin:8px auto;background:#5a4a2a;border:2px solid #2b2620"></div>
+        <div id="pt" style="font-size:30px;letter-spacing:6px;min-height:40px;font-family:monospace"></div><div id="me" style="font-size:24px;letter-spacing:6px;min-height:32px;font-family:monospace;color:#c9472f"></div>
+        <p id="msg" style="min-height:22px;font-size:14px"></p>
+        <button class="btn main" id="key" style="display:none;width:200px;height:64px;font-size:18px;touch-action:none;user-select:none;margin-bottom:8px">누르기</button>
+        <div class="row" style="justify-content:center"><button class="btn main" id="go">시작</button><button class="btn" id="qt">그만두기</button></div>`,
+        (el, close) => {
+          let dead = false, score = 0, rd = 0, phase = '', tm = 0, t0 = 0, inp = [];
+          const $ = s => el.querySelector(s), lamp = $('#lamp'), pt = $('#pt'), me = $('#me'), msg = $('#msg'), key = $('#key');
+          const alive = () => !dead && el.isConnected, sym = s => s === 'd' ? '·' : '−';
+          const lampOn = on => { lamp.style.background = on ? '#ffd25a' : '#5a4a2a'; lamp.style.boxShadow = on ? '0 0 18px #ffd25a' : 'none'; if (on) S.spark = .25; };
+          $('#qt').onclick = () => { dead = true; clearTimeout(tm); close(); done(); };
+          function judge(pat) {
+            if (phase !== 'in') return; phase = 'x'; clearTimeout(tm); const ok = inp.join('') === pat.join(''); if (ok) score++;
+            pt.textContent = pat.map(sym).join(' '); msg.textContent = ok ? '맞았어요' : '조금 달랐어요'; key.style.display = 'none';
+            setTimeout(() => { if (!alive()) return; rd++; rd < 3 ? round() : finish(); }, 1200); }
+          function round() {
+            const pat = [...rounds[rd][1]]; inp = []; phase = 'show'; key.style.display = 'none'; me.textContent = ''; pt.textContent = '';
+            msg.textContent = `${rd + 1}번째 신호 · 잘 보고 들어요`; let t = 500;
+            for (const s of pat) { const len = s === 'd' ? 180 : 480;
+              setTimeout(() => { if (!alive()) return; lampOn(true); c.beep(700, len / 1000, 0, 'sine', .06); pt.textContent += (pt.textContent ? ' ' : '') + sym(s); }, t);
+              setTimeout(() => alive() && lampOn(false), t + len); t += len + 260; }
+            setTimeout(() => { if (!alive()) return; phase = 'in'; key.style.display = ''; msg.textContent = '이제 똑같이 눌러요';
+              if (rd === 2) pt.textContent = pat.map(() => '?').join(' '); tm = setTimeout(() => judge(pat), 6500); }, t + 100); }
+          key.onpointerdown = e => { if (phase !== 'in') return; e.preventDefault(); t0 = performance.now(); lampOn(true); c.beep(700, .09, 0, 'sine', .06); };
+          const up = () => { if (phase !== 'in' || !t0) return; const dur = performance.now() - t0; t0 = 0; lampOn(false); inp.push(dur < 260 ? 'd' : 'l'); me.textContent = inp.map(sym).join(' ');
+            if (inp.length >= rounds[rd][1].length) judge([...rounds[rd][1]]); };
+          key.onpointerup = up; key.onpointerleave = up; key.onpointercancel = up;
+          function finish() {
+            dead = true; c.count('morse'); close();
+            if (score === 3) { c.DB.morseOk = (c.DB.morseOk || 0) + 1; c.save(); c.doAct(c.player, 'cheer'); c.stamp('전신 완벽', '세 번 모두 맞혔어요'); }
+            else c.toast(`📡 전신 ${score}/3 — 손가락이 조금 느렸나 봐요`);
+            setTimeout(done, 1500); }
+          $('#go').onclick = () => { $('#go').remove(); round(); };
+        }); }},
+    {id: 'star', icon: '⭐', label: '별 보기', spot: [-8.9, 5.65], face: -Math.PI / 2, run(c, done) {
+      const d = c.now(), D = daily(d); c.doAct(c.player, 'stretch'); const n = c.count('star');
+      setTimeout(() => c.dialog('별 보기', `${c.hm(d)} · ${WX[D.wx][0]}`, skySvg(D) + `<p style="font-size:15px">「${SKY[(D.dn + n - 1) % SKY.length]}」</p>`,
+        [['고개 내리기', () => { if (n % 3 === 0) c.stamp('별 구경', `오늘 ${n}번째`); done(); }, 'main']]), 900); }},
+    {id: 'tea', icon: '🍵', label: '식당칸 홍차', spot: [8, -5.2], face: Math.PI, run(c, done) {
+      const D = daily(c.now()), n = c.count('tea'), t = TEA[(D.dn + n - 1) % TEA.length], got = new Set(c.DB.teas || []);
+      const cup = c.cyl(0.06, 0.045, 0.1, 0xf4f0e6, 0, -0.02, 0.06, c.hand); c.doAct(c.player, 'sip'); c.beep(520, .05, .3, 'sine', .03);
+      got.add(t); c.DB.teas = [...got]; c.save();
+      setTimeout(() => { c.toast(`🍵 ${t}`, 3000); if (n % 3 === 0) c.stamp('홍차 세 잔', `오늘 ${n}번째`); }, 700);
+      setTimeout(() => { c.hand.remove(cup); done(); }, 2800); }},
+  ],
+  recExtra: c => `<p style="font-size:13px;color:#7a6e5e">전신 세 번 모두 맞힌 횟수 ${c.DB.morseOk || 0}번<br>맛본 홍차 ${(c.DB.teas || []).length}/${TEA.length}종: ${(c.DB.teas || []).join(' · ') || '아직 없음'}</p>`,
+  onEnter(c) { const D = daily(c.now()); c.toast(c.visits() > 1 ? `🚢 항해 ${D.day}일째 밤. 오늘도 바다는 조용해요` : '🚢 밤 갑판. 멀리서 기관 소리만 낮게 들려요', 3000); },
+});
+</script></body></html>

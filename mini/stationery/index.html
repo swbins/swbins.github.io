@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>학교 앞 문방구</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start, THREE, doAct} from '../mini.js';
+
+const dayN = d => Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
+const PAL = [0xe85a4f, 0xf2b134, 0x4aa3c9, 0x6fb07a, 0xb06ac9, 0xf08fb0, 0x3d6fb5, 0xf4ecdc];
+
+// 오늘 들어온 간식 — 일반 이름만
+const SNACKS = [
+  {n: '쫀득이', p: '백 원', c: 0xb86b3a, t: '질겅질겅. 턱이 먼저 지친다.'},
+  {n: '달고나', p: '이백 원', c: 0xd9a24a, t: '모양대로 떼어 내면 하나 더. 나는 늘 부러뜨렸다.'},
+  {n: '눈깔사탕', p: '오십 원', c: 0xe85a4f, t: '볼이 불룩. 말을 못 하니 조용히 걷게 된다.'},
+  {n: '라면땅', p: '백 원', c: 0xe0b060, t: '부스러기가 반이다. 그래서 더 맛있다.'},
+  {n: '쫄쫄이', p: '백 원', c: 0xb06ac9, t: '봉지를 쭉 짜서 먹는다. 손이 끈적해진다.'},
+  {n: '사탕 목걸이', p: '이백 원', c: 0xf08fb0, t: '목에 걸고 한 알씩. 어느새 끈만 남는다.'},
+  {n: '막대 과자', p: '오십 원', c: 0xd9b27a, t: '봉지 바닥 가루까지 털어 먹는다.'},
+  {n: '캐러멜', p: '백 원', c: 0xc98a3a, t: '이에 달라붙는 게 자랑이던 때가 있었다.'},
+  {n: '풍선껌', p: '백 원', c: 0x6fc3ea, t: '크게 불면 코에 붙는다. 그래도 또 분다.'},
+  {n: '쥐포', p: '삼백 원', c: 0xc99a6a, t: '오래 씹을수록 짜다. 오래 씹는다.'},
+];
+const HALMOEONI = [
+  '숙제는 하고 왔니? ...아니다, 혼잣말이다.',
+  '지우개는 닳아야 지우개지. 아껴 두면 굳는다.',
+  '오백 원 들고 오면 사장 노릇 하는 기분이지? 맞다.',
+  '뽑기는 마음 비우고 돌려야 잘 나온다. 아닌가, 안 나오니까 마음을 비우는 건가.',
+  '연필 깎는 소리가 요즘은 잘 안 들리네. 다들 샤프를 쓰더라.',
+  '외상은 안 된다. ...내일 갚는다면 오늘은 된다.',
+  '실내화 주머니 두고 가는 아이가 한 해에 얼마나 되는지 아니? 나도 모른다. 많다.',
+  '졸리면 졸리다고 해. 가게는 졸아도 문은 열려 있다.',
+  '스티커는 붙이는 순간부터 아까워진다. 그게 스티커 맛이다.',
+  '학교 종 치면 가게도 기지개를 켠다. 곧 올 거다.',
+  '딱지는 손목으로 치는 거다. 팔이 아니라.',
+  '공책 한 권이면 하루는 쓴다. 두 권이면 이틀. 난 그냥 쌓아 둔다.',
+];
+const DK = [{c: 0xd9533a, n: '빨간'}, {c: 0x3a7bd5, n: '파란'}, {c: 0xe0b030, n: '노란'}, {c: 0x4aa86a, n: '초록'}, {c: 0x9b59b6, n: '보라'}];
+const DK_WIN = ['넘어갔다. 이 맛에 손목이 아팠지.', '넘어갔다. 아무도 못 봤으면 좋겠다.', '넘어갔다. 오늘은 내가 이긴 걸로.'];
+const DK_LOSE = ['안 넘어갔다. 바람이 불었다, 분명히.', '안 넘어갔다. 딱지가 너무 두꺼웠다.', '안 넘어갔다. 다시, 하고 싶지만 내일.'];
+const GR = [
+  {n: '흰 캡슐', css: '#ececec', col: 0xececec, it: ['작은 고무공', '지우개 한 개', '플라스틱 반지'], m: ['또 흰색. 정든다.', '흰색도 나쁘지 않다. 흔하다는 뜻이지만.']},
+  {n: '하늘 캡슐', css: '#6fc3ea', col: 0x6fc3ea, it: ['미니 팽이', '별 모양 스티커', '물방울 반지'], m: ['하늘색이다. 나쁘지 않다.']},
+  {n: '분홍 캡슐', css: '#f08fb0', col: 0xf08fb0, it: ['반짝이 열쇠고리', '작은 곰 열쇠고리', '향기 지우개'], m: ['분홍이다. 누구한테 자랑하지.']},
+  {n: '금 캡슐', css: '#e8b830', col: 0xe8b830, it: ['금빛 별 배지', '반짝이 구슬 팔찌', '접히는 부채 장난감'], m: ['금색이다. 손이 떨린다. 오늘 운을 다 썼다.']},
+];
+const ENTER = ['오백 원이면 부자였다.', '가게 앞에 서면 왜 천천히 걷게 될까.', '가방이 무거워도 여기선 안 무겁다.', '들어갈 돈은 없는데 구경은 하고 싶다.'];
+
+const anim = (c, dur, fn, end) => { let t = 0; const f = dt => { t += dt; fn(Math.min(1, t / dur)); if (t >= dur) { const i = c.fx.indexOf(f); if (i >= 0) c.fx.splice(i, 1); end && end(); } }; c.fx.push(f); };
+
+start({
+  key: 'stationery', title: '학교 앞 문방구', enter: '문방구 앞으로', time: 'real', nickIcon: '✏️',
+  nick: [['방과후','쪼그려 앉은','용돈 받은','숙제 미룬','오백 원 쥔','뽑기 좋아하는'],['꼬마','단골','손님','구경꾼','어른']],
+  intro: '<p>학교 앞 작은 문방구. 가판 구경하고,<br>뽑기 한 번, 딱지 한 번 하고 가요.</p>',
+  floor: {w: 30, d: 24, c1: '#9a9486', c2: '#a59f90', around: 0x77736b},
+  startPos: [0, 9], cam: {h: 10, back: 12},
+  playerLook: {coat: 0x6a8f6a, pants: 0x3a3f4a, hair: 0x2a2018},
+  build(c) {
+    const {box, cyl, ball, glowBall, sign, solid, npc, fx, THREE, scene} = c;
+    const d0 = c.now(), snack = SNACKS[dayN(d0) % SNACKS.length];
+    const bag = (o, col) => box(0.5, 0.62, 0.26, col, 0, 0.92, -0.46, o);
+    bag(c.player, 0xd05a4a);
+
+    // 뒤쪽 건물 — 가운데 문방구, 양옆 이웃 건물
+    box(18, 6.2, 0.6, 0xeadbb8, 0, 3.1, -10.5);
+    box(6, 7, 0.6, 0xc8b8a0, -12, 3.5, -10.5); box(6, 5.6, 0.6, 0xb8c0b0, 12, 2.8, -10.5);
+    c.winMat = new THREE.MeshBasicMaterial({color: 0xcfe6f2});
+    for (const [x, y] of [[-12, 4.2], [12, 3.2]]) { const w = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.3), c.winMat); w.position.set(x, y, -10.17); scene.add(w); }
+    box(2.2, 3.2, 0.12, 0x5a3e2a, 0, 1.6, -10.12);                       // 문
+    box(0.8, 1.2, 0.05, 0x9ac4d8, 0, 2.0, -10.04);
+    box(18.2, 0.2, 0.9, 0xb04a35, 0, 4.1, -9.75);                         // 처마 — 뒤쪽 띠만
+    sign(['해님 문방구', '학용품 · 뽑기 · 간식'], 7, 1.5, '#2f5d8a', '#fff8ec', 0, 5.3, -10.15, 0, [64, 28]);
+    for (let i = 0; i < 12; i++) glowBall(0.08, [0xffd27a, 0xfff0b0][i % 2], -5.5 + i, 3.95, -9.2, 0);
+
+    // 안쪽 선반 — 알록달록 재고
+    for (const sx of [-5.2, 5.2]) { box(5, 3.2, 0.5, 0x8a6a4a, sx, 1.6, -9.85);
+      for (let r = 0; r < 3; r++) { box(4.9, 0.08, 0.55, 0xb08a5a, sx, 0.75 + r * 0.9, -9.85);
+        for (let i = 0; i < 8; i++) box(0.4, 0.3 + (i % 3) * 0.08, 0.3, PAL[(i * 3 + r * 5 + (sx > 0 ? 2 : 0)) % 8], sx - 2.1 + i * 0.6, 0.94 + r * 0.9, -9.7); } }
+
+    // 계산대 + 할아버지
+    box(5, 1.1, 1, 0x8a6a4a, 0, 0.55, -7.8); box(5.2, 0.1, 1.2, 0xc9a870, 0, 1.15, -7.8); solid(0, -7.8, 5, 1.1);
+    cyl(0.2, 0.2, 0.4, 0xbfe4ff, -1.6, 1.4, -7.8); cyl(0.2, 0.2, 0.4, 0xffd0a0, -1.1, 1.4, -7.8); box(0.7, 0.2, 0.5, 0x333333, 1.4, 1.3, -7.8); box(0.5, 0.06, 0.35, 0xf4ecdc, 0.5, 1.23, -7.7);
+    c.grandpa = npc({coat: 0x8a9a7a, pants: 0x4a4440, hair: 0xe8e8e8, glasses: true}, [[0, -8.9]], {face: 0, idle: ['wave'], scale: 1.25});
+
+    // 가판 — 작은 상자들을 층층이
+    const stall = (x, w, off) => { box(w, 0.9, 1.4, 0x9a7a52, x, 0.45, -6.8); solid(x, -6.8, w, 1.4);
+      for (let r = 0; r < 3; r++) { box(w - 0.3, 0.06, 0.42, 0xb08a5a, x, 0.95 + r * 0.34, -6.4 - r * 0.38);
+        const n = Math.floor((w - 0.5) / 0.46); for (let i = 0; i < n; i++) box(0.38, 0.28, 0.34, PAL[(i * 3 + r * 2 + off) % 8], x - (n - 1) * 0.23 + i * 0.46, 1.12 + r * 0.34, -6.4 - r * 0.38); }
+      for (let i = 0; i < 3; i++) { cyl(0.16, 0.16, 0.34, PAL[(i + off) % 8], x - w / 2 + 0.45 + i * 0.45, 1.07, -6.15);
+        for (let j = 0; j < 3; j++) { const s = cyl(0.015, 0.015, 0.45, PAL[(j + i * 2 + off) % 8], x - w / 2 + 0.45 + i * 0.45 + (j - 1) * 0.05, 1.3, -6.15); s.rotation.z = (j - 1) * 0.15; } } };
+    stall(-9.5, 4.2, 0); stall(10.8, 3.6, 3);
+
+    // 간식 탁자 + 오늘의 칠판
+    box(2.6, 0.9, 1.2, 0x9a7a52, -4.8, 0.45, -6.6); solid(-4.8, -6.6, 2.6, 1.2);
+    for (let i = 0; i < 6; i++) { cyl(0.2, 0.2, 0.46, PAL[(i * 2) % 8], -5.7 + i * 0.36, 1.13, -6.7 + (i % 2) * 0.3); cyl(0.14, 0.14, 0.06, 0xd0d0d0, -5.7 + i * 0.36, 1.39, -6.7 + (i % 2) * 0.3); }
+    box(1.3, 1.9, 0.1, 0x6a5a3a, -6.8, 0.95, -5.7);
+    sign(['오늘 들어온 것', snack.n, snack.p], 1.15, 1.5, '#2f4a3a', '#f4ecdc', -6.8, 1.1, -5.64, 0, [30, 46, 30]);
+    box(0.5, 0.2, 0.3, snack.c, -4.3, 1.2, -6.3);
+
+    // 뽑기 기계 둘
+    const gm = (x, col) => { box(1.5, 1.1, 1.3, col, x, 0.55, -6.5);
+      const gl = new THREE.MeshLambertMaterial({color: 0xbfe4ff, transparent: true, opacity: 0.4}); const g = ball(0.95, gl, x, 2.05, -6.5); g.castShadow = false;
+      for (let i = 0; i < 14; i++) ball(0.17, PAL[i % 8], x + Math.cos(i * 2.4) * (0.15 + (i % 3) * 0.2), 1.55 + (i % 4) * 0.22, -6.5 + Math.sin(i * 2.4) * (0.1 + (i % 3) * 0.18));
+      cyl(0.5, 0.6, 0.12, 0x555555, x, 1.15, -6.5); box(0.9, 0.5, 0.12, 0xf4ecdc, x, 0.7, -5.82); box(0.3, 0.18, 0.1, 0x222222, x, 0.3, -5.8);
+      const h = new THREE.Group(); h.position.set(x, 0.74, -5.72); scene.add(h); box(0.5, 0.08, 0.08, 0xd0d0d0, 0, 0, 0, h); box(0.12, 0.12, 0.12, 0x444444, 0.25, 0, 0, h); return h; };
+    c.handle = gm(5.6, 0xd9533a); gm(7.2, 0x3a7bd5); solid(6.4, -6.5, 3.4, 1.5);
+    fx.push(dt => { if (c.spin) c.handle.rotation.z += dt * 7; });
+
+    // 딱지 판 + 사방치기
+    box(4.2, 0.02, 3.2, 0x8a8478, -5, 0.01, 3.6);
+    for (const [x, z, col] of [[-6.4, 2.6, 0xe0b030], [-3.7, 4.4, 0x4aa86a], [-4.0, 2.7, 0x9b59b6]]) { const m = box(0.5, 0.04, 0.5, col, x, 0.04, z); m.rotation.y = x; }
+    c.dk = new THREE.Group(); c.dk.position.set(-5, 0.05, 3.6); scene.add(c.dk);
+    box(0.7, 0.04, 0.7, 0xd9533a, 0, 0.02, 0, c.dk); box(0.7, 0.04, 0.7, 0x3a7bd5, 0, -0.02, 0, c.dk);
+    for (const [x, z] of [[3.5, 7.0], [3.5, 6.0], [3.0, 5.0], [4.0, 5.0], [3.5, 4.0], [3.5, 3.0]]) box(0.85, 0.02, 0.85, 0xeeeeee, x, 0.01, z);
+
+    // 가로등
+    for (const x of [-13, 13]) { cyl(0.08, 0.1, 5, 0x555555, x, 2.5, 7); glowBall(0.25, 0xffe2a0, x, 5.1, 7, 0); }
+
+    // 아이들 — 책가방 멘
+    const kid = (look, bagC, path, opt) => { const k = npc(look, path, Object.assign({scale: 0.95}, opt)); bag(k.o, bagC); return k; };
+    kid({coat: 0xe0a040, pants: 0x3a4a6a, hair: 0x2a2018, hairStyle: 'short'}, 0x4a8ad0, [[4.2, -4.8]], {face: 2.2, idle: ['cheer', 'crouch']});
+    kid({coat: 0x4a8ad0, pants: 0x4a4440, hair: 0x3a2a1a, hairStyle: 'bob'}, 0xe0a040, [[-6.6, 3.2]], {face: Math.PI / 2, idle: ['crouch']});
+    kid({coat: 0xd05a6a, pants: 0x3a3f4a, hair: 0x2a2018, hairStyle: 'bun'}, 0x6aa86a, [[-9.5, -4.6]], {face: Math.PI, idle: ['wave']});
+    kid({coat: 0x6aa86a, pants: 0x3a3f4a, hair: 0x2a2018, hat: {type: 'cap', c: 0xd05a4a}}, 0x3a3f4a, [[-13, 8], [13, 8]], {wait: 3, speed: 1.5});
+    kid({coat: 0xb06ac9, pants: 0x3a4a6a, hair: 0x2a2018, hairStyle: 'short'}, 0xf2b134, [[13, 5.8], [-13, 5.8]], {wait: 8, speed: 1.7});
+    kid({coat: 0xf08fb0, pants: 0x4a4440, hair: 0x3a2a1a, hairStyle: 'bob'}, 0x3d6fb5, [[13.6, 5.2], [-12.4, 5.2]], {wait: 8, speed: 1.7});
+  },
+  onTime(p, c) { c.winMat?.color.setHex(p === 'day' ? 0xcfe6f2 : 0xffd27a); },
+  lamps: [[-5, -3], [6, -3]],
+  acts: [
+    {id: 'gacha', icon: '🎰', label: '뽑기', spot: [6.4, -4.4], face: Math.PI, run(c, done) {
+      const d = c.now(), speed = 200 + (dayN(d) % 3) * 45; c.spin = true;
+      c.play(`<h3>뽑기</h3><p style="font-size:13px;color:#7a6e5e;margin:2px 0 8px">초록 칸에 바늘이 들어왔을 때 「돌리기」 · 세 번</p>
+        <div id="dial" style="position:relative;width:150px;height:150px;border-radius:50%;margin:6px auto;border:2px solid #2b2620"><div id="nd" style="position:absolute;left:calc(50% - 2px);bottom:50%;width:4px;height:68px;background:#2b2620;border-radius:2px;transform-origin:50% 100%"></div><div style="position:absolute;left:calc(50% - 7px);top:calc(50% - 7px);width:14px;height:14px;border-radius:50%;background:#2b2620"></div></div>
+        <p id="gm" style="min-height:40px;font-size:14px;margin:6px 0">1/3</p>
+        <p><button class="btn main" data-t="1">돌리기!</button> <button class="btn" data-q="1">그만두기</button></p>`, (el, close) => {
+        const q = s => el.querySelector(s), dial = q('#dial'), nd = q('#nd'), W = 72;
+        let k = 0, hits = 0, sec = 0, ang = 0, ended = false, lock = false, frozen = false, raf = 0; const t0 = performance.now();
+        const newSec = () => { sec = Math.random() * 360; dial.style.background = `conic-gradient(from ${sec}deg, #6fb07a 0deg ${W}deg, #fffaf0 ${W}deg 360deg)`; };
+        const tick = () => { if (ended) return; if (!frozen) { ang = (performance.now() - t0) / 1000 * speed % 360; nd.style.transform = `rotate(${ang}deg)`; } raf = requestAnimationFrame(tick); };
+        const quit = () => { if (ended) return; ended = true; cancelAnimationFrame(raf); clearTimeout(cap); c.spin = false; close(); done(); };
+        const finish = () => { if (ended) return; ended = true; cancelAnimationFrame(raf); clearTimeout(cap); c.spin = false;
+          const g = GR[hits], prize = g.it[Math.random() * 3 | 0];
+          c.DB.caps = c.DB.caps || [0, 0, 0, 0]; c.DB.caps[hits]++; c.save(); c.count('gacha');
+          el.firstElementChild.innerHTML = `<h3>뽑기</h3><div style="width:64px;height:64px;border-radius:50%;margin:10px auto;border:2px solid #2b2620;background:linear-gradient(${g.css} 50%,#fff 50%)"></div><p><b>${g.n}</b></p><p>안에 「${prize}」</p><p style="font-size:13px;color:#7a6e5e">맞힌 칸 ${hits}/3</p>`;
+          c.beep(700 + hits * 200, .12, 0, 'sine'); c.beep(1000 + hits * 200, .15, .12, 'sine');
+          setTimeout(() => { close(); c.stamp(g.n, prize); const cap2 = c.ball(0.13, g.col, 0, 0, 0, c.hand); c.doAct(c.player, hits >= 2 ? 'cheer' : 'wave');
+            c.toast('「' + g.m[Math.random() * g.m.length | 0] + '」', 2800); setTimeout(() => { c.hand.remove(cap2); done(); }, 2400); }, 2200); };
+        const cap = setTimeout(finish, 26000);
+        el.onclick = e => { const b = e.target.closest('button'); if (!b || ended) return;
+          if (b.dataset.q) return quit();
+          if (lock) return; lock = true; frozen = true;
+          const hit = ((ang - sec) % 360 + 360) % 360 < W; if (hit) hits++; k++;
+          c.beep(hit ? 1200 : 200, .1, 0, 'sine'); q('#gm').textContent = `${k}/3 — ${hit ? '맞았다' : '빗나갔다'}`;
+          setTimeout(() => { if (ended) return; if (k >= 3) finish(); else { newSec(); lock = false; frozen = false; } }, 800); };
+        newSec(); tick();
+      }); }},
+    {id: 'ddakji', icon: '🟥', label: '딱지', spot: [-5, 5.4], face: Math.PI, run(c, done) {
+      const d = c.now(), col = DK[dayN(d) % DK.length], win = Math.random() < 0.45, T = c.dk, p = c.player.position, sx = p.x, sz = p.z - 0.4;
+      c.doAct(c.player, 'throw'); const m = new THREE.Group(); c.box(0.6, 0.05, 0.6, col.c, 0, 0, 0, m);
+      setTimeout(() => { c.scene.add(m); c.beep(500, .05, 0, 'sine', .04);
+        anim(c, 0.55, k => { m.position.set(sx + (-5.5 - sx) * k, 1.5 - 1.4 * k + Math.sin(k * Math.PI) * 1.6, sz + (3.9 - sz) * k); m.rotation.y = k * 9; }, () => {
+          m.position.set(-5.5, 0.1, 3.9); m.rotation.y = 0.3; c.beep(110, .14, 0, 'sine', .09);
+          if (win) anim(c, 0.6, k => { T.rotation.x = k * Math.PI; T.position.y = 0.05 + Math.sin(k * Math.PI) * 0.6; }, () => T.position.y = 0.05);
+          else anim(c, 0.5, k => { T.rotation.z = Math.sin(k * 14) * 0.16 * (1 - k); }, () => T.rotation.z = 0);
+          const n = c.count('ddakji'); if (win) c.count('dwin');
+          setTimeout(() => { if (win) c.stamp('넘어갔다', `${col.n} 딱지로 한 장`); c.toast((n === 1 ? '「' : `${n}번째. 「`) + (win ? DK_WIN : DK_LOSE)[Math.random() * 3 | 0] + '」', 3000); }, 700);
+          setTimeout(() => { T.rotation.set(0, 0, 0); T.position.y = 0.05; c.scene.remove(m); done(); }, 2300); }); }, 280); }},
+    {id: 'snack', icon: '🍬', label: '간식', spot: [-4.8, -4.8], face: Math.PI, run(c, done) {
+      const d = c.now(), s = SNACKS[dayN(d) % SNACKS.length], it = c.box(0.22, 0.14, 0.12, s.c, 0, 0.05, 0, c.hand);
+      c.beep(1400, .05, 0, 'square', .04); c.beep(1800, .08, .08, 'square', .04); c.player.rotation.y = 0; c.doAct(c.player, 'sip');
+      const n = c.count('snack'); c.DB.snacks = c.DB.snacks || {}; c.DB.snacks[s.n] = (c.DB.snacks[s.n] || 0) + 1; c.save();
+      c.toast(n === 1 ? `🍬 오늘은 「${s.n}」 ${s.p}` : `🍬 「${s.n}」 ${n}번째. 용돈이 줄어든다`, 2600);
+      setTimeout(() => c.toast('「' + s.t + '」', 3200), 2300); setTimeout(() => { c.hand.remove(it); done(); }, 3000); }},
+    {id: 'talk', icon: '👴', label: '할아버지', spot: [0.6, -6.2], face: Math.PI, run(c, done) {
+      c.player.rotation.y = Math.PI; c.grandpa.talk = true; c.doAct(c.grandpa.o, 'wave'); const d = c.now(), first = !c.today().talk, line = HALMOEONI[(dayN(d) * 5 + 3) % HALMOEONI.length];
+      c.count('talk');
+      setTimeout(() => { c.grandpa.talk = false; c.dialog('할아버지의 오늘 한마디', `${c.hm(d)} · ${c.visits()}번째 온 날`, `<p style="font-size:17px">「${line}」</p>` + (first ? '' : '<p style="color:#7a6e5e;font-size:13px">한마디는 하루에 하나. 내일 또 와요.</p>'), [['네', done, 'main']]); }, 900); }},
+  ],
+  recExtra: c => { const d = c.now(), t = c.today(), caps = c.DB.caps || [0, 0, 0, 0], sn = c.DB.snacks || {}, s = SNACKS[dayN(d) % SNACKS.length];
+    return `<p style="font-size:13px;color:#7a6e5e">오늘 들어온 간식<br><span style="color:#2b2620;font-size:14px">${s.n} · ${s.p}</span></p>`
+      + `<p style="font-size:13px;color:#7a6e5e">모은 캡슐<br><span style="color:#2b2620;font-size:14px">${GR.map((g, i) => `<span style="display:inline-block;width:11px;height:11px;border-radius:50%;border:1px solid #2b2620;background:${g.css};margin:0 3px 0 6px"></span>${caps[i]}`).join('')}</span></p>`
+      + `<p style="font-size:13px;color:#7a6e5e">딱지 · 오늘 ${t.dwin || 0}번 넘어감 / ${t.ddakji || 0}번 던짐<br>먹어 본 간식 ${Object.keys(sn).length}/${SNACKS.length}종</p>`; },
+  onEnter(c) { const d = c.now(); c.doAct(c.grandpa.o, 'wave'); c.toast(c.visits() > 1 ? `✏️ 또 왔구나. ${c.visits()}번째` : '✏️ 「' + ENTER[dayN(d) % ENTER.length] + '」', 3200); },
+});
+</script></body></html>

@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>아마존 강 배</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 하루에 하나 — 오늘의 강 이야기(날짜로 고른다). 모두 실제 사실
+const STORY = [
+  '아마존강은 바다로 흘러드는 물의 양이 세계에서 가장 많아요.',
+  '아마존강돌고래(보투)는 분홍색이에요. 자랄수록 분홍빛이 짙어져요.',
+  '보투는 목뼈가 서로 붙어 있지 않아서 고개를 좌우로 돌릴 수 있어요.',
+  '마나우스 근처에서 검은 네그루강과 누런 솔리몽이스강이 만나, 몇 킬로미터를 섞이지 않고 나란히 흘러요.',
+  '강물 높이가 우기와 건기에 10미터 넘게 차이 나는 곳도 있어요.',
+  '피라루쿠는 3미터 가까이 자라는 민물고기예요. 가끔 수면으로 올라와 공기로 숨을 쉬어요.',
+  '큰부리새의 부리는 몸길이의 3분의 1쯤이지만 속이 비어 있어 가벼워요.',
+  '새끼 호아친은 날개에 발톱이 있어서 나뭇가지를 기어올라요.',
+  '아마존에서는 해먹을 걸고 배 위에서 며칠씩 자며 강을 따라 다니는 일이 흔해요.',
+  '아마존 열대우림은 지구에서 가장 큰 열대우림이에요.',
+];
+const dayN = d => Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
+
+// 새소리 — 실제 소리가 아니라 흉내 낸 신호음. [높이, 길이, 시작, 파형]
+const BIRDS = [
+  {n: '큰부리새', fact: '큰부리새의 부리는 속이 비어 있어 가벼워요.', pat: [[380, .11, 0, 'square'], [380, .11, .2, 'square'], [380, .11, .4, 'square'], [300, .2, .62, 'square']]},
+  {n: '금강앵무', fact: '금강앵무는 한 번 짝을 맺으면 오래 함께 다녀요.', pat: [[1800, .07, 0, 'sawtooth'], [1300, .22, .1, 'sawtooth'], [1800, .07, .55, 'sawtooth'], [1300, .22, .65, 'sawtooth']]},
+  {n: '호아친', fact: '새끼 호아친은 날개에 발톱이 있어요.', pat: [[240, .5, 0, 'sawtooth'], [200, .45, .6, 'sawtooth']]},
+];
+
+start({
+  key: 'amazon', title: '아마존 강 배', enter: '배에 올라타기', time: 'day', nickIcon: '🛶',
+  nick: [['느긋한', '해먹 좋아하는', '강바람 쐬는', '분홍빛 찾는', '졸린', '선장 친구'], ['투칸', '해먹', '돌고래', '노', '바나나', '앵무']],
+  intro: '<p>아마존 강 위를 천천히 가는 나무 배.<br>노 젓고, 새소리 듣고, 해먹에 누워 가요.</p>',
+  floor: {w: 12, d: 18, c1: '#a0703f', c2: '#5a3a1e', pattern: 'plank', around: 0x7a5a3a},
+  bg: {day: 0xa8d0e8},
+  startPos: [0, 6], cam: {h: 10, back: 12},
+  playerLook: {coat: 0x3a8a6a, pants: 0x3a3f4a, hair: 0x2a2018, hat: {type: 'cap', c: 0xe0b040}},
+  build(c) {
+    const {box, cyl, ball, solid, fx, THREE, scene, sign, npc, person} = c;
+    const rnd = (a, b) => a + Math.random() * (b - a);
+    const flow = {v: 2.4, boost: 0}; c.flow = flow;
+
+    // 선체 · 난간 · 강가
+    box(12.4, 1.3, 18.6, 0x5a3418, 0, -0.7, 0); box(12.5, 0.25, 18.7, 0xe8e0cc, 0, -0.4, 0);
+    for (const x of [-6.05, 6.05]) box(0.2, 0.8, 18.2, 0x6a3f22, x, 0.4, 0);
+    for (let z = -8; z <= 8; z += 4) for (const x of [-6.05, 6.05]) box(0.28, 1.0, 0.28, 0x4a2a14, x, 0.5, z);
+    box(12, 0.1, 0.1, 0x6a3f22, 0, 0.85, 9.0); for (const x of [-6, -3, 0, 3, 6]) box(0.12, 0.9, 0.12, 0x4a2a14, x, 0.45, 9.0);
+    for (const s of [-1, 1]) box(40, 0.3, 200, 0x3f6a2e, s * 34, -0.1, -30);
+
+    // 조타실(지붕 없음) — 선장
+    box(6, 2.2, 0.3, 0xe8e0cc, 0, 1.1, -8.85); for (const s of [-3, 3]) box(0.3, 1.2, 2.8, 0xe8e0cc, s, 0.6, -7.6);
+    sign(['아마존 호', '마나우스 가는 길'], 5, 1.5, '#c9472f', '#fff8ec', 0, 3.0, -8.68, 0, [70, 32]);
+    box(0.2, 1.2, 0.2, 0x6b4424, 0, 0.6, -6.7);
+    const wheel = cyl(0.5, 0.5, 0.08, 0x8a5a2a, 0, 1.5, -6.7, undefined, 10); wheel.rotation.x = Math.PI / 2;
+    for (let i = 0; i < 4; i++) { const sp = box(1.3, 0.07, 0.07, 0x8a5a2a, 0, 1.5, -6.7); sp.rotation.z = i * Math.PI / 4; wheel.add(sp); sp.position.set(0, 0, 0); sp.rotation.set(0, i * Math.PI / 4, 0); sp.rotation.x = 0; }
+    solid(0, -7.6, 6.4, 2.8);
+    c.captain = npc({coat: 0xf4ecdc, hat: {type: 'cap', c: 0x1a2a5a}, hair: 0x2a2018, sash: 0xc9472f}, [[0, -7.5]], {face: 0, idle: ['wave', 'stretch']});
+    let wt = 0; fx.push((dt, t) => { wheel.rotation.y = Math.sin(t * 0.5) * 0.25; });
+
+    // 짐 — 상자·바나나·파란 통
+    box(1.3, 1, 1.2, 0x9a7040, -4.3, 0.5, -5.2); box(1, 0.8, 1, 0x8a6030, -4.1, 1.4, -5.3); solid(-4.3, -5.2, 1.6, 1.6);
+    for (let i = 0; i < 5; i++) { const b = box(0.14, 0.14, 0.55, 0xe8c53a, -4.5 + i * 0.18, 1.88, -5.3); b.rotation.y = 0.2 * i; }
+    cyl(0.5, 0.5, 1, 0x2a6ab0, -5.0, 0.5, -3.6); solid(-5.0, -3.6, 1.1, 1.1);
+    const coil = new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.1, 6, 16), new THREE.MeshLambertMaterial({color: 0xc9a870})); coil.rotation.x = -Math.PI / 2; coil.position.set(-2.6, 0.12, -4.4); scene.add(coil);
+
+    // 해먹 둘 — 아래(z 1.2)는 내 자리, 위(z -1.4)는 자는 승객
+    const hammock = (z, col) => {
+      for (const x of [2.15, 5.45]) cyl(0.07, 0.07, 2, 0x6b4424, x, 1, z);
+      for (const [x, th] of [[2.35, 0.31], [5.25, -0.31]]) for (const dz of [-0.3, 0.3]) { const r = box(0.03, 1.0, 0.03, 0xd9c29a, x, 1.37, z + dz); r.rotation.z = th; }
+      const h = ball(1, col, 3.8, 0.85, z); h.scale.set(1.55, 0.16, 0.55); const st = ball(1, 0xf4ecdc, 3.8, 0.97, z); st.scale.set(1.2, 0.05, 0.1);
+      solid(3.8, z, 3.6, 1.1); return h;
+    };
+    hammock(-1.4, 0xc9472f); c.hammock = hammock(1.2, 0x3a6ab0);
+    c.lay = (g, x, y, z) => { g.rotation.order = 'YXZ'; g.rotation.set(-Math.PI / 2, Math.PI / 2, 0); g.position.set(x, y, z);
+      const sh = g.children.find(o => o.geometry?.type === 'CircleGeometry'); if (sh) sh.visible = false; };
+    c.stand = (g, x, z) => { g.rotation.order = 'XYZ'; g.rotation.set(0, Math.PI, 0); g.position.set(x, 0, z);
+      const sh = g.children.find(o => o.geometry?.type === 'CircleGeometry'); if (sh) sh.visible = true; };
+    const sleeper = person({coat: 0x8a6a9a, pants: 0x4a4f5a, hat: {type: 'beanie', c: 0xc9472f}}, 1.1); c.lay(sleeper, 5.0, 1.25, -1.4);
+    const zz = sign(['z z z'], 1.6, 0.7, 'rgba(0,0,0,0)', '#ffffff', 3.2, 2.4, -1.4, 0, [56]);
+    fx.push((dt, t) => { zz.position.y = 2.4 + Math.sin(t * 1.4) * 0.12; });
+
+    // 노 둘(왼쪽이 젓는 노)
+    const oar = s => { const g = new THREE.Group(); g.position.set(s * 6.1, 0.95, 2.5);
+      const shaft = cyl(0.05, 0.05, 3.2, 0x8a5a2a, 0, 0, 0, g, 8); shaft.rotation.z = Math.PI / 2; shaft.position.x = s * 1.4; box(0.7, 0.04, 0.3, 0x8a5a2a, s * 2.9, 0, 0, g);
+      g.rotation.z = s * -0.3; scene.add(g); return g; };
+    const oarL = oar(-1), oarR = oar(1); c.rowT = 0;
+    fx.push((dt, t) => { if (c.rowT > 0) { c.rowT -= dt; const w = Math.sin(t * 4) * 0.45; oarL.rotation.y = w; oarR.rotation.y = -w; } else { oarL.rotation.y *= 0.9; oarR.rotation.y *= 0.9; } });
+
+    // 지나가는 승객
+    npc({coat: 0xc9472f, hairStyle: 'bun', hair: 0x2a2018}, [[-4.6, 0.5]], {face: -Math.PI / 2, idle: ['stretch', 'wave']});
+
+    // 열대 나무 — 뒤(-z)로 흘러가고, 끝에서 다시 앞으로
+    const trees = [];
+    const tree = (x, z) => {
+      const g = new THREE.Group(), s = rnd(0.8, 1.5);
+      if (Math.random() < 0.3) { cyl(0.12 * s, 0.18 * s, 4.2 * s, 0x7a5a3a, 0, 2.1 * s, 0, g, 8);
+        for (let i = 0; i < 6; i++) { const a = i * 1.05, f = ball(1, 0x3c9a48, Math.cos(a) * 1.0 * s, 4.3 * s, Math.sin(a) * 1.0 * s, g); f.scale.set(1.3 * s, 0.1 * s, 0.35 * s); f.rotation.y = -a; f.rotation.z = 0.2; } }
+      else { cyl(0.2 * s, 0.3 * s, 2.8 * s, 0x6b4a2a, 0, 1.4 * s, 0, g, 8);
+        const col = [0x2f7a3a, 0x3f8f45, 0x246a34, 0x4a9a4a][Math.random() * 4 | 0];
+        ball(1.7 * s, col, 0, 3.6 * s, 0, g); ball(1.2 * s, 0x3a8a40, 1.1 * s, 3.0 * s, 0.5 * s, g); ball(1.3 * s, 0x2a7034, -1.0 * s, 3.2 * s, -0.4 * s, g);
+        if (Math.random() < 0.4) { const k = new THREE.Mesh(new THREE.ConeGeometry(1.2 * s, 2.4 * s, 8), new THREE.MeshLambertMaterial({color: 0x246a34})); k.position.set(0, 5.2 * s, 0); g.add(k); } }
+      g.position.set(x, 0.05, z); g.traverse(o => { o.castShadow = false; }); scene.add(g); trees.push(g);
+    };
+    for (const sd of [-1, 1]) for (let z = -100; z < 40; z += 3.6) tree(sd * rnd(15.5, 34), z + rnd(-1.4, 1.4));
+
+    // 강물 위 물결 줄무늬 — 흐름이 보이게
+    const streaks = [];
+    for (let i = 0; i < 18; i++) { const m = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.02, rnd(1.2, 2.6)), new THREE.MeshBasicMaterial({color: 0xa88a62}));
+      const sd = i % 2 ? 1 : -1; m.position.set(sd * rnd(7.2, 13.5), 0.01, rnd(-100, 40)); scene.add(m); streaks.push(m); }
+    fx.push(dt => { flow.boost *= Math.pow(0.5, dt); const s = (flow.v + flow.boost) * dt;
+      for (const g of trees) { g.position.z -= s; if (g.position.z < -100) g.position.z += 140; }
+      for (const m of streaks) { m.position.z -= s * 1.1; if (m.position.z < -100) m.position.z += 140; } });
+
+    // 하늘을 가로지르는 앵무
+    const bird = new THREE.Group(), body = new THREE.Mesh(new THREE.SphereGeometry(0.28, 10, 8), new THREE.MeshLambertMaterial({color: 0xd23a2a})); body.scale.set(0.8, 0.8, 1.6); bird.add(body);
+    const wings = [-1, 1].map(s => { const w = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.05, 0.35), new THREE.MeshLambertMaterial({color: s < 0 ? 0x2a5ab0 : 0xe0b040})); w.position.x = s * 0.5; bird.add(w); return w; });
+    scene.add(bird); bird.rotation.y = Math.PI / 2;
+    fx.push((dt, t) => { const u = (t * 2.6) % 90; bird.position.set(-45 + u, 6.5 + Math.sin(t * 0.7) * 0.6, -14); bird.visible = u > 0;
+      wings[0].rotation.z = Math.sin(t * 14) * 0.6; wings[1].rotation.z = -Math.sin(t * 14) * 0.6; });
+
+    // 분홍 돌고래 — 물결 넷 중 한 곳에서 솟는다(가끔은 그냥 물고기)
+    const spots = [[-9, -2.5], [-8.5, 3.5], [9, -1.5], [8.5, 4]];
+    const rings = spots.map(() => { const r = new THREE.Mesh(new THREE.RingGeometry(0.4, 0.55, 24), new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0.6, side: THREE.DoubleSide}));
+      r.rotation.x = -Math.PI / 2; r.visible = false; scene.add(r); return r; });
+    const dol = new THREE.Group();
+    const dm = new THREE.MeshLambertMaterial({color: 0xf0a0b6, emissive: 0x401820});
+    const db = new THREE.Mesh(new THREE.SphereGeometry(0.5, 14, 10), dm); db.scale.set(0.75, 0.7, 1.8); dol.add(db);
+    const sn = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.14, 0.6, 8), dm); sn.rotation.x = Math.PI / 2; sn.position.z = 1.05; dol.add(sn);
+    const fin = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.4, 6), dm); fin.position.set(0, 0.55, -0.1); dol.add(fin);
+    const tail = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.07, 0.3), dm); tail.position.z = -1.0; dol.add(tail);
+    dol.scale.setScalar(1.2); dol.visible = false; scene.add(dol);
+    const fish = new THREE.Mesh(new THREE.SphereGeometry(0.2, 10, 8), new THREE.MeshLambertMaterial({color: 0xc8d0d8})); fish.scale.set(0.6, 0.6, 1.8); fish.visible = false; scene.add(fish);
+    const D = {t: 99, spot: 0, real: true};
+    c.dolphin = (spot, real) => { D.t = 0; D.spot = spot; D.real = real; };
+    c.dolSpots = spots;
+    fx.push(dt => {
+      D.t += dt; const drift = D.t * 2.4;
+      spots.forEach(([x, z], i) => { const r = rings[i], rt = D.t - (i === D.spot ? 0 : 0.3);
+        r.visible = rt > 0 && rt < 2.2; if (r.visible) { r.position.set(x, 0.03, z - drift); r.scale.setScalar(1 + rt * 1.6); r.material.opacity = 0.6 * (1 - rt / 2.2); } });
+      const u = (D.t - 1.2) / 1.5, up = u > 0 && u < 1, [sx, sz] = spots[D.spot], obj = D.real ? dol : fish;
+      dol.visible = up && D.real; fish.visible = up && !D.real;
+      if (up) { obj.position.set(sx, -0.5 + Math.sin(u * Math.PI) * (D.real ? 1.3 : 0.9), sz - drift); obj.rotation.x = (u - 0.5) * 1.4; obj.rotation.y = sx < 0 ? 0.6 : -0.6; }
+    });
+  },
+  lamps: [],
+  acts: [
+    {id: 'row', icon: '🚣', label: '노 젓기', spot: [-4.6, 2.5], face: -Math.PI / 2, run(c, done) {
+      c.rowT = 3.6; c.flow.boost = 3.2; c.doAct(c.player, 'crouch'); setTimeout(() => c.doAct(c.player, 'crouch'), 1200); setTimeout(() => c.doAct(c.player, 'crouch'), 2400);
+      c.beep(160, .25, 0, 'sine', .06); c.beep(160, .25, 1.2, 'sine', .06); c.beep(160, .25, 2.4, 'sine', .06);
+      const n = c.count('row');
+      setTimeout(() => { c.doAct(c.captain.o, 'wave'); c.toast(n === 1 ? '🚣 영차. 배가 조금 빨라졌어요' : n < 4 ? `🚣 ${n}번째 — 팔이 뻐근해요` : `🚣 ${n}번… 선장이 웃어요`); done(); }, 3800); }},
+    {id: 'bird', icon: '🦜', label: '새소리', spot: [0, 4.2], face: Math.PI, run(c, done) {
+      const d = c.now(), day = dayN(d), seq = [day % 3, (day + 1) % 3, (day + 2) % 3, (day * 2) % 3];
+      c.play(`<h3>새소리 맞히기</h3><div id="bx"></div>`, (el, close) => {
+        const q = s => el.querySelector(s); let k = 0, score = 0, dead = false, lock = false;
+        const pl = i => BIRDS[i].pat.forEach(([f, l, w, t]) => c.beep(f, l, w, t, .045));
+        const quit = () => { dead = true; close(); done(); };
+        const learn = () => { q('#bx').innerHTML = `<p style="font-size:13px;color:#7a6e5e">진짜 새소리가 아니라 흉내 낸 신호음이에요.<br>세 마리 소리를 눌러 들어 보세요.</p>`
+          + BIRDS.map((b, i) => `<button class="btn" data-l="${i}" style="margin:3px">🔈 ${b.n}</button>`).join('')
+          + `<p><button class="btn main" data-go="1">시작</button> <button class="btn" data-q="1">그만두기</button></p>`;
+          q('#bx').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.q) quit(); else if (b.dataset.go) round(); else pl(+b.dataset.l); }; };
+        const round = () => { if (dead) return; if (k >= 4) return finish(); lock = false;
+          q('#bx').innerHTML = `<p>${k + 1}/4 — 어떤 새일까요?</p><button class="btn" data-r="1">🔊 다시 듣기</button><p>`
+            + BIRDS.map((b, i) => `<button class="btn" data-a="${i}" style="margin:3px">${b.n}</button>`).join('') + `</p><p id="msg" style="min-height:44px;font-size:14px"></p>`;
+          q('#bx').onclick = e => { const b = e.target.closest('button'); if (!b || lock) return; if (b.dataset.r) return pl(seq[k]);
+            lock = true; const ok = +b.dataset.a === seq[k]; if (ok) { score++; c.beep(900, .1, 0, 'sine'); c.beep(1200, .12, .1, 'sine'); } else c.beep(180, .25, 0, 'sine');
+            q('#msg').innerHTML = `<b>${ok ? '맞아요' : '아쉬워요'}</b> — ${BIRDS[seq[k]].n}<br><span style="font-size:13px;color:#7a6e5e">${BIRDS[seq[k]].fact}</span>`;
+            k++; setTimeout(round, 2000); };
+          setTimeout(() => !dead && pl(seq[k]), 300); };
+        const finish = () => { const msg = score === 4 ? '귀가 밝아요' : score === 3 ? '꽤 잘 들어요' : '내일 또 들어 봐요';
+          c.DB.bird = Math.max(c.DB.bird || 0, score); c.save(); c.count('bird');
+          q('#bx').innerHTML = `<p style="font-size:26px;margin:6px"><b>${score}/4</b></p><p>${msg}</p><p style="font-size:13px;color:#7a6e5e">새 순서는 날마다 달라져요</p>`;
+          setTimeout(() => { if (dead) return; close(); c.stamp(`${score}/4`, msg); done(); }, 2000); };
+        learn();
+      }); }},
+    {id: 'dolphin', icon: '🐬', label: '분홍 돌고래', spot: [0, 4], face: Math.PI, run(c, done) {
+      const sp = Math.random() * 4 | 0, real = Math.random() < 0.7, [sx, sz] = c.dolSpots[sp], p = c.player.position;
+      c.toast('🐬 물결을 살펴요…', 1600); c.dolphin(sp, real); c.player.rotation.y = Math.atan2(sx - p.x, sz - p.z);
+      setTimeout(() => {
+        if (real) { c.doAct(c.player, 'cheer'); const n = c.count('dolphin'); c.beep(1000, .1, 0, 'sine'); c.beep(1400, .15, .12, 'sine');
+          c.stamp('돌고래!', '아마존강돌고래 보투'); c.toast(n % 2 ? '🐬 분홍색이에요. 자랄수록 분홍빛이 짙어져요' : '🐬 보투는 고개를 좌우로 돌릴 수 있어요', 3800); setTimeout(done, 2800); }
+        else { c.beep(300, .2, 0, 'sine', .05); c.toast('🐟 물고기였어요. 다시 살펴봐요', 2400); setTimeout(done, 1800); } }, 1800); }},
+    {id: 'lie', icon: '😴', label: '해먹', spot: [3.8, 2.6], face: Math.PI, run(c, done) {
+      const p = c.player; c.lay(p, 5.0, 1.25, 1.2); c.beep(260, .4, 0, 'sine', .04);
+      const n = c.count('lie'); c.toast('😴 흔들흔들…', 1600);
+      setTimeout(() => c.toast(['🌿 물소리가 천천히 지나가요', '🦜 어디선가 앵무 소리', '🍃 나뭇잎 그림자가 지나가요', '☁ 구름이 배보다 느려요'][(n + c.visits()) % 4], 2600), 1800);
+      setTimeout(() => { c.stand(p, 3.8, 2.6); c.doAct(p, 'stretch'); setTimeout(done, 1000); }, 4600); }},
+  ],
+  recExtra: c => { const d = c.now();
+    return `<p style="font-size:13px;color:#7a6e5e">오늘의 강 이야기<br><span style="color:#2b2620;font-size:14px">${STORY[dayN(d) % STORY.length]}</span></p>`
+      + `<p style="font-size:13px;color:#7a6e5e">새소리 최고 점수: ${c.DB.bird || 0}/4</p>`; },
+  onEnter(c) { const d = c.now(); c.doAct(c.captain.o, 'wave'); c.toast(`🛶 선장: 「${STORY[dayN(d) % STORY.length]}」`, 5500); },
+});
+</script></body></html>

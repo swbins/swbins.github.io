@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>조선 장터</title></head><body>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import {start} from '../mini.js';
+
+// 장돌뱅이 소문 — 날짜마다 하나씩 차례로
+const FACT = [
+  '닷새마다 서는 오일장은 조선 후기에 전국에 자리를 잡았어요.',
+  '장날은 고을마다 달랐어요. 2·7일, 3·8일처럼 날짜 끝자리로 정했죠.',
+  '상평통보는 1678년(숙종 4년)부터 널리 쓰이기 시작한 엽전이에요.',
+  '엽전은 둥근 모양에 가운데 네모난 구멍이 있어서 끈에 꿰어 다녔어요.',
+  '보부상은 봇짐을 지는 보상과 등짐을 지는 부상을 함께 부르는 말이에요.',
+  '옹기엔 눈에 안 보이는 숨구멍이 있어서 김치·장 같은 발효 음식을 두기 좋아요.',
+  '짚신은 볏짚으로 삼은 신이라 값이 싸고 금방 닳았어요.',
+  '장승은 마을 어귀나 길가에 세워 길을 알려 주고, 마을을 지켜 준다고 믿었어요.',
+  '엿장수는 가위를 쳐서 소리를 내 아이들과 손님을 불렀어요.',
+  '엿은 곡식에 엿기름을 넣어 삭힌 뒤 오래 졸여서 만들어요.',
+  '주막은 길손에게 밥과 술을 팔고 잠자리도 내주던 곳이에요.',
+  '김홍도의 풍속화첩에는 주막 풍경도 그려져 있어요.',
+];
+// 오늘 상인이 내놓은 물건 — 값은 놀이용
+const WARE = [
+  {n: '옹기 항아리', p: 64}, {n: '짚신 다섯 켤레', p: 30}, {n: '갓 하나', p: 90}, {n: '엿 한 판', p: 24},
+  {n: '무명 한 필', p: 120}, {n: '놋그릇 한 벌', p: 80}, {n: '담뱃대 하나', p: 40},
+];
+const LABEL = ['5·10', '1·6', '2·7', '3·8', '4·9'];   // 날짜 끝자리로 서는 오일장 이름
+function daily(d) {   // 오늘의 장터 — 날짜로만 정해진다
+  const dn = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
+  return {dn, w: WARE[dn % WARE.length], lab: LABEL[d.getDate() % 5], fact: FACT[dn % FACT.length], day: d.getDate()};
+}
+const WHITE = 0xf4f0e6, STRAW = 0xc9a85a;
+const YEOT = ['찰캉 찰캉 — 엿 사라는 가위 소리예요', '엿 한 가락 입에 쏙. 이가 붙어요', '가위 소리에 아이들이 모여들어요', '엿장수 마음대로, 한 가락 더'];
+const SOUP = ['뜨끈한 국밥 한 그릇. 장날엔 이게 제일', '깍두기 한 점, 국물 한 모금', '속이 풀려요. 한 그릇 더?'];
+
+start({
+  key: 'joseon', title: '조선 장터', enter: '장터 들어서기', time: 'day', nickIcon: '🏮',
+  nick: [['장 구경 온', '흥정하는', '갓 쓴', '짚신 신은', '엿 물고 있는', '봇짐 멘'], ['장꾼', '보부상', '엿가위', '옹기', '장승', '엽전']],
+  intro: '<p>닷새마다 서는 시골 장터.<br>값 깎고, 국밥 한 그릇 먹고, 소문 하나 듣고 가요.</p>',
+  floor: {w: 30, d: 24, c1: '#b59b72', c2: '#a38963', around: '#8c9c6a'},
+  bg: {day: 0xbcd6e6}, startPos: [0, 7], cam: {h: 10, back: 12},
+  playerLook: {coat: WHITE, pants: 0xd9d3c4, hat: {type: 'cap', c: 0x1a1a1f}},
+  build(c) {
+    const {box, cyl, ball, glowBall, sign, solid, fx, THREE, scene, npc} = c;
+    const grp = (x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); scene.add(g); return g; };
+    const D = daily(c.now());
+    // 먼 낮은 산
+    for (const [x, z, r, h] of [[-44, -60, 16, 9], [-16, -64, 13, 6], [14, -58, 15, 10], [42, -62, 16, 8], [64, -54, 11, 6]]) {
+      const m = new THREE.Mesh(new THREE.ConeGeometry(r, h, 6), new THREE.MeshLambertMaterial({color: 0x7f9a68})); m.position.set(x, h / 2 - 1, z); scene.add(m); }
+    // 소나무
+    for (const [x, z] of [[-13.4, -5], [13.6, 7], [-13.6, 6], [13.2, -9], [-12.6, -10]]) {
+      cyl(0.18, 0.26, 3, 0x6b4a2a, x, 1.5, z); const t = ball(1.4, 0x3d6b3a, x, 3.4, z); t.scale.y = 0.6; ball(0.95, 0x477a42, x + 0.2, 4.2, z).scale.y = 0.6; solid(x, z, 0.7, 0.7); }
+    // 초가 주막 — 뒤쪽, 지붕은 낮게
+    box(6.6, 2.2, 3.4, 0xd6c4a0, -7, 1.1, -8.5); solid(-7, -8.5, 6.6, 3.4);
+    for (const s of [1, -1]) box(7.2, 0.22, 2.3, STRAW, -7, 2.75, -8.5 + s * 0.85).rotation.x = s * 0.5;
+    box(7.2, 0.12, 0.12, 0xa8843c, -7, 2.17, -6.65); box(7.2, 0.26, 0.4, 0xb8943f, -7, 3.35, -8.5);
+    box(0.9, 1.6, 0.06, 0x6b4a2a, -7, 0.8, -6.78);
+    for (const x of [-9.3, -4.8]) { const w = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.7), new THREE.MeshBasicMaterial({color: 0xf4ecd0})); w.position.set(x, 1.3, -6.78); scene.add(w); }
+    sign(['주막'], 1.5, 0.46, '#f4ecdc', '#2b2620', -7, 1.92, -6.76, 0, [80]);
+    // 가마솥 — 국밥
+    for (const [dx, dz] of [[-0.4, 0.2], [0.4, 0.2], [0, -0.4]]) box(0.3, 0.3, 0.3, 0x6b6660, -9.2 + dx, 0.15, -5.7 + dz);
+    cyl(0.62, 0.5, 0.55, 0x2a2622, -9.2, 0.6, -5.7); cyl(0.54, 0.54, 0.02, 0xb88a4a, -9.2, 0.88, -5.7); solid(-9.2, -5.7, 1.4, 1.4);
+    glowBall(0.1, 0xff7a2a, -9.2, 0.14, -5.1, 0);
+    const puffs = [0, 1, 2, 3].map(i => { const m = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0.5}); const b = ball(0.18, m, -9.2, 1, -5.7); b.castShadow = false; return {b, m, ph: i / 4}; });
+    fx.push((dt, t) => { for (const p of puffs) { const k = (t * 0.35 + p.ph) % 1; p.b.position.set(-9.2 + Math.sin(k * 6 + p.ph * 5) * 0.15, 1 + k * 1.2, -5.7); p.b.scale.setScalar(0.6 + k); p.m.opacity = 0.5 * (1 - k); } });
+    // 평상 — 사발 둘
+    box(2.6, 0.45, 1.1, 0x9a7a4c, -5.9, 0.23, -5.7); solid(-5.9, -5.7, 2.6, 1.1);
+    for (const x of [-6.5, -5.4]) { cyl(0.16, 0.1, 0.12, 0xe8e0d0, x, 0.52, -5.7); cyl(0.14, 0.14, 0.02, 0xb88a4a, x, 0.58, -5.7); }
+    // 장독대 — 주막 왼쪽
+    for (const [x, z, h] of [[-11.3, -6.4, 0.7], [-12.1, -7.2, 0.9], [-11.4, -7.8, 0.6]]) { cyl(0.34, 0.26, h, 0x7a4a2a, x, h / 2, z); cyl(0.3, 0.3, 0.05, 0x5a3a22, x, h + 0.03, z); solid(x, z, 0.8, 0.8); }
+    // 장터 현수막 — 뒤쪽
+    for (const x of [-2.6, 2.6]) cyl(0.09, 0.09, 4.8, 0x6b4a2a, x, 2.4, -11.2);
+    sign(['조선 장터 · 오일장'], 4.8, 1.1, '#efe6cc', '#8a2a1f', 0, 4.3, -11.1, 0, [46]);
+    // 좌판 A — 옹기·잡화 (오늘의 물건 간판)
+    box(3.4, 0.05, 2.2, 0xd8c27a, -4.5, 0.03, -3); solid(-4.5, -3, 3.4, 2.2);
+    for (const [x, z, h] of [[-5.7, -2.5, 0.6], [-5.0, -3, 0.75], [-4.2, -2.5, 0.55], [-3.5, -3.1, 0.7], [-4.7, -2.1, 0.4]]) { cyl(0.3, 0.22, h, 0x8a4a2a, x, 0.05 + h / 2, z); cyl(0.2, 0.3, 0.1, 0x7a3e22, x, 0.08 + h, z); }
+    box(1.0, 0.1, 0.6, 0xe8e0cc, -3.1, 0.1, -2.1);
+    sign([D.w.n, D.w.p + '닢'], 2.6, 0.8, '#efe6cc', '#2b2620', -4.5, 3.1, -5.2, 0, [50, 38]);
+    // 좌판 B — 갓·짚신
+    box(3, 0.05, 1.8, 0xd8c27a, 0.6, 0.03, -3.8); solid(0.6, -3.8, 3, 1.8);
+    for (const x of [-0.4, 0.5, 1.5]) { cyl(0.5, 0.5, 0.03, 0x15151a, x, 0.1, -4.1); cyl(0.17, 0.2, 0.34, 0x15151a, x, 0.28, -4.1); }
+    for (let i = 0; i < 6; i++) { box(0.14, 0.06, 0.4, 0xcbb272, -0.4 + i * 0.4, 0.09, -3.2).rotation.y = 0.15 * (i % 2 ? 1 : -1); }
+    // 엿판
+    for (const [dx, dz] of [[-0.6, -0.4], [0.6, -0.4], [-0.6, 0.4], [0.6, 0.4]]) cyl(0.05, 0.05, 0.9, 0x6b4a2a, 5 + dx, 0.45, -2.2 + dz);
+    box(1.5, 0.1, 1.0, 0x8a6a44, 5, 0.92, -2.2); solid(5, -2.2, 1.6, 1.1);
+    for (let i = 0; i < 4; i++) box(0.3, 0.12, 0.7, 0xe8c277, 4.5 + i * 0.33, 1.03, -2.2);
+    // 장승 한 쌍
+    for (const [x, t] of [[11, ['천', '하', '대', '장', '군']], [12.4, ['지', '하', '여', '장', '군']]]) {
+      cyl(0.26, 0.3, 3.2, 0x7a5a38, x, 1.6, -3); ball(0.42, 0x8a6a44, x, 3.4, -3);
+      for (const s of [-1, 1]) { box(0.14, 0.1, 0.05, 0xf4f0e6, x + s * 0.16, 3.5, -2.62); box(0.05, 0.05, 0.05, 0x1a1a1a, x + s * 0.16, 3.5, -2.59); }
+      box(0.1, 0.14, 0.1, 0x6b4a2a, x, 3.38, -2.6); box(0.3, 0.06, 0.05, 0x8a2a1f, x, 3.22, -2.62);
+      sign(t, 0.5, 1.4, '#8a6a44', '#2b2620', x, 1.7, -2.69, 0, [130]); solid(x, -3, 0.8, 0.8); }
+    // 보부상의 보따리
+    ball(0.4, 0xb89a68, 1.4, 0.5, -0.6).scale.y = 0.8;
+    // 사람들 — 흰 옷에 갓·패랭이
+    const white = {coat: WHITE, pants: 0xd9d3c4};
+    c.vendor = npc({...white, hat: {type: 'cap', c: STRAW}}, [[-4.5, -4.5]], {face: 0, idle: ['wave', 'stretch']}).o;
+    c.jumo = npc({...white, hairStyle: 'bun', apron: 0xb8a07a}, [[-6.3, -4.3]], {face: 0, idle: ['wave', 'stretch']}).o;
+    c.yeot = npc({...white, hat: {type: 'cap', c: 0x6b4a2a}, sash: 0xc9472f}, [[5, -3.3]], {face: 0, idle: ['wave', 'cheer']}).o;
+    npc({...white, hat: {type: 'cap', c: STRAW}, sash: 0x8a4a2a}, [[1.4, 0.2]], {face: 0, idle: ['stretch']});
+    npc({...white, hat: {type: 'cap', c: 0x1a1a1f}}, [[-1.8, -0.6], [-1.8, 3.6], [3.2, 3.6], [3.2, -0.6]], {speed: 1.4});
+    npc({...white, hairStyle: 'bun', coat: 0xf0e4d8}, [[8, 1], [8, 6], [-7.5, 6], [-7.5, 2.5]], {speed: 1.7});
+    npc({...white, sash: 0xc9472f}, [[7, 2], [2, 2.6], [7, 5]], {scale: 0.9, speed: 2.2});
+    npc({...white, hat: {type: 'cap', c: 0x1a1a1f}}, [[9.6, -1.4]], {face: Math.PI / 2, idle: ['stretch', 'wave']});
+  },
+  lamps: [],
+  acts: [
+    {id: 'haggle', icon: '🪙', label: '흥정', spot: [-4.5, -0.9], face: Math.PI, run(c, done) {
+      const D = daily(c.now()), P = D.w.p, Rd = 0.28 + Math.random() * 0.12, GW = 0.08, MAX = 0.5, a = (Rd - GW) / MAX * 100, b = Rd / MAX * 100;
+      c.play(`<h3>엽전 흥정</h3><p style="font-size:15px;margin:2px 0">오늘의 물건 <b>${D.w.n}</b><br>상인이 부른 값 <b>${P}닢</b></p>
+        <p style="font-size:13px;color:#7a6e5e">움직이는 막대가 초록 칸에 있을 때 「깎기」를 눌러요.<br>너무 깎으면 상인이 안 팔아요. (값은 놀이용)</p>
+        <div style="position:relative;height:34px;margin:10px 4px;border:1.5px solid #2b2620;border-radius:6px;overflow:hidden;background:linear-gradient(90deg,#f1e2a8 0%,#f1e2a8 ${a}%,#9ccf7a ${a}%,#9ccf7a ${b}%,#d98a7a ${b}%,#d98a7a 100%)"><div id="mk" style="position:absolute;top:0;bottom:0;width:5px;margin-left:-2px;left:0;background:#2b2620"></div></div>
+        <div class="row" style="justify-content:center"><button class="btn main" id="cut">깎기</button><button class="btn" id="qt">그만두기</button></div>`,
+        (el, close) => {
+          let dead = false, raf = 0, pos = 0; const mk = el.querySelector('#mk'), t0 = performance.now() + 400;
+          const stop = () => { dead = true; cancelAnimationFrame(raf); close(); };
+          const tick = () => { if (dead || !el.isConnected) return; const ph = Math.max(0, performance.now() - t0) / 1700 % 2; pos = ph < 1 ? ph : 2 - ph; mk.style.left = pos * 100 + '%'; raf = requestAnimationFrame(tick); };
+          tick();
+          el.querySelector('#qt').onclick = () => { stop(); done(); };
+          setTimeout(() => { if (dead || !el.isConnected) return; stop(); c.toast('상인이 하품을 해요. 다음에 또 와요'); done(); }, 16000);
+          el.querySelector('#cut').onclick = () => {
+            if (dead) return; const disc = pos * MAX, price = Math.round(P * (1 - disc)), pct = Math.round(disc * 100); stop(); c.count('haggle'); c.beep(1500, .04); c.beep(1100, .04, .06);
+            if (disc >= Rd) { c.toast('「에이, 그 값엔 안 팔아!」 상인이 고개를 저어요', 3000); c.DB.refused = (c.DB.refused || 0) + 1; }
+            else if (disc >= Rd - GW) { c.DB.hgWin = (c.DB.hgWin || 0) + 1; c.DB.hgBest = Math.max(c.DB.hgBest || 0, pct); c.doAct(c.vendor, 'wave'); c.doAct(c.player, 'cheer'); c.stamp('흥정 성공', `${P}닢 → ${price}닢 (${pct}% 깎음)`); }
+            else c.toast(`${price}닢에 샀어요. 조금 더 깎을 수 있었는데…`, 3000);
+            c.save(); setTimeout(done, 1500); };
+        }); }},
+    {id: 'soup', icon: '🍲', label: '국밥', spot: [-9.2, -4.4], face: Math.PI, run(c, done) {
+      c.beep(220, .4, 0, 'sine', .03); c.toast('주모가 국밥을 퍼 줘요…', 1500);
+      const g = new c.THREE.Group(); c.hand.add(g); c.cyl(0.13, 0.08, 0.1, 0xe8e0d0, 0, 0, 0, g); c.cyl(0.115, 0.115, 0.02, 0xb88a4a, 0, 0.05, 0, g);
+      setTimeout(() => { c.doAct(c.jumo, 'wave'); c.doAct(c.player, 'sip'); const n = c.count('soup'); c.toast(SOUP[(n - 1) % SOUP.length], 3000); if (n === 3) setTimeout(() => c.stamp('배불러요', '오늘 국밥 세 그릇'), 900); setTimeout(() => { c.hand.remove(g); done(); }, 2400); }, 1600); }},
+    {id: 'scissors', icon: '✂️', label: '엿가위', spot: [5, -0.6], face: Math.PI, run(c, done) {
+      for (let i = 0; i < 6; i++) { c.beep(i % 2 ? 2600 : 2000, .035, i * 0.16, 'square', .05); if (i % 2) c.beep(3200, .03, i * 0.16 + .06, 'square', .03); }
+      c.doAct(c.yeot, 'cheer'); const n = c.count('scissors');
+      const g = new c.THREE.Group(); c.hand.add(g); c.box(0.07, 0.4, 0.07, 0xe8c277, 0, 0, 0, g);
+      setTimeout(() => { c.doAct(c.player, 'cheer'); c.toast(YEOT[(n - 1) % YEOT.length], 3000); }, 1100);
+      setTimeout(() => { c.hand.remove(g); done(); }, 2800); }},
+    {id: 'rumor', icon: '📜', label: '소문', spot: [1.4, 1.7], face: Math.PI, run(c, done) {
+      const d = c.now(), D = daily(d), first = !c.today().rumor, got = new Set(c.DB.rumors || []); c.beep(500, .06); c.beep(700, .06, .08); c.count('rumor');
+      got.add(D.dn % FACT.length); c.DB.rumors = [...got]; c.save();
+      setTimeout(() => c.dialog('장돌뱅이 소문', `${c.hm(d)} · ${c.visits()}번째 온 날`,
+        `<p style="font-size:14px;margin:0">오늘 ${D.day}일은 <b>${D.lab}일</b>장이 서는 날이에요.<br><span style="font-size:12px;color:#7a6e5e">날짜 끝자리로 닷새마다 열리는 장이에요.</span></p>
+         <p style="font-size:16px">「${D.fact}」</p><p style="font-size:13px">오늘 장터엔 <b>${D.w.n}</b>이 나왔어요.</p>` + (first ? '' : '<p style="color:#7a6e5e;font-size:13px">소문은 하루에 하나. 내일 또 와요.</p>'), [['알았소', done, 'main']]), 600); }},
+  ],
+  recExtra: c => `<p style="font-size:13px;color:#7a6e5e">흥정 성공 ${c.DB.hgWin || 0}번 · 최고 ${c.DB.hgBest || 0}% 깎음 · 거절당함 ${c.DB.refused || 0}번<br>모은 소문 ${(c.DB.rumors || []).length}/${FACT.length}</p>`,
+  onEnter(c) { const D = daily(c.now()); c.toast(c.visits() > 1 ? `🏮 ${c.visits()}번째 장 구경. 오늘은 ${D.lab}일장이에요` : `🏮 오늘은 ${D.lab}일장이 서는 날. 구경하고 가요`, 3200); },
+});
+</script></body></html>
