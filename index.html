@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>swbins — 매일 하는 귀찮은 일, PC 가 대신하게 (무료 Windows 앱)</title>
-<meta name="description" content="매일 하는 귀찮은 일을 PC 가 대신하게 — Taskhand(사이트 확인·백업 자동화), 둥이로그(체험단 글 여러 곳 한 번에), Usage Tray(Claude Code 한도). 개인이 만든 무료 Windows 앱, 내 PC 안에서만 돕니다.">
+<title>swbins — 귀찮은 일은 PC 가, 쉬는 시간엔 추리 한 판 (무료 앱·웹 게임)</title>
+<meta name="description" content="개인이 만든 무료 앱과 게임. Taskhand(사이트 확인·백업 자동화)·둥이로그(체험단 글 여러 곳 한 번에)·Usage Tray(Claude Code 한도)는 내 PC 안에서만 돌고, 추리 게임 한겨울 사진관·3D 눈마을·Nameless World 는 브라우저에서 바로 해요.">
 <meta name="naver-site-verification" content="d4726741552042409e87ec8998d4827c2f618d63" />
 <link rel="canonical" href="https://swbins.github.io/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="swbins">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:url" content="https://swbins.github.io/">
-<meta property="og:title" content="swbins — 매일 하는 귀찮은 일, PC 가 대신하게 (무료 Windows 앱)">
-<meta property="og:description" content="매일 하는 귀찮은 일을 PC 가 대신하게 — Taskhand(사이트 확인·백업 자동화), 둥이로그(체험단 글 여러 곳 한 번에), Usage Tray(Claude Code 한도). 개인이 만든 무료 Windows 앱, 내 PC 안에서만 돕니다.">
+<meta property="og:title" content="swbins — 귀찮은 일은 PC 가, 쉬는 시간엔 추리 한 판 (무료 앱·웹 게임)">
+<meta property="og:description" content="개인이 만든 무료 앱과 게임. Taskhand(사이트 확인·백업 자동화)·둥이로그(체험단 글 여러 곳 한 번에)·Usage Tray(Claude Code 한도)는 내 PC 안에서만 돌고, 추리 게임 한겨울 사진관·3D 눈마을·Nameless World 는 브라우저에서 바로 해요.">
 <meta property="og:image" content="https://swbins.github.io/taskhand/assets/poster.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="spine.css">
@@ -32,10 +32,16 @@ h1 { font-size: clamp(34px, 5.4vw, 60px); line-height: 1.16; }
 .book small.lat { text-orientation: mixed; letter-spacing: .06em; }
 .book:active, .book:focus-visible { transform: translateY(-22px); }
 @media (hover: hover) { .book:hover { transform: translateY(-22px); } }
-.b1 { width: 60px; height: 268px; background: var(--spine); color: var(--on-spine); }
-.b2 { width: 72px; height: 236px; background: var(--face); }
-.b3 { width: 50px; height: 252px; background: var(--b3); }
-.b4 { width: 54px; height: 204px; background: var(--ink); color: var(--bg); }
+.b1 { width: 56px; height: 268px; background: var(--spine); color: var(--on-spine); }
+.b2 { width: 62px; height: 236px; background: var(--face); }
+.b3 { width: 46px; height: 252px; background: var(--b3); }
+.b4 { width: 46px; height: 196px; background: var(--ink); color: var(--bg); }
+.b5 { width: 54px; height: 258px; background: var(--g1); color: #F6EFE6; }
+.b6 { width: 48px; height: 228px; background: var(--g2); color: #EEF2F4; }
+.b7 { width: 58px; height: 244px; background: var(--g3); color: #FBF6E8; }
+.shelf .gap { width: 12px; flex: none; }
+:root { --g1: #8A4A3A; --g2: #4E6470; --g3: #7A6A3E; }
+:root[data-theme="dark"] { --g1: #9C5A48; --g2: #5E7682; --g3: #8C7B4C; }
 .chores { list-style: none; margin-top: 2px; }
 .chores a { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 14px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line);
             text-decoration: none; font-size: 15px; word-break: keep-all; }
@@ -89,8 +95,10 @@ h1 { font-size: clamp(34px, 5.4vw, 60px); line-height: 1.16; }
 }
 @media (max-width: 600px) {
   .shelf { height: 250px; gap: 4px; padding: 0 6px; }
-  .b1 { width: 54px; height: 236px; } .b2 { width: 62px; height: 206px; } .b3 { width: 46px; height: 222px; } .b4 { width: 48px; height: 180px; }
-  .book .v { font-size: 16px; }
+  .shelf { gap: 3px; } .shelf .gap { width: 6px; }
+  .b1,.b2,.b3,.b4,.b5,.b6,.b7 { width: calc((100% - 40px) / 7); }
+  .b1 { height: 236px; } .b2 { height: 206px; } .b3 { height: 222px; } .b4 { height: 172px; } .b5 { height: 228px; } .b6 { height: 200px; } .b7 { height: 214px; }
+  .book .v { font-size: 14px; letter-spacing: .06em; } .book small { font-size: 10px; }
   .promise div { padding: 12px 12px 14px; }
 }
 @media (prefers-reduced-motion: reduce) { .book:hover, .book:active, .book:focus-visible, .rest:hover, .rest:active { transform: none !important; } }
@@ -118,35 +126,43 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
   <div class="page">
   <section class="hero">
     <div>
-      <p class="kicker">Windows 10/11 · 무료 · 내 PC 안에서만</p>
-      <h1>매일 하는 귀찮은 일,<br><em class="keep">PC 가 대신하게</em></h1>
-      <p class="sub">개인이 만든 무료 앱입니다. 가입·광고 없이 내 PC 안에서만 돌고, AI 없이도 쓸 수 있어요.</p>
+      <p class="kicker">개인이 만든 · 무료 · 가입 없음</p>
+      <h1>귀찮은 일은 <em class="keep">PC 가 대신</em>,<br>쉬는 시간엔 <em class="keep">추리 한 판</em></h1>
+      <p class="sub">일을 덜어 주는 Windows 앱 셋과, 브라우저에서 바로 하는 게임 셋. 앱은 내 PC 안에서만 돌고, 게임은 설치 없이 폰에서도 돼요.</p>
     </div>
     <nav class="index" aria-labelledby="index-h">
-      <h2 id="index-h">이런 일을 대신합니다</h2>
+      <h2 id="index-h">책장 — 앱 셋 · 게임 셋 · 쉬어가기</h2>
       <div class="shelf" aria-hidden="true">
         <a class="book b1" href="#taskhand" tabindex="-1"><span class="v">태스크핸드</span><small class="lat">Taskhand</small></a>
         <a class="book b2" href="#dungilog" tabindex="-1"><span class="v">둥이로그</span><small>6곳 글</small></a>
         <a class="book b3" href="#usage-tray" tabindex="-1"><span class="v">한도 살피기</span><small class="lat">Usage Tray</small></a>
+        <span class="gap"></span>
+        <a class="book b5" href="hangyeoul/" tabindex="-1"><span class="v">한겨울 사진관</span><small>추리</small></a>
+        <a class="book b6" href="nunmaeul/" tabindex="-1"><span class="v">눈마을</span><small>3D 추리</small></a>
+        <a class="book b7" href="nameless-world/" tabindex="-1"><span class="v">이름 없는 곳</span><small class="lat">Nameless</small></a>
+        <span class="gap"></span>
         <a class="book b4" href="rest/" tabindex="-1"><span class="v">쉬어가기</span><small>놀이</small></a>
       </div>
       <ul class="chores">
         <li><a href="#taskhand"><span class="chore">아침마다 사이트 열어 새 주문 확인</span><span class="who">Taskhand</span></a></li>
         <li><a href="#dungilog"><span class="chore">체험단 글을 6곳에 따로 쓰기</span><span class="who">둥이로그</span></a></li>
         <li><a href="#usage-tray"><span class="chore">Claude Code 한도 살피기</span><span class="who">Usage Tray</span></a></li>
+        <li><a href="hangyeoul/play/"><span class="chore">사진 한 장으로 범인 찾기 — 바로 하기</span><span class="who">한겨울 사진관</span></a></li>
+        <li><a href="mini/village/"><span class="chore">눈 내리는 3D 마을에서 추리 — 바로 하기</span><span class="who">눈마을</span></a></li>
+        <li><a href="mini/plaza/"><span class="chore">문을 열면 다른 곳, 1~2분 놀이 — 바로 하기</span><span class="who">Nameless World</span></a></li>
       </ul>
     </nav>
   </section>
 
-  <dl class="promise" aria-label="세 앱 모두">
+  <dl class="promise" aria-label="모두 지키는 것">
     <div><dt>무료</dt><dd>유료판·개수 제한 없음</dd></div>
     <div><dt>가입 없음</dt><dd>계정·로그인 없이 바로</dd></div>
-    <div><dt>내 PC 안에서만</dt><dd>따로 서버 없이 이 PC 에서 돌아요</dd></div>
-    <div><dt>exe 하나</dt><dd>설치 과정 없이 실행</dd></div>
+    <div><dt>앱은 내 PC 안에서만</dt><dd>exe 하나, 따로 서버 없이</dd></div>
+    <div><dt>게임은 브라우저에서</dt><dd>설치 없이 폰에서도</dd></div>
   </dl>
 
   <section class="apps" aria-labelledby="apps-h">
-    <h2 id="apps-h">앱 세 개</h2>
+    <h2 id="apps-h">앱 셋 — Windows 10/11</h2>
 
     <article class="app" id="taskhand">
       <div>
@@ -192,17 +208,18 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
   </section>
 
   <section class="apps" id="play" aria-labelledby="play-h">
-    <h2 id="play-h">게임 세 개</h2>
+    <h2 id="play-h">게임 셋 — 브라우저에서 바로</h2>
 
     <article class="app" id="hangyeoul">
       <div>
         <h3><a href="hangyeoul/">한겨울 사진관</a></h3>
         <span class="tag">사진관 탐정의 추리 게임</span>
         <p>사진관 탐정 한겨울과 고양이 도토리가 되어 장소를 살피고, 사람들을 심문하고, 범인을 지목해요. 한 사건에 10~20분.</p>
-        <p class="meta">추리 · 시즌 1 열 사건 + 번외편 열 편 · 인터넷 없어도</p>
+        <p class="meta">추리 · 시즌 1 열 사건 + 번외편 열 편 · 시즌 2 는 PC 앱에서</p>
         <div class="acts">
-          <a class="btn main" href="hangyeoul/#get">받기</a>
-          <a class="btn" href="hangyeoul/">영상으로 보기</a>
+          <a class="btn main" href="hangyeoul/play/" data-goatcounter-click="home-play-hangyeoul">바로 하기</a>
+          <a class="btn" href="hangyeoul/list/">사건 목록</a>
+          <a class="btn" href="hangyeoul/">소개·앱</a>
         </div>
       </div>
       <a class="shot" href="hangyeoul/" tabindex="-1" aria-hidden="true"><img src="hangyeoul/assets/poster.jpg" alt="" loading="lazy"></a>
@@ -213,10 +230,10 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
         <h3><a href="nunmaeul/">눈마을</a></h3>
         <span class="tag">눈 내리는 3D 마을의 추리</span>
         <p>작은 눈마을을 탐정이 되어 걸으며 단서를 줍고, 미행하고, 사진으로 순간을 잡아 범인을 찍어요. 같은 사건을 하는 사람들이 마을에서 서로 보여요.</p>
-        <p class="meta">3D 추리 · 다 같이 걷기</p>
+        <p class="meta">3D 추리 · 다 같이 걷기 · PC 권장</p>
         <div class="acts">
-          <a class="btn main" href="nunmaeul/#get">받기</a>
-          <a class="btn" href="nunmaeul/">영상으로 보기</a>
+          <a class="btn main" href="mini/village/" data-goatcounter-click="home-play-nunmaeul">바로 하기</a>
+          <a class="btn" href="nunmaeul/">소개·앱</a>
         </div>
       </div>
       <a class="shot" href="nunmaeul/" tabindex="-1" aria-hidden="true"><img src="nunmaeul/assets/poster.jpg" alt="" loading="lazy"></a>
@@ -227,10 +244,10 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
         <h3><a href="nameless-world/">Nameless World</a></h3>
         <span class="tag">문을 열면 다른 곳</span>
         <p>분수 광장 둘레의 문을 골라 들어가면 포장마차, 남극 기지, 우주정거장, 조선 장터. 장소마다 1~2분이면 끝나는 놀이가 있어요.</p>
-        <p class="meta">3D 미니게임 · 다 같이 걷기</p>
+        <p class="meta">3D 미니게임 · 다 같이 걷기 · PC 권장</p>
         <div class="acts">
-          <a class="btn main" href="nameless-world/#get">받기</a>
-          <a class="btn" href="nameless-world/">영상으로 보기</a>
+          <a class="btn main" href="mini/plaza/" data-goatcounter-click="home-play-nameless">바로 하기</a>
+          <a class="btn" href="nameless-world/">소개·앱</a>
         </div>
       </div>
       <a class="shot" href="nameless-world/" tabindex="-1" aria-hidden="true"><img src="nameless-world/assets/poster.jpg" alt="" loading="lazy"></a>
