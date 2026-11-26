@@ -1060,7 +1060,7 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
       var stars = Math.max(1, 5 - st.miss); sfx(stars === 5 ? 'five' : 'solve');
       $('e-stars').textContent = '★★★★★'.slice(0, stars) + '☆☆☆☆☆'.slice(0, 5 - stars);
       $('e-rank').textContent = ['', '탐정 조수 — 실수 N번. ' + EP.pet + '가 많이 도와줬네요.', '견습 탐정 — 실수 N번.', '탐정 — 실수 N번, 제법이에요.', '일류 탐정 — 실수 한 번, 거의 완벽해요.', '명탐정 — 한 번도 틀리지 않았어요.'][stars].replace('N', st.miss);
-      /*side*/ (function () { var el = $('e-side'); if (!el) return; if (stars === 5) { try { localStorage.setItem('swbins-side-5', '1'); } catch (e) {} el.innerHTML = '<a class="btn" href="../side/5/" style="text-decoration:none;display:inline-block">★ 번외편 열림 — 「대합실 분실물 상자」</a>'; } else { el.innerHTML = '<p style="margin:0;color:var(--muted);font-size:14px">별 다섯 개(실수 없이)로 풀면 번외편 「대합실 분실물 상자」가 열려요. 「처음부터 다시」로 다시 도전!</p>'; } })(); /*/side*/
+      /*side*/ (function () { var el = $('e-side'); if (!el) return; if (stars === 5) { try { localStorage.setItem('swbins-side-5', '1'); } catch (e) {} el.innerHTML = '<a class="btn" href="https://github.com/swbins/hangyeoul/releases/latest" style="text-decoration:none;display:inline-block" data-goatcounter-click="download-hangyeoul-side">★ 번외편 「대합실 분실물 상자」 — PC 앱에서 이어져요</a>'; } else { el.innerHTML = '<p style="margin:0;color:var(--muted);font-size:14px">번외편 「대합실 분실물 상자」는 PC 앱에서 할 수 있어요(앱에서 본편을 별 다섯 개로 풀면 열려요).</p>'; } })(); /*/side*/
       if (typeof EP_PIECE !== 'undefined') (function () {
         var el = $('e-piece'); if (!el) return;
         var pc = {}; try { pc = JSON.parse(localStorage.getItem('swbins-s2-pieces') || '{}') || {}; } catch (e) { pc = {}; }
