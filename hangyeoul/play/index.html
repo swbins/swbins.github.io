@@ -825,11 +825,11 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
     { id: 'shoes', type: 'spot', title: '여덟 켤레 실내화', sub: '한 켤레만 다른 것 찾기', need: ['p_hall'], clues: ['shoes'],
       img: 'img/pz1-shoes.webp',
       q: '현관 신발장의 산장 실내화 여덟 켤레. 관리인은 9시 반엔 다 바싹 말라 있었다고 했다. 돋보기로 훑어 보고, 젖은 한 켤레를 찾아 누르세요.',
-      // targets = 베이지 한 켤레(pz1img.py 가 출력한 SHOE_T)
-      targets: [[24, 9, 27, 47]], found: ['이 켤레만 축축하다 — 회색 실오라기까지 붙어 있다!'], no: '이건 바싹 말라 있다. 다른 켤레를 보자.',
+      // targets = 옅은 베이지 한 켤레(pz1shoes_hq.py 가 출력한 SHOE_T)
+      targets: [[28, 6, 30, 38]], found: ['이 켤레만 축축하다 — 회색 실오라기까지 붙어 있다!'], no: '이건 바싹 말라 있다. 다른 켤레를 보자.',
       hints: [['cat', '킁킁… (도토리가 윗줄 앞에서 멈춘다.) 아랫줄 말고 윗줄이야. 냐.'],
-              ['cat', '하얀 것도 빨간 것도 아니야. 색이 군데군데 진하게 번진 켤레를 봐.'],
-              ['cat', '윗줄 왼쪽에서 두 번째, 베이지색 켤레. 반짝이는 물기랑 회색 실이 보여?']],
+              ['cat', '빨간 것도 까만 것도 아니야. 색이 군데군데 진하게 번진 켤레를 봐.'],
+              ['cat', '윗줄 왼쪽에서 두 번째, 옅은 베이지색 켤레. 반짝이는 물기랑 회색 실이 보여?']],
       win: [['cg', 'img/pz1-shoes.webp', '여덟 켤레 중 한 켤레만, 밑창이 젖어 있었다.'],
             ['han', '이것만 밑창이 축축해요. 회색 실오라기도 붙어 있고… 걸레 올이네요. 안쪽 이름표는 「오태석」.'],
             ['han', '다른 실내화는 바싹 말라 있어요. 청소하던 사람은 장화를 신었을 테고요.']] },
@@ -854,7 +854,7 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
     { id: 'twin', type: 'twin', title: '사진 속 작업실', sub: '7시 반 사진과 지금 — 다른 곳 다섯', need: ['p_studio'], clues: ['photo'],
       a: 'img/pz1-then.webp', b: 'img/pz1-now.webp', la: '저녁 7시 반 · 한겨울이 찍은 사진', lb: '밤 11시 · 지금',
       q: '저녁 먹기 전, 한겨울은 창밖 눈을 찍다가 작업실도 한 장 찍었다. 사진과 지금의 작업실을 견주어 다른 곳 다섯 군데를 찾으세요.',
-      targets: [[0, 7, 11, 36], [11, 80, 40, 20], [80, 56, 9, 9], [64, 90, 13, 9], [80, 16, 8, 20]],   // twin1img.py TARGETS
+      targets: [[35, 11, 37, 29], [39, 88, 48, 12], [45, 50, 14, 7], [6, 92, 14, 8], [90, 11, 8, 13]],   // twin1hq.py TARGETS
       found: ['창밖 — 7시 반엔 눈이 펑펑 내렸는데, 지금은 그쳤다. (9시쯤 그쳤다고 했지.)',
               '바닥에 젖은 발자국! 복도 쪽에서 이젤까지 이어진다.',
               '책상 서랍이 반쯤 열려 있다. 보험 증서가 든 서랍이다.',
@@ -862,8 +862,8 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
               '벽 액자가 비뚤어졌다. 어두운 데서 부딪친 걸까.'],
       no: '여기는 똑같다. 두 장을 번갈아 보자.',
       hints: [['cat', '창밖도 그림이야. 그땐 하늘에서 뭐가 내렸지? 냐.'],
-              ['cat', '바닥을 봐. 이젤 쪽으로 이어지는 얼룩, 그리고 오른쪽 아래 길쭉한 것 둘.'],
-              ['cat', '책상 위 빨간 서랍, 그리고 그 위 벽에 걸린 작은 액자. 냐아.']],
+              ['cat', '바닥을 봐. 오른쪽에서 이젤 쪽으로 이어지는 얼룩, 그리고 왼쪽 아래 길쭉한 것 둘.'],
+              ['cat', '창 아래 책상 가운데 서랍, 그리고 오른쪽 벽에 걸린 작은 액자. 냐아.']],
       win: [['han', '사진은 거짓말을 안 해요. 7시 반과 11시 사이에 누군가 이 방에 들어와 서둘러 움직였어요.'],
             ['han', '젖은 발자국… 젖은 복도를 지나온 사람이에요.']] },
 
@@ -899,8 +899,20 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
     order: function (d, seq) { return seq.length === d.cards.length && seq.every(function (x, i) { return x === i; }); },
     cipher: function (d, a) { var n = pzNorm(a); return d.answers.some(function (x) { return pzNorm(x) === n; }); },
     twin: function (d, found) { return d.targets.every(function (_, i) { return found.indexOf(i) >= 0; }); },
-    contra: function (d, got) { return d.pairs.every(function (_, i) { return got.indexOf(i) >= 0; }); }
+    contra: function (d, got) { return d.pairs.every(function (_, i) { return got.indexOf(i) >= 0; }); },
+    // 현상실(앱 전용, 11-26) — 보정(f: 밝기 b·대비 c 퍼센트, 반전 inv)이 cond 안에 들 때 누른 칸만 찾은 것으로 친다
+    darkroom: function (d, found) { return d.targets.every(function (_, i) { return found.indexOf(i) >= 0; }); },
+    // 수사 보드(앱 전용 C, 11-26) — links = [[카드 id, 카드 id], …] 에 맞는 쌍(d.pairs)이 다 있으면(순서 상관없이)
+    board: function (d, links) {
+      var key = function (p) { return p.slice().sort().join('|'); }, got = links.map(key);
+      return d.pairs.every(function (p) { return got.indexOf(key(p)) >= 0; });
+    }
   };
+  function pzDarkOk(d, f) {
+    var c = d.cond || {};
+    function inR(r, v) { return !r || (v >= r[0] && v <= r[1]); }
+    return inR(c.b, f.b) && inR(c.c, f.c) && (c.inv === undefined || !!c.inv === !!f.inv);
+  }
   function pzNorm(s) { return String(s || '').replace(/[\s·.,!?'"「」-]/g, '').toUpperCase(); }
   function pzHit(t, x, y) { for (var i = 0; i < t.length; i++) { var r = t[i]; if (x >= r[0] && x <= r[0] + r[2] && y >= r[1] && y <= r[1] + r[3]) return i; } return -1; }
   /* combine: 가방 물건 a 와 물건/대상 b — recipes: [a, b, 결과 물건 id 또는 '!' (목표), 말, 남길 것('a'·'b'·'ab')] */
@@ -960,6 +972,15 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
     + '.pz-zb{display:block;margin:0 0 6px auto;background:var(--face,#E2E8D8);border:0;box-shadow:inset -4px 0 0 var(--spine,#2F3A3A);padding:7px 12px;font-size:13px;font-family:inherit;color:var(--ink,#2A3324)}'
     + '.pz-cnt{margin:0 0 8px;font-size:13px;color:var(--sub,#5A6650)}.pz-h4{margin:10px 0 4px;font-size:13px;font-weight:700;color:var(--sub,#5A6650)}'
     + '.pz-twin{display:grid;grid-template-columns:1fr;gap:8px}@media (min-width:620px){.pz-twin{grid-template-columns:1fr 1fr}}'
+    + '.pz-dr{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 8px;padding:8px 10px;background:#1d1a17;color:#f3e6cf;border-radius:6px;font-size:13px}'
+    + '.pz-dr label{display:flex;align-items:center;gap:6px}.pz-dr input[type=range]{width:120px;accent-color:#d9534f}.pz-dr output{min-width:3.2em;font-variant-numeric:tabular-nums}'
+    + '.pz-dr-reset{margin-left:auto;background:transparent;color:#f3e6cf;border:1px solid #f3e6cf55;padding:4px 10px;font-family:inherit;font-size:12px}'
+    + '.pz-board{position:relative;height:440px;border-radius:8px;background:#b8875a radial-gradient(circle at 30% 20%,#c99a6b 0,#a87547 70%);box-shadow:inset 0 0 0 10px #6b4426,inset 0 0 30px #0005;touch-action:none;user-select:none;overflow:hidden}'
+    + '.pz-bd-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.pz-thread{stroke:#c0392b;stroke-width:3;stroke-linecap:round}.pz-thread.temp{stroke-dasharray:6 5;opacity:.8}'
+    + '.pz-board .pz-card{display:block;flex-direction:column;position:absolute;width:28%;max-width:190px;padding:16px 10px 10px;background:#fbf6ea;border:0;box-shadow:2px 3px 6px #0006;text-align:left;font-family:inherit;color:#2a2a2a;cursor:grab}'
+    + '.pz-card i{position:absolute;top:4px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#d9534f;box-shadow:0 1px 2px #0007}'
+    + '.pz-card b{display:block;font-size:13px;margin-bottom:3px}.pz-card span{display:block;font-size:11.5px;line-height:1.4;color:#555}.pz-card.on{outline:3px solid #f1c40f}'
+    + '@media (max-width:620px){.pz-board{height:520px}.pz-card{width:42%}.pz-card span{font-size:11px}}'
     + '.pz-tw{margin:0}.pz-tw figcaption{font-size:12px;font-weight:700;color:var(--sub,#5A6650);margin:0 0 3px}'
     + '.pz-in input{width:100%;font-size:18px;padding:10px 12px;border:0;border-bottom:2px solid var(--ink,#2A3324);border-radius:0;background:var(--face2,#FAFBF7);color:var(--ink,#2A3324);font-family:inherit}';
 
@@ -968,7 +989,8 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
   function pzById(id) { for (var i = 0; i < PZ.length; i++) if (PZ[i].id === id) return PZ[i]; return null; }
   function pzInit() {
     /* 퍼즐이 주는 단서는 장소 대사에서 빼 둔다(퍼즐을 풀어야 수첩에 적힘) */
-    var take = {}; PZ.forEach(function (d) { d.clues.forEach(function (c) { take[c] = 1; }); });
+    var take = {}; PZ.concat(PZ_LT).forEach(function (d) { (d.clues || []).forEach(function (c) { take[c] = 1; }); });
+    if (PZ_LT.length) setTimeout(function () { var n = pzLtNew(); if (n) toast('📮 새 편지 ' + n + '통이 왔어요'); }, 800);
     Object.keys(S).forEach(function (k) {
       [S[k], S[k].win, S[k].sum].forEach(function (o) { if (o && o.clues) o.clues = o.clues.filter(function (c) { return !take[c]; }); });
     });
@@ -1024,7 +1046,47 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
     PZ_UI[d.type](d, pzEl.body);
     pzSays(); pzBar(); pzEl.w.hidden = false; pzEl.x.focus();
   }
+  /* ── 하루 한 통(앱 전용 B, 11-26) — 화 데이터에 var LETTERS = [{ id, day, from, title, need, lines, clues }] 가 있으면
+     처음 연 날(st.day0)부터 day 일 지나야 편지가 온다. 옵션 「편지 바로 받기」(swbins-letters-now, 기본 끔)면 바로 다. */
+  var PZ_LT = typeof LETTERS !== 'undefined' ? LETTERS : [];
+  function pzToday() { var t = new Date(); return t.getFullYear() + '-' + ('0' + (t.getMonth() + 1)).slice(-2) + '-' + ('0' + t.getDate()).slice(-2); }
+  function pzDays() {
+    if (!st.day0) { st.day0 = pzToday(); save(); }
+    var a = st.day0.split('-'), b = pzToday().split('-');
+    return Math.round((new Date(b[0], b[1] - 1, b[2]) - new Date(a[0], a[1] - 1, a[2])) / 864e5);
+  }
+  function pzNow() { try { return localStorage.getItem('swbins-letters-now') === '1'; } catch (e) { return false; } }
+  function pzLtReady(L) { return pzNow() || pzDays() >= L.day; }
+  function pzLtNeed(L) { return (L.need || []).every(function (k) { return st.seen[k] || st.asked[k] || st.clues.indexOf(k) >= 0; }); }
+  function pzLtTiles(pl) {
+    if (!st.lt) st.lt = {};
+    var next = null;
+    PZ_LT.forEach(function (L) {
+      if (!pzLtNeed(L)) return;
+      if (!pzLtReady(L)) { if (!next || L.day < next.day) next = L; return; }
+      var read = st.lt[L.id], b = document.createElement('button'); b.type = 'button';
+      b.className = 'tile pzt' + (read ? ' clear' : '');
+      b.innerHTML = '<i class="dot"></i><b></b><span></span>';
+      b.querySelector('b').textContent = '📮 ' + L.title; b.querySelector('span').textContent = read ? '읽었다' : L.from + ' 에게서 편지가 왔다';
+      b.addEventListener('click', function () {
+        play(L.lines, function () { if (!st.lt[L.id]) { st.lt[L.id] = 1; gain(L.clues || []); save(); } hub(); });
+      });
+      pl.appendChild(b);
+    });
+    if (next) {
+      var w = document.createElement('div'); w.className = 'tile pzt'; w.setAttribute('aria-disabled', 'true'); w.style.opacity = '.6';
+      var left = next.day - pzDays();
+      w.innerHTML = '<i class="dot"></i><b></b><span></span>';
+      w.querySelector('b').textContent = '📮 다음 편지';
+      w.querySelector('span').textContent = (left <= 1 ? '내일' : left + '일 뒤') + ' 도착 · 옵션에서 「바로 다」로 바꿀 수 있어요';
+      pl.appendChild(w);
+    }
+  }
+  function pzLtNew() { if (!st.lt) st.lt = {}; return PZ_LT.filter(function (L) { return pzLtNeed(L) && pzLtReady(L) && !st.lt[L.id]; }).length; }
+  if (typeof window !== 'undefined') window.pzLetters = function () { try { hub(); } catch (e) {} };   // 옵션에서 바꾸면 목록 다시
+
   function pzTiles(pl) {
+    pzLtTiles(pl);
     PZ.forEach(function (d) {
       var ok = (d.need || []).every(function (k) { return st.seen[k] || st.asked[k] || st.clues.indexOf(k) >= 0; });   // 장소 키 · 물어본 질문 키(예: seo0) · 가진 단서 id
       if (!ok) return;
@@ -1127,6 +1189,101 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
         pzMsg((d.found && d.found[i]) || '찾았다!');
         if (PZ_CHECK.spot(d, found)) setTimeout(pzDone, 700);
       }, function () { pzMsg(d.no || '여기는 아니다.', true); }));
+      pzEl.ok.hidden = true;
+    },
+    darkroom: function (d, body) {
+      // 현상실 — 어두운·흐린 사진을 밝기·대비·반전으로 보정해 숨은 것을 찾는다. 보정이 맞아야 그 칸이 「보인다」
+      var found = [], f = { b: 100, c: 100, inv: false };
+      var zw = pzEls('<div class="pz-zoomw"></div>'), zb = pzEls('<button type="button" class="pz-zb">🔍 크게 보기</button>');
+      zb.addEventListener('click', function () { var big = zw.classList.toggle('big'); zb.textContent = big ? '↙ 원래 크기' : '🔍 크게 보기'; });
+      var pic = pzPic(d.img, d.targets, function (i) {
+        if (!pzDarkOk(d, f)) { pic.lastChild.remove(); pzMsg(d.dark || '어두워서 뭐가 있는지 모르겠다. 보정을 바꿔 보자.', true); return; }
+        if (found.indexOf(i) < 0) found.push(i); sfx('clue');
+        pzMsg((d.found && d.found[i]) || '보였다!');
+        if (PZ_CHECK.darkroom(d, found)) setTimeout(pzDone, 700);
+      }, function () { pzMsg(d.no || '여기는 아니다.', true); });
+      var tools = pzEls('<div class="pz-dr">'
+        + '<label>☀ 밝기 <input type="range" min="40" max="300" step="5" value="100" data-k="b"><output>100%</output></label>'
+        + '<label>◐ 대비 <input type="range" min="40" max="300" step="5" value="100" data-k="c"><output>100%</output></label>'
+        + '<label class="pz-dr-inv"><input type="checkbox" data-k="inv"> 음화 반전</label>'
+        + '<button type="button" class="pz-dr-reset">처음대로</button></div>');
+      function apply() {
+        var flt = 'brightness(' + f.b + '%) contrast(' + f.c + '%)' + (f.inv ? ' invert(1)' : '');
+        pic.querySelector('img').style.filter = flt; pic.querySelector('.pz-lens').style.filter = flt;
+        tools.querySelectorAll('input[type=range]').forEach(function (r) { r.nextElementSibling.textContent = r.value + '%'; });
+      }
+      tools.addEventListener('input', function (e) {
+        var k = e.target.getAttribute('data-k'); if (!k) return;
+        f[k] = k === 'inv' ? e.target.checked : +e.target.value; apply();
+      });
+      tools.querySelector('.pz-dr-reset').addEventListener('click', function () {
+        f = { b: 100, c: 100, inv: false };
+        tools.querySelectorAll('input[type=range]').forEach(function (r) { r.value = 100; });
+        tools.querySelector('input[type=checkbox]').checked = false; apply();
+      });
+      body.appendChild(tools); body.appendChild(zb); body.appendChild(zw); zw.appendChild(pic);
+      pzEl.ok.hidden = true;
+    },
+    board: function (d, body) {
+      // 수사 보드 — 코르크판 위 단서 카드를 끌어(또는 눌러서 둘) 실로 잇는다. 맞는 쌍만 실이 남는다
+      var links = [], from = null, drag = null;
+      var wrap = pzEls('<div class="pz-board"><svg class="pz-bd-svg"></svg></div>'), svg = wrap.querySelector('svg');
+      var NS = 'http://www.w3.org/2000/svg';
+      d.cards.forEach(function (c, i) {
+        var el = pzEls('<button type="button" class="pz-card"><i></i><b></b><span></span></button>');
+        el.dataset.id = c.id; el.style.left = c.x + '%'; el.style.top = c.y + '%';
+        el.style.transform = 'rotate(' + ((i * 37 % 7) - 3) + 'deg)';
+        el.querySelector('b').textContent = c.title; el.querySelector('span').textContent = c.text || '';
+        wrap.appendChild(el);
+      });
+      function center(id) {
+        var el = wrap.querySelector('.pz-card[data-id="' + id + '"]'), r = el.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+        return { x: r.left - w.left + r.width / 2, y: r.top - w.top + 10 };
+      }
+      function line(a, b, cls) {
+        var l = document.createElementNS(NS, 'line'); l.setAttribute('class', cls || 'pz-thread');
+        l.setAttribute('x1', a.x); l.setAttribute('y1', a.y); l.setAttribute('x2', b.x); l.setAttribute('y2', b.y);
+        svg.appendChild(l); return l;
+      }
+      function redraw() {
+        svg.innerHTML = '';
+        links.forEach(function (p) { line(center(p[0]), center(p[1])); });
+      }
+      function pick(el) { wrap.querySelectorAll('.pz-card.on').forEach(function (x) { x.classList.remove('on'); }); if (el) el.classList.add('on'); }
+      function tryLink(a, b) {
+        if (!a || !b || a === b) return;
+        var k = [a, b].sort().join('|');
+        if (links.some(function (p) { return p.slice().sort().join('|') === k; })) return;
+        var hit = -1; d.pairs.forEach(function (p, i) { if (p.slice().sort().join('|') === k) hit = i; });
+        if (hit < 0) { sfx('bad'); pzMsg(d.no || '두 단서는 이어지지 않는다.', true); return; }
+        links.push([a, b]); redraw(); sfx('clue');
+        pzMsg((d.found && d.found[hit]) || '이어졌다!');
+        if (PZ_CHECK.board(d, links)) setTimeout(pzDone, 900);
+      }
+      wrap.addEventListener('pointerdown', function (e) {
+        var el = e.target.closest('.pz-card'); if (!el) return;
+        e.preventDefault(); drag = { id: el.dataset.id, moved: false, l: null };
+        try { wrap.setPointerCapture(e.pointerId); } catch (_) {}
+      });
+      wrap.addEventListener('pointermove', function (e) {
+        if (!drag) return;
+        var w = wrap.getBoundingClientRect(), p = { x: e.clientX - w.left, y: e.clientY - w.top };
+        if (!drag.l) { drag.l = line(center(drag.id), p, 'pz-thread temp'); drag.moved = true; }
+        drag.l.setAttribute('x2', p.x); drag.l.setAttribute('y2', p.y);
+      });
+      wrap.addEventListener('pointerup', function (e) {
+        if (!drag) return;
+        var g = drag; drag = null; if (g.l) g.l.remove();
+        var under = document.elementFromPoint(e.clientX, e.clientY), el = under && under.closest('.pz-card');
+        if (g.moved && el && el.dataset.id !== g.id) { pick(null); from = null; tryLink(g.id, el.dataset.id); return; }
+        if (!g.moved) {                                // 눌러서 잇기 — 하나 고르고 다른 하나
+          if (from && from !== g.id) { var a = from; from = null; pick(null); tryLink(a, g.id); }
+          else { from = from === g.id ? null : g.id; pick(from ? wrap.querySelector('.pz-card[data-id="' + g.id + '"]') : null); }
+        }
+      });
+      window.addEventListener('resize', redraw);
+      body.appendChild(pzEls('<p class="pz-cnt">카드를 끌어 다른 카드에 놓거나, 두 장을 차례로 누르면 실로 이어요. 맞는 쌍 ' + d.pairs.length + '개.</p>'));
+      body.appendChild(wrap);
       pzEl.ok.hidden = true;
     },
     diff: function (d, body) {
