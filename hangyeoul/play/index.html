@@ -43,6 +43,10 @@ a { color: inherit; text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 [data-theme="dark"] .bg, [data-theme="dark"] .stage img, [data-theme="dark"] .board img, [data-theme="dark"] .report img, [data-theme="dark"] .pz img { filter: brightness(.9); }
 .game { position: relative; height: 100dvh; display: grid; grid-template-columns: minmax(0, 1fr) var(--sp); }
+/* 대사를 연달아 누르면 글자·그림이 파랗게 선택되던 것 막기(11-26) — 결과 공유 글(.slip-t)·입력칸만 선택 허용 */
+.game, .board { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.game img, .board img { -webkit-user-drag: none; }
+.game input, .game textarea, .board input, .board textarea { -webkit-user-select: text; user-select: text; }
 .gm { position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
 
 /* ── 책등 — 오른쪽 세로 띠, 사건 장소를 세워 쓴다. 화면이 바뀌어도 움직이지 않는다 ── */
