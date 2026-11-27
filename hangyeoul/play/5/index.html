@@ -43,6 +43,10 @@ a { color: inherit; text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 [data-theme="dark"] .bg, [data-theme="dark"] .stage img, [data-theme="dark"] .board img, [data-theme="dark"] .report img, [data-theme="dark"] .pz img { filter: brightness(.9); }
 .game { position: relative; height: 100dvh; display: grid; grid-template-columns: minmax(0, 1fr) var(--sp); }
+/* 대사를 연달아 누르면 글자·그림이 파랗게 선택되던 것 막기(11-26) — 결과 공유 글(.slip-t)·입력칸만 선택 허용 */
+.game, .board { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.game img, .board img { -webkit-user-drag: none; }
+.game input, .game textarea, .board input, .board textarea { -webkit-user-select: text; user-select: text; }
 .gm { position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
 
 /* ── 책등 — 오른쪽 세로 띠, 사건 장소를 세워 쓴다. 화면이 바뀌어도 움직이지 않는다 ── */
@@ -101,8 +105,13 @@ a { color: inherit; text-underline-offset: 3px; }
 .locked .stage > .layer:not(#L-lock), .locked .bar > button { display: none !important; }
 
 /* ═════════ 2. 대화 — 위 장소 띠, 서 있는 인물 크게, 아래 대사 판 ═════════ */
-.stage:has(> #L-talk:not([hidden])) > .bg { bottom: auto; height: 36%; border-bottom: 3px solid var(--ink); }
-.who-pic { position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 96px; height: min(calc(100% - 108px), 920px); max-width: 100%; object-fit: contain; object-position: 50% 100%; pointer-events: none; }
+/* 장소 그림을 화면 전체에 깔고 인물이 그 안에 서게(위 띠 + 빈 판이면 오려 붙인 티가 났다, 11-26) */
+.stage:has(> #L-talk:not([hidden])) > .bg { filter: brightness(.86) saturate(.95); }
+.stage > #L-talk:not([hidden]) { background: linear-gradient(to bottom, rgba(0,0,0,0) 45%, rgba(0,0,0,.28)); }
+.who-pic { position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 96px; height: min(calc(100% - 108px), 920px); max-width: 100%; object-fit: contain; object-position: 50% 100%; pointer-events: none;
+  filter: drop-shadow(0 0 1.2px rgba(20,24,18,.55)) drop-shadow(0 14px 22px rgba(0,0,0,.35)); }
+/* 허리 아래 잘린 단은 대사 판 쪽으로 흐리게 */
+.who-pic:not(.cat) { -webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent 99%); mask-image: linear-gradient(to bottom, #000 80%, transparent 99%); }
 .who-pic.cat { height: min(34%, 300px); bottom: 150px; }
 .who-pic[hidden] { display: block; opacity: 0; }
 .who-pic.enter { animation: whoin .32s cubic-bezier(.2, .8, .2, 1); }
@@ -124,7 +133,7 @@ a { color: inherit; text-underline-offset: 3px; }
 .box .next { position: absolute; right: 16px; bottom: 9px; font-size: 12px; line-height: 1; color: var(--sub); }
 .box .next[hidden] { display: none; }
 /* 질문 목록 — 대사 판 바로 위, 줄로만 나눔 */
-.choices { position: absolute; z-index: 5; left: 0; right: 0; bottom: 150px; max-height: calc(100% - 170px); overflow-y: auto; display: flex; flex-direction: column; background: var(--bg); border-top: 3px solid var(--ink); }
+.choices { position: absolute; z-index: 5; left: 0; right: 0; bottom: 150px; max-height: calc(100% - 170px); overflow-y: auto; display: flex; flex-direction: column; background: var(--bg); box-shadow: 0 -44px 40px -8px var(--bg); }   /* 위 먹선 대신 부드럽게(11-26) */
 .choices[hidden] { display: none; }
 .choices button { display: flex; gap: 12px; align-items: baseline; padding: 12px 18px 12px 16px; border-bottom: 1px solid var(--line); font-size: 16px; line-height: 1.5; text-align: left; box-shadow: inset -4px 0 0 var(--spine); transition: transform .15s, box-shadow .15s; }
 .choices button:active { transform: translateX(-6px); box-shadow: inset -10px 0 0 var(--spine); }
@@ -490,17 +499,17 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
 
   /* ════════ 화별 데이터 블록 (옛 페이지에서 그대로 옮김) ════════ */
   var P = {
-    han:   { name: '한겨울', img: '../img/det.webp' },
+    han:   { name: '한겨울', img: '../img/w1/han.webp' },
     cat:   { name: '도토리', img: '../img/cat.webp' },
-    park:  { name: '박 역장', img: '../img/park.webp' },
-    jin:   { name: '도진우', img: '../img/jin.webp', role: '철도공사 · 폐역 담당', bg: 'waiting' },
-    hayun: { name: '박하윤', img: '../img/hayun.webp', role: '역장의 손녀', bg: 'platform' },
-    gil:   { name: '길태수', img: '../img/gil.webp', role: '철도 사진가', bg: 'platform' },
-    cheolmin:{ name: '곽철민', img: '../img/cheolmin5.webp', role: '철도공사 선로 보수원', bg: 'platform' },
-    giseok:  { name: '엄기석', img: '../img/giseok5.webp', role: '역 앞 택시 기사', bg: 'waiting' },
-    taeho:   { name: '문태호', img: '../img/taeho5.webp', role: '국숫집 주인의 조카', bg: 'noodle' },
-    sea:     { name: '류세아', img: '../img/sea5.webp', role: '폐역 뒤 카페 들어올 사업자', bg: 'waiting' },
-    ok:    { name: '문옥자', img: '../img/ok.webp', role: '역 앞 국숫집 주인', bg: 'noodle' }
+    park:  { name: '박 역장', img: '../img/w5/park.webp' },
+    jin:   { name: '도진우', img: '../img/w5/jin.webp', role: '철도공사 · 폐역 담당', bg: 'waiting' },
+    hayun: { name: '박하윤', img: '../img/w5/hayun.webp', role: '역장의 손녀', bg: 'platform' },
+    gil:   { name: '길태수', img: '../img/w5/gil.webp', role: '철도 사진가', bg: 'platform' },
+    cheolmin:{ name: '곽철민', img: '../img/w5/cheolmin5.webp', role: '철도공사 선로 보수원', bg: 'platform' },
+    giseok:  { name: '엄기석', img: '../img/w5/giseok5.webp', role: '역 앞 택시 기사', bg: 'waiting' },
+    taeho:   { name: '문태호', img: '../img/w5/taeho5.webp', role: '국숫집 주인의 조카', bg: 'noodle' },
+    sea:     { name: '류세아', img: '../img/w5/sea5.webp', role: '폐역 뒤 카페 들어올 사업자', bg: 'waiting' },
+    ok:    { name: '문옥자', img: '../img/w5/ok.webp', role: '역 앞 국숫집 주인', bg: 'noodle' }
   };
   var BG = { platform: '../img/platform.webp', waiting: '../img/waiting.webp', noodle: '../img/noodle.webp', signal: '../img/signal.webp' };
   var HOME_BG = 'waiting', DED_BG = 'waiting';
