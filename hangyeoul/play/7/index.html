@@ -43,6 +43,10 @@ a { color: inherit; text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 [data-theme="dark"] .bg, [data-theme="dark"] .stage img, [data-theme="dark"] .board img, [data-theme="dark"] .report img, [data-theme="dark"] .pz img { filter: brightness(.9); }
 .game { position: relative; height: 100dvh; display: grid; grid-template-columns: minmax(0, 1fr) var(--sp); }
+/* 대사를 연달아 누르면 글자·그림이 파랗게 선택되던 것 막기(11-26) — 결과 공유 글(.slip-t)·입력칸만 선택 허용 */
+.game, .board { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.game img, .board img { -webkit-user-drag: none; }
+.game input, .game textarea, .board input, .board textarea { -webkit-user-select: text; user-select: text; }
 .gm { position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
 
 /* ── 책등 — 오른쪽 세로 띠, 사건 장소를 세워 쓴다. 화면이 바뀌어도 움직이지 않는다 ── */
@@ -101,8 +105,13 @@ a { color: inherit; text-underline-offset: 3px; }
 .locked .stage > .layer:not(#L-lock), .locked .bar > button { display: none !important; }
 
 /* ═════════ 2. 대화 — 위 장소 띠, 서 있는 인물 크게, 아래 대사 판 ═════════ */
-.stage:has(> #L-talk:not([hidden])) > .bg { bottom: auto; height: 36%; border-bottom: 3px solid var(--ink); }
-.who-pic { position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 96px; height: min(calc(100% - 108px), 920px); max-width: 100%; object-fit: contain; object-position: 50% 100%; pointer-events: none; }
+/* 장소 그림을 화면 전체에 깔고 인물이 그 안에 서게(위 띠 + 빈 판이면 오려 붙인 티가 났다, 11-26) */
+.stage:has(> #L-talk:not([hidden])) > .bg { filter: brightness(.86) saturate(.95); }
+.stage > #L-talk:not([hidden]) { background: linear-gradient(to bottom, rgba(0,0,0,0) 45%, rgba(0,0,0,.28)); }
+.who-pic { position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 96px; height: min(calc(100% - 108px), 920px); max-width: 100%; object-fit: contain; object-position: 50% 100%; pointer-events: none;
+  filter: drop-shadow(0 0 1.2px rgba(20,24,18,.55)) drop-shadow(0 14px 22px rgba(0,0,0,.35)); }
+/* 허리 아래 잘린 단은 대사 판 쪽으로 흐리게 */
+.who-pic:not(.cat) { -webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent 99%); mask-image: linear-gradient(to bottom, #000 80%, transparent 99%); }
 .who-pic.cat { height: min(34%, 300px); bottom: 150px; }
 .who-pic[hidden] { display: block; opacity: 0; }
 .who-pic.enter { animation: whoin .32s cubic-bezier(.2, .8, .2, 1); }
@@ -124,7 +133,7 @@ a { color: inherit; text-underline-offset: 3px; }
 .box .next { position: absolute; right: 16px; bottom: 9px; font-size: 12px; line-height: 1; color: var(--sub); }
 .box .next[hidden] { display: none; }
 /* 질문 목록 — 대사 판 바로 위, 줄로만 나눔 */
-.choices { position: absolute; z-index: 5; left: 0; right: 0; bottom: 150px; max-height: calc(100% - 170px); overflow-y: auto; display: flex; flex-direction: column; background: var(--bg); border-top: 3px solid var(--ink); }
+.choices { position: absolute; z-index: 5; left: 0; right: 0; bottom: 150px; max-height: calc(100% - 170px); overflow-y: auto; display: flex; flex-direction: column; background: var(--bg); box-shadow: 0 -44px 40px -8px var(--bg); }   /* 위 먹선 대신 부드럽게(11-26) */
 .choices[hidden] { display: none; }
 .choices button { display: flex; gap: 12px; align-items: baseline; padding: 12px 18px 12px 16px; border-bottom: 1px solid var(--line); font-size: 16px; line-height: 1.5; text-align: left; box-shadow: inset -4px 0 0 var(--spine); transition: transform .15s, box-shadow .15s; }
 .choices button:active { transform: translateX(-6px); box-shadow: inset -10px 0 0 var(--spine); }
@@ -490,16 +499,16 @@ apply();setInterval(apply,60000);if(mq&&mq.addEventListener)mq.addEventListener(
 
   /* ════════ 화별 데이터 블록 (옛 페이지에서 그대로 옮김) ════════ */
   var P = {
-    han:     { name: '한겨울', img: '../img/det.webp' },
+    han:     { name: '한겨울', img: '../img/w1/han.webp' },
     cat:     { name: '도토리', img: '../img/cat.webp' },
-    hajun:   { name: '도하준', img: '../img/hajun.webp', role: '결선 참가자 · 호텔 파티시에', bg: 'bakery' },
-    jiun:    { name: '석지운', img: '../img/jiun.webp', role: '공동 심사위원 · 음식 평론가', bg: 'judgeroom' },
-    eunbyul: { name: '노은솔', img: '../img/eunbyul.webp', role: '손녀 · 대회 생중계 담당', bg: 'bakery' },
-    misook:  { name: '정미숙', img: '../img/misook.webp', role: '매장 실장 · 30년', bg: 'bkitchen' },
-    minseo:  { name: '여민서', img: '../img/minseo7.webp', role: '결선 참가자 · 동네 카페 사장', bg: 'bakery' },
-    seongchan:{ name: '구성찬', img: '../img/seongchan7.webp', role: '지역 방송 카메라 기사', bg: 'bakery' },
-    yerin:   { name: '하예린', img: '../img/yerin7.webp', role: '계산대 아르바이트', bg: 'bakery' },
-    sanggu:  { name: '탁상구', img: '../img/sanggu7.webp', role: '건너편 「달빛 베이커리」 사장', bg: 'bakery' }
+    hajun:   { name: '도하준', img: '../img/w7/hajun.webp', role: '결선 참가자 · 호텔 파티시에', bg: 'bakery' },
+    jiun:    { name: '석지운', img: '../img/w7/jiun.webp', role: '공동 심사위원 · 음식 평론가', bg: 'judgeroom' },
+    eunbyul: { name: '노은솔', img: '../img/w7/eunbyul.webp', role: '손녀 · 대회 생중계 담당', bg: 'bakery' },
+    misook:  { name: '정미숙', img: '../img/w7/misook.webp', role: '매장 실장 · 30년', bg: 'bkitchen' },
+    minseo:  { name: '여민서', img: '../img/w7/minseo7.webp', role: '결선 참가자 · 동네 카페 사장', bg: 'bakery' },
+    seongchan:{ name: '구성찬', img: '../img/w7/seongchan7.webp', role: '지역 방송 카메라 기사', bg: 'bakery' },
+    yerin:   { name: '하예린', img: '../img/w7/yerin7.webp', role: '계산대 아르바이트', bg: 'bakery' },
+    sanggu:  { name: '탁상구', img: '../img/w7/sanggu7.webp', role: '건너편 「달빛 베이커리」 사장', bg: 'bakery' }
   };
   var BG = { bakery: '../img/bakery.webp', judgeroom: '../img/judgeroom.webp', bkitchen: '../img/bkitchen.webp' };
   var HOME_BG = 'bakery', DED_BG = 'bakery';
